@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>UTC Cinemas</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+</head>
+<body>
+<div class="top-bar">
+    <div class="logo-container">
+        <img src="/image/logo.png" alt="UTC Cinemas Logo">
+        <h2>UTC Cinemas</h2>
+    </div>
+    <h4 id="welcomeUser">Chào mừng...</h4>
+</div>
+
+<div class="container">
+    <aside class="aside">
+        <ul>
+            <li onclick="navigateTo('/utc-cinemas/home')">
+                <span class="iconify" data-icon="ph:house-line" data-inline="true"></span> Trang chủ
+            </li>
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/movies')">
+                <span class="iconify" data-icon="ph:film-strip" data-inline="true"></span> Quản lý phim
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/showtimes')">
+                <span class="iconify" data-icon="ph:calendar-check" data-inline="true"></span> Quản lý suất chiếu
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/bookings')">
+                <span class="iconify" data-icon="ph:ticket" data-inline="true"></span> Quản lý đặt vé
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/users')">
+                <span class="iconify" data-icon="ph:user-circle" data-inline="true"></span> Quản lý người dùng
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/reports')">
+                <span class="iconify" data-icon="ph:chart-bar" data-inline="true"></span> Thống kê báo cáo
+            </li>
+        </ul>
+        <button id="logoutBtn">Đăng xuất</button>
+    </aside>
+
+    <div class="main-content">
+        <div class="content-box">
+            <div class="edit-header">
+                <h2>Thêm phim mới</h2>
+                <div class="edit-actions">
+                    <button onclick="navigateTo('/utc-cinemas/movies')">
+                        Quay lại
+                    </button>
+                </div>
+            </div>
+
+            <div class="edit-container">
+                <form id="movieForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="title">Tên phim <span class="required">*</span></label>
+                            <input type="text" id="title" name="title" maxlength="255">
+                            <div class="error-message" id="title-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="genre">Thể loại <span class="required">*</span></label>
+                            <input type="text" id="genre" name="genre" maxlength="255">
+                            <div class="error-message" id="genre-error"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="duration">Thời lượng (phút) <span class="required">*</span></label>
+                            <input type="number" id="duration" name="duration" min="1">
+                            <div class="error-message" id="duration-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="releaseDate">Ngày phát hành <span class="required">*</span></label>
+                            <input type="datetime-local" id="releaseDate" name="releaseDate">
+                            <div class="error-message" id="releaseDate-error"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rating">Xếp hạng <span class="required">*</span></label>
+                            <select id="rating" name="rating">
+                                <option value="">Chọn xếp hạng</option>
+                                <option value="1">1 ⭐</option>
+                                <option value="2">2 ⭐⭐</option>
+                                <option value="3">3 ⭐⭐⭐</option>
+                                <option value="4">4 ⭐⭐⭐⭐</option>
+                                <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                            </select>
+                            <div class="error-message" id="rating-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Trạng thái <span class="required">*</span></label>
+                            <select id="status" name="status">
+                                <option value="">Chọn trạng thái</option>
+                                <option value="0">Sắp chiếu</option>
+                                <option value="1">Đang chiếu</option>
+                                <option value="2">Đã chiếu</option>
+                            </select>
+                            <div class="error-message" id="status-error"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Mô tả <span class="required">*</span></label>
+                        <textarea id="description" name="description" rows="4"></textarea>
+                        <div class="error-message" id="description-error"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/movies')">Hủy bỏ</button>
+                        <button type="submit" id="saveBtn">Lưu phim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/javascript/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePage();
+        document.getElementById('movieForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    function initializePage() {
+        checkToken();
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        setDefaultDateTime();
+        document.getElementById('status').value = '0';
+    }
+
+    function setDefaultDateTime() {
+        const now = new Date();
+        const offset = 7 * 60 * 60 * 1000;
+        const localTime = new Date(now.getTime() + offset);
+        document.getElementById('releaseDate').value = localTime.toISOString().slice(0, 16);
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        clearErrorMessages();
+
+        if (!validateForm()) return;
+        await submitFormData();
+    }
+
+    function clearErrorMessages() {
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    }
+
+    function validateForm() {
+        const validationRules = [
+            { id: 'title', validation: value => value.trim() !== '', message: 'Vui lòng nhập tên phim' },
+            { id: 'genre', validation: value => value !== '', message: 'Vui lòng chọn thể loại' },
+            { id: 'duration', validation: value => value > 0, message: 'Vui lòng nhập thời lượng hợp lệ' },
+            { id: 'releaseDate', validation: value => value !== '', message: 'Vui lòng chọn ngày phát hành' },
+            { id: 'rating', validation: value => value !== '', message: 'Vui lòng chọn xếp hạng' },
+            { id: 'status', validation: value => value !== '' || value === '0', message: 'Vui lòng chọn trạng thái' },
+            { id: 'description', validation: value => value.trim() !== '', message: 'Vui lòng nhập mô tả phim' }
+        ];
+
+        let isValid = true;
+
+        validationRules.forEach(rule => {
+            const field = document.getElementById(rule.id);
+            const errorElement = document.getElementById(`${rule.id}-error`);
+
+            if (!rule.validation(field.value)) {
+                errorElement.textContent = rule.message;
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    async function submitFormData() {
+        try {
+            const formData = getFormData();
+            const response = await httpRequest('/api/admin/movies/create', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
+            handleApiResponse(response);
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+            showModal('error', 'Lỗi!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+        }
+    }
+
+    function getFormData() {
+        return {
+            title: document.getElementById('title').value.trim(),
+            genre: document.getElementById('genre').value,
+            duration: parseInt(document.getElementById('duration').value),
+            description: document.getElementById('description').value.trim(),
+            releaseDate: document.getElementById('releaseDate').value,
+            rating: parseInt(document.getElementById('rating').value),
+            status: parseInt(document.getElementById('status').value)
+        };
+    }
+
+    function handleApiResponse(response) {
+        if (response.code === 1) {
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/movies');
+        } else {
+            showModal('error', 'Ôi xong!', response.message);
+        }
+    }
+</script>
+</body>
+</html>

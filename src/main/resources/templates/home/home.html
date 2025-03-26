@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>UTC Cinemas</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+</head>
+<body>
+<div class="top-bar">
+    <div class="logo-container">
+        <img src="/image/logo.png" alt="UTC Cinemas Logo">
+        <h2>UTC Cinemas</h2>
+    </div>
+    <h4 id="welcomeUser">Chào mừng...</h4>
+</div>
+
+<div class="container">
+    <aside class="aside">
+        <ul>
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/home')">
+                <span class="iconify" data-icon="ph:house-line"></span> Trang chủ
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/movies')">
+                <span class="iconify" data-icon="ph:film-strip"></span> Quản lý phim
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/showtimes')">
+                <span class="iconify" data-icon="ph:calendar-check"></span> Quản lý suất chiếu
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/bookings')">
+                <span class="iconify" data-icon="ph:ticket"></span> Quản lý đặt vé
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/users')">
+                <span class="iconify" data-icon="ph:user-circle"></span> Quản lý người dùng
+            </li>
+            <li onclick="navigateTo('/utc-cinemas/reports')">
+                <span class="iconify" data-icon="ph:chart-bar"></span> Thống kê báo cáo
+            </li>
+        </ul>
+        <button id="logoutBtn">Đăng xuất</button>
+    </aside>
+
+    <div class="main-content">
+        <div class="content-box">
+            <h1 style="color: #2d3748; font-weight: bold;">Điểm tin đáng chú ý gửi tới <span id="userName"></span></h1>
+            <div class="articles">
+                <div class="article">
+                    <h3>Lịch sử điện ảnh thế giới</h3>
+                    <p>Điện ảnh bắt đầu từ những năm cuối thế kỷ 19 với các bộ phim câm đơn giản. Đến thế kỷ 20, công nghệ màu và âm thanh đã thay đổi toàn bộ ngành công nghiệp này. Ngày nay, điện ảnh không chỉ là nghệ thuật mà còn là ngành kinh doanh tỷ đô, kết hợp giữa kỹ thuật số, hiệu ứng đặc biệt và nội dung sáng tạo.</p>
+                </div>
+                <div class="article">
+                    <h3>Các bộ phim bom tấn năm 2024</h3>
+                    <p>Năm 2024 chứng kiến sự ra mắt của nhiều bộ phim đình đám như "Avengers: Reassembled", "Fast & Furious 11" và "Jurassic World: Evolution". Các bộ phim này không chỉ thu hút khán giả bởi nội dung hấp dẫn mà còn nhờ công nghệ CGI tiên tiến và dàn diễn viên hàng đầu Hollywood.</p>
+                </div>
+                <div class="article">
+                    <h3>Cách chọn bộ phim phù hợp với bạn</h3>
+                    <p>Không phải ai cũng có gu xem phim giống nhau. Nếu bạn yêu thích hành động, hãy tìm đến những phim có nhiều cảnh chiến đấu hoành tráng. Nếu thích lãng mạn, phim tình cảm là lựa chọn tuyệt vời. Còn nếu bạn muốn phiêu lưu vào thế giới giả tưởng, hãy xem các bộ phim khoa học viễn tưởng hoặc kỳ ảo.</p>
+                </div>
+                <div class="article">
+                    <h3>Tầm quan trọng của điện ảnh trong đời sống</h3>
+                    <p>Điện ảnh không chỉ là một phương tiện giải trí mà còn phản ánh xã hội, văn hóa và lịch sử của nhân loại. Những bộ phim như "Schindler's List", "Forrest Gump" hay "Parasite" đã giúp người xem hiểu sâu hơn về các vấn đề xã hội và truyền tải thông điệp mạnh mẽ.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/javascript/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        checkToken();
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    });
+</script>
+</body>
+</html>

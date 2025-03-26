@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>UTC Cinemas - Đăng nhập</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+<div class="login-container">
+    <div class="login-logo">
+        <img src="/image/logo.png" alt="UTC Cinemas Logo">
+    </div>
+    <div class="login-title">Chào mừng đến với UTC Cinemas</div>
+    <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+    <form id="loginForm">
+        <div class="input-wrapper">
+            <input class="login-input" type="text" id="username" placeholder="Tên đăng nhập" required>
+        </div>
+        <div class="input-wrapper">
+            <input class="login-input" type="password" id="password" placeholder="Mật khẩu" required>
+        </div>
+
+        <div class="login-footer">
+            <a href="#">Quên mật khẩu?</a>
+            <a href="#">Đăng ký</a>
+        </div>
+
+        <button type="button" onclick="submitLogin()" class="login-btn">Đăng nhập</button>
+    </form>
+</div>
+
+<script src="/javascript/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            logout();
+        }
+        fetch('/api/auth/validate-token', {
+            method: 'GET',
+            headers: {'Authorization': `Bearer ${token}`}
+        })
+            .then(res => {
+                if (res.ok) window.location.href = '/utc-cinemas/home';
+                else logout();
+            })
+            .catch(() => logout());
+    });
+
+    function submitLogin() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            showError("Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 200 && result.data?.token) {
+                    const token = result.data.token;
+                    localStorage.setItem('token', token);
+                    document.cookie = `token=${token}; path=/; max-age=${getMaxAgeFromToken(token)}`;
+                    const redirectUrl = localStorage.getItem('url_redirect') || '/utc-cinemas/home';
+                    localStorage.removeItem('url_redirect');
+                    window.location.href = redirectUrl;
+                } else {
+                    throw new Error(result.message || 'Lỗi không xác định');
+                }
+            })
+            .catch(error => {
+                showError(error.message);
+                document.getElementById('password').value = '';
+            });
+    }
+
+    function getMaxAgeFromToken(token) {
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const payload = JSON.parse(atob(payloadBase64));
+            const exp = payload.exp;
+            if (!exp) return 86400;
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            return Math.max(exp - currentTimestamp, 0);
+        } catch (error) {
+            console.error("Lỗi khi trích xuất max-age từ token:", error);
+            return 86400;
+        }
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.innerText = message;
+        errorDiv.style.display = 'block';
+    }
+</script>
+</body>
+</html>

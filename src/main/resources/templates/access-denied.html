@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>UTC Cinemas - Quyền truy cập bị từ chối</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <link rel="stylesheet" href="/css/login.css">
+    <style>
+        .access-denied-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .access-denied-title {
+            color: #e74c3c;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .access-denied-message {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div class="access-denied-container">
+    <div class="login-logo">
+        <img src="/image/logo.png" alt="UTC Cinemas Logo">
+    </div>
+    <div class="access-denied-title">Quyền truy cập bị từ chối</div>
+    <div class="access-denied-message">
+        Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ với quản trị viên nếu bạn cho rằng đây là lỗi.
+    </div>
+    <a id="backBtn" class="back-button">Quay lại trang đăng nhập</a>
+</div>
+
+<script src="/javascript/main.js"></script>
+<script>
+    document.getElementById('backBtn').addEventListener('click', logout);
+</script>
+</body>
+</html>
