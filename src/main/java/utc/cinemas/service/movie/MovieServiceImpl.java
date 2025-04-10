@@ -50,17 +50,6 @@ public class MovieServiceImpl implements MovieService {
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }
-//
-//    @Override
-//    public Response getMovieById(Long id) {
-//        try {
-//
-//            return Utils.createResponse(ResponseCode.SUCCESS);
-//        } catch (Exception e) {
-//            log.error("Error fetching movie by ID: {}", e.getMessage());
-//            return Utils.createResponse(ResponseCode.ERROR);
-//        }
-//    }
 
     @Override
     public Response create(MoviesDto moviesDto) {
@@ -69,36 +58,10 @@ public class MovieServiceImpl implements MovieService {
             DatabaseUtils.createEntity(movie, movieRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm phim mới thành công");
         } catch (DataIntegrityViolationException e) {
-            if (e.getMessage().contains("Duplicate entry")) {
-                return Utils.createResponse(ResponseCode.ERROR, "Tên phim đã tồn tại");
-            }
-            return Utils.createResponse(ResponseCode.ERROR);
+            return Utils.createResponse(ResponseCode.ERROR, "Tên phim đã tồn tại");
         } catch (Exception e) {
-            log.error("Error adding movie: {}", e.getMessage());
+            log.error("Error adding movie: {}", e.getMessage(), e);
             return Utils.createResponse(ResponseCode.ERROR, "Thêm phim mới thất bại");
         }
     }
-
-
-//    @Override
-//    public Response updateMovie(Long id, Movie movieDetails) {
-//        try {
-//
-//            return Utils.createResponse(ResponseCode.SUCCESS);
-//        } catch (Exception e) {
-//            log.error("Error updating movie: {}", e.getMessage());
-//            return Utils.createResponse(ResponseCode.ERROR);
-//        }
-//    }
-
-//    @Override
-//    public Response deleteMovie(Long id) {
-//        try {
-//
-//            return Utils.createResponse(ResponseCode.SUCCESS);
-//        } catch (Exception e) {
-//            log.error("Error deleting movie: {}", e.getMessage());
-//            return Utils.createResponse(ResponseCode.ERROR);
-//        }
-//    }
 }

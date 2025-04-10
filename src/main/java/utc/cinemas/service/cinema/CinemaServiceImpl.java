@@ -12,12 +12,9 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
 import utc.cinemas.repository.CinemaRepository;
-import utc.cinemas.util.AuthUtils;
-import utc.cinemas.util.Constants;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.Utils;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +43,7 @@ public class CinemaServiceImpl implements CinemaService {
             Map<String, Object> response = new HashMap<>();
             response.put("data", cinemas.getContent());
             response.put("totalPages", cinemas.getTotalPages());
-
+            
             return Utils.createResponse(ResponseCode.SUCCESS, response);
         } catch (Exception e) {
             log.error("Error fetching movies: {}", e.getMessage());
