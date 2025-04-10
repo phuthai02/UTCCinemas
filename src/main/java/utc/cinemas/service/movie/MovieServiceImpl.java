@@ -13,10 +13,9 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Movie;
 import utc.cinemas.repository.MovieRepository;
-import utc.cinemas.util.AuthUtils;
+import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.Utils;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,9 +66,7 @@ public class MovieServiceImpl implements MovieService {
     public Response create(MoviesDto moviesDto) {
         try {
             Movie movie = moviesDto.getEntity();
-            movie.setCreatedDate(new Timestamp(System.currentTimeMillis()));
-            movie.setCreatedUser(AuthUtils.getUserId());
-            movieRepository.save(movie);
+            DatabaseUtils.createEntity(movie, movieRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm phim mới thành công");
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("Duplicate entry")) {

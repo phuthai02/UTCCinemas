@@ -20,6 +20,7 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.entity.User;
 import utc.cinemas.repository.UserRepository;
 import utc.cinemas.service.user.UserService;
+import utc.cinemas.util.Constants;
 
 
 import java.util.Map;
@@ -60,6 +61,7 @@ public class AuthController {
             return buildResponse(500, "Lỗi hệ thống, vui lòng thử lại sau", null);
         }
     }
+
 
     @GetMapping("/validate-token")
     public ResponseEntity<Response> validateToken(@RequestHeader("Authorization") String token) {

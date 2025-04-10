@@ -132,6 +132,13 @@ table {
     border: none;
 }
 
+table td:first-child,
+table th:first-child {
+    width: 30px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 th, td {
     padding: 12px 16px;
     text-align: left;
@@ -151,7 +158,7 @@ th {
 }
 
 tbody tr:hover {
-    background-color: #f7fafc;
+    background-color: #a0b9e6 !important;
     cursor: pointer;
 }
 
@@ -244,7 +251,7 @@ tbody tr:nth-child(odd) {
     border: 1px solid #4a5568;
 }
 
-.search-filter button:hover, .add-btn:hover, .pagination button:hover {
+.search-filter button:hover, .add-btn:hover, .pagination button:hover, #cancelBtn:hover {
     background-color: #4a5568;
     color: white;
 }
@@ -260,7 +267,11 @@ tbody tr:nth-child(odd) {
     transform: scale(1.05);
 }
 
-/* STATUS BADGES */
+.badge {
+    font-size: 12px;
+}
+
+    /* STATUS BADGES */
 .bg-success, .bg-secondary, .bg-danger {
     color: white;
     padding: 5px 10px;
@@ -292,6 +303,7 @@ tbody tr:nth-child(odd) {
     margin-bottom: 13px;
     border-left: 5px solid #007bff;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .article h3 {
@@ -466,10 +478,6 @@ img {
     background-color: white;
     color: #4a5568;
     border: 1px solid #4a5568;
-}
-
-#cancelBtn:hover {
-    background-color: #f7fafc;
 }
 
 #saveBtn {

@@ -21,6 +21,28 @@ public class AdminTemplate {
         return "home/home";
     }
 
+    @GetMapping("/cinemas")
+    public String cinemas() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "cinemas/view";
+    }
+
+    @GetMapping("/cinemas/create")
+    public String createCinemas() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "cinemas/create";
+    }
+
     @GetMapping("/users")
     public String user() {
         if (!AuthUtils.isAuthenticated()) {

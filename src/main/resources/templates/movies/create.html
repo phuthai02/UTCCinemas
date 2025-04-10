@@ -20,22 +20,35 @@
     <aside class="aside">
         <ul>
             <li onclick="navigateTo('/utc-cinemas/home')">
-                <span class="iconify" data-icon="ph:house-line" data-inline="true"></span> Trang chủ
+                <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
             </li>
-            <li class="aside-active" onclick="navigateTo('/utc-cinemas/movies')">
-                <span class="iconify" data-icon="ph:film-strip" data-inline="true"></span> Quản lý phim
+
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/cinemas')">
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
             </li>
+
+            <li onclick="navigateTo('/utc-cinemas/rooms')">
+                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/movies')">
+                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
+            </li>
+
             <li onclick="navigateTo('/utc-cinemas/showtimes')">
-                <span class="iconify" data-icon="ph:calendar-check" data-inline="true"></span> Quản lý suất chiếu
+                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/bookings')">
-                <span class="iconify" data-icon="ph:ticket" data-inline="true"></span> Quản lý đặt vé
+                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/users')">
-                <span class="iconify" data-icon="ph:user-circle" data-inline="true"></span> Quản lý người dùng
+                <span class="iconify" data-icon="mdi:account-circle-outline" data-inline="true"></span> Quản lý người dùng
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/reports')">
-                <span class="iconify" data-icon="ph:chart-bar" data-inline="true"></span> Thống kê báo cáo
+                <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo
             </li>
         </ul>
         <button id="logoutBtn">Đăng xuất</button>

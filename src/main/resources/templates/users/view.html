@@ -20,22 +20,35 @@
     <aside class="aside">
         <ul>
             <li onclick="navigateTo('/utc-cinemas/home')">
-                <span class="iconify" data-icon="ph:house-line" data-inline="true"></span> Trang chủ
+                <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
             </li>
+
+            <li onclick="navigateTo('/utc-cinemas/cinemas')">
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/rooms')">
+                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
+            </li>
+
             <li onclick="navigateTo('/utc-cinemas/movies')">
-                <span class="iconify" data-icon="ph:film-strip" data-inline="true"></span> Quản lý phim
+                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/showtimes')">
-                <span class="iconify" data-icon="ph:calendar-check" data-inline="true"></span> Quản lý suất chiếu
+                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/bookings')">
-                <span class="iconify" data-icon="ph:ticket" data-inline="true"></span> Quản lý đặt vé
+                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
+
             <li class="aside-active" onclick="navigateTo('/utc-cinemas/users')">
-                <span class="iconify" data-icon="ph:user-circle" data-inline="true"></span> Quản lý người dùng
+                <span class="iconify" data-icon="mdi:account-circle-outline" data-inline="true"></span> Quản lý người dùng
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/reports')">
-                <span class="iconify" data-icon="ph:chart-bar" data-inline="true"></span> Thống kê báo cáo
+                <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo
             </li>
         </ul>
         <button id="logoutBtn">Đăng xuất</button>
@@ -47,11 +60,11 @@
                 <div class="top-left">
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                        <select>
-                            <option value="">Tất cả</option>
-                            <option value="option1">Lựa chọn 1</option>
-                            <option value="option2">Lựa chọn 2</option>
-                        </select>
+                        <!--                        <select>-->
+                        <!--                            <option value="">Tất cả</option>-->
+                        <!--                            <option value="option1">Lựa chọn 1</option>-->
+                        <!--                            <option value="option2">Lựa chọn 2</option>-->
+                        <!--                        </select>-->
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
@@ -111,7 +124,8 @@
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
-            const result = await httpRequest('/api/admin/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc');
+            const search = document.getElementById("search-input").value;
+            const result = await httpRequest('/api/admin/movies/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -137,11 +151,11 @@
                 tableBody.appendChild(row);
             });
             totalPages = result.data.totalPages;
-            if (page > totalPages - 1) {
+            if (totalPages > 0 && page > totalPages - 1) {
                 page = 0;
                 await loadData();
             }
-            document.getElementById("pageInfo").placeholder = (page + 1) + " / " + totalPages;
+            document.getElementById("pageInfo").placeholder = (totalPages == 0 ? 0 : (page + 1)) + " / " + totalPages;
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
         }
@@ -166,6 +180,9 @@
         document.getElementById('logoutBtn').addEventListener('click', logout);
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
+        document.querySelector(".add-btn").addEventListener("click", function () {
+            navigateTo("/utc-cinemas/movies/create")
+        });
         loadData();
     });
 </script>

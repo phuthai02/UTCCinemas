@@ -15,6 +15,10 @@ public class MoviesDto {
     private String description;
     private Timestamp releaseDate;
     private Integer rating;
+    private Long createdUser;
+    private Long modifiedUser;
+    private Timestamp createdDate;
+    private Timestamp modifiedDate;
     private Integer status;
 
     public Movie getEntity() {

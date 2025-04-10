@@ -20,22 +20,35 @@
     <aside class="aside">
         <ul>
             <li class="aside-active" onclick="navigateTo('/utc-cinemas/home')">
-                <span class="iconify" data-icon="ph:house-line"></span> Trang chủ
+                <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
             </li>
+
+            <li onclick="navigateTo('/utc-cinemas/cinemas')">
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/rooms')">
+                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
+            </li>
+
             <li onclick="navigateTo('/utc-cinemas/movies')">
-                <span class="iconify" data-icon="ph:film-strip"></span> Quản lý phim
+                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/showtimes')">
-                <span class="iconify" data-icon="ph:calendar-check"></span> Quản lý suất chiếu
+                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/bookings')">
-                <span class="iconify" data-icon="ph:ticket"></span> Quản lý đặt vé
+                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/users')">
-                <span class="iconify" data-icon="ph:user-circle"></span> Quản lý người dùng
+                <span class="iconify" data-icon="mdi:account-circle-outline" data-inline="true"></span> Quản lý người dùng
             </li>
+
             <li onclick="navigateTo('/utc-cinemas/reports')">
-                <span class="iconify" data-icon="ph:chart-bar"></span> Thống kê báo cáo
+                <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo
             </li>
         </ul>
         <button id="logoutBtn">Đăng xuất</button>
@@ -45,12 +58,12 @@
         <div class="content-box">
             <h1 style="color: #2d3748; font-weight: bold;">Điểm tin đáng chú ý gửi tới <span id="userName"></span></h1>
             <div class="articles">
-                <div class="article">
+                <div class="article" onclick="navigateTo('https://archive.org/details/lichsudienanhthegioi')">
                     <h3>Lịch sử điện ảnh thế giới</h3>
                     <p>Điện ảnh bắt đầu từ những năm cuối thế kỷ 19 với các bộ phim câm đơn giản. Đến thế kỷ 20, công nghệ màu và âm thanh đã thay đổi toàn bộ ngành công nghiệp này. Ngày nay, điện ảnh không chỉ là nghệ thuật mà còn là ngành kinh doanh tỷ đô, kết hợp giữa kỹ thuật số, hiệu ứng đặc biệt và nội dung sáng tạo.</p>
                 </div>
-                <div class="article">
-                    <h3>Các bộ phim bom tấn năm 2024</h3>
+                <div class="article" onclick="navigateTo('https://vtv.vn/van-hoa-giai-tri/nhung-bo-phim-duoc-cho-doi-nhat-nam-2025-20241224120701126.htm')">
+                    <h3>Các bộ phim bom tấn năm 2025</h3>
                     <p>Năm 2024 chứng kiến sự ra mắt của nhiều bộ phim đình đám như "Avengers: Reassembled", "Fast & Furious 11" và "Jurassic World: Evolution". Các bộ phim này không chỉ thu hút khán giả bởi nội dung hấp dẫn mà còn nhờ công nghệ CGI tiên tiến và dàn diễn viên hàng đầu Hollywood.</p>
                 </div>
                 <div class="article">

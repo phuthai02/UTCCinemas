@@ -23,7 +23,7 @@
                 <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
             </li>
 
-            <li onclick="navigateTo('/utc-cinemas/cinemas')">
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/cinemas')">
                 <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
             </li>
 
@@ -31,7 +31,7 @@
                 <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
             </li>
 
-            <li class="aside-active" onclick="navigateTo('/utc-cinemas/movies')">
+            <li onclick="navigateTo('/utc-cinemas/movies')">
                 <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
             </li>
 
@@ -60,11 +60,6 @@
                 <div class="top-left">
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-<!--                        <select>-->
-<!--                            <option value="">Tất cả</option>-->
-<!--                            <option value="option1">Lựa chọn 1</option>-->
-<!--                            <option value="option2">Lựa chọn 2</option>-->
-<!--                        </select>-->
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
@@ -80,12 +75,9 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Tên phim</th>
-                        <th>Thể loại</th>
-                        <th>Thời lượng</th>
-                        <th>Mô tả</th>
-                        <th>Ngày phát hành</th>
-                        <th>Xếp hạng</th>
+                        <th>Tên rạp</th>
+                        <th>Địa chỉ</th>
+                        <th>Ngày tạo</th>
                         <th>Trạng thái</th>
                     </tr>
                     </thead>
@@ -126,7 +118,7 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const result = await httpRequest('/api/admin/movies/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
+            const result = await httpRequest('/api/admin/cinemas/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -138,13 +130,10 @@
                 const row = document.createElement("tr");
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.title}</td>
-                <td>${item.genre}</td>
-                <td>${item.duration} phút</td>
-                <td>${item.description}</td>
-                <td>${new Date(item.releaseDate).toLocaleString('vi-VN')}</td>
-                <td>${Array.from({length: item.rating}, () => '⭐').join('')}</td>
-                 <td>
+                <td>${item.name}</td>
+                <td>${item.location}</td>
+                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
+                <td>
                   <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
                     ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
                   </span>
@@ -157,7 +146,7 @@
                 page = 0;
                 await loadData();
             }
-            document.getElementById("pageInfo").placeholder = (totalPages === 0 ? 0 : (page + 1)) + " / " + totalPages;
+            document.getElementById("pageInfo").placeholder = (totalPages == 0 ? 0 : (page + 1)) + " / " + totalPages;
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
         }
@@ -170,7 +159,7 @@
     }
 
     function nextPage() {
-        if (page > totalPages - 1) return;
+        if (page === (totalPages - 1)) return;
         page++;
         loadData();
     }
@@ -183,7 +172,7 @@
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
         document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/movies/create")
+            navigateTo("/utc-cinemas/cinemas/create")
         });
         loadData();
     });
