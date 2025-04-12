@@ -64,11 +64,11 @@
                 <div class="top-left">
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                        <!--                        <select>-->
-                        <!--                            <option value="">Tất cả</option>-->
-                        <!--                            <option value="option1">Lựa chọn 1</option>-->
-                        <!--                            <option value="option2">Lựa chọn 2</option>-->
-                        <!--                        </select>-->
+                        <select id="search-select">
+                            <option value="-1">Tất cả vai trò&emsp;&emsp;</option>
+                            <option value="1">Quản trị viên&emsp;&emsp;</option>
+                            <option value="0">Người dùng&emsp;&emsp;</option>
+                        </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
@@ -83,12 +83,13 @@
                 <table id="tableData" class="display">
                     <thead>
                     <tr>
-                        <th>Tên phim</th>
-                        <th>Thể loại</th>
-                        <th>Thời lượng</th>
-                        <th>Mô tả</th>
-                        <th>Ngày phát hành</th>
-                        <th>Xếp hạng</th>
+                        <th>#</th>
+                        <th>Tên hiển thị</th>
+                        <th>Tên đăng nhập</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Vai trò</th>
+                        <th>Ngày tạo</th>
                         <th>Trạng thái</th>
                     </tr>
                     </thead>
@@ -123,13 +124,14 @@
 <script src="/javascript/main.js"></script>
 <script>
     let page = 0;
-    let totalPages = 0
+    let totalPages = 0;
 
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const result = await httpRequest('/api/admin/movies/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
+            const role = document.getElementById("search-select").value;
+            const result = await httpRequest('/api/admin/users/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&role=' + role);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -139,19 +141,23 @@
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
                 const row = document.createElement("tr");
+                row.onclick = () => {
+                    navigateTo(`/utc-cinemas/users/edit?id=${item.id}`);
+                };
                 row.innerHTML = `
-                <td>${item.title}</td>
-                <td>${item.genre}</td>
-                <td>${item.duration} phút</td>
-                <td>${item.description}</td>
-                <td>${new Date(item.releaseDate).toLocaleString('vi-VN')}</td>
-                <td>${Array.from({length: item.rating}, () => '⭐').join('')}</td>
+                <td>${page * pageSize + index + 1}</td>
+                <td>${item.name}</td>
+                <td>${item.username}</td>
+                <td>${item.email}</td>
+                <td>${item.phoneNumber || 'Chưa cập nhật'}</td>
+                <td>${item.role === 1 ? 'Quản trị viên' : 'Người dùng'}</td>
+                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : item.status === 2 ? 'bg-danger' : 'bg-secondary'}">
-                    ${item.status === 1 ? "Đang chiếu" : item.status === 2 ? "Đã chiếu" : "Sắp chiếu"}
+                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
+                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
                   </span>
                 </td>
-            `;
+                `;
                 tableBody.appendChild(row);
             });
             totalPages = result.data.totalPages;
@@ -177,7 +183,7 @@
         loadData();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         checkToken();
         document.getElementById('nextPageBtn').addEventListener('click', nextPage);
         document.getElementById('prevPageBtn').addEventListener('click', prevPage);
@@ -185,9 +191,10 @@
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
         document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/movies/create")
+            navigateTo("/utc-cinemas/users/create")
         });
-        loadData();
+
+        await loadData();
     });
 </script>
 </body>

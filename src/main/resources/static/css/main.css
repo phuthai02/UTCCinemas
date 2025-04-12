@@ -840,3 +840,13 @@ button:focus-visible {
 .selected-director.show, .selected-cinema.show {
     display: block;
 }
+
+.disabled-input {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.password-group input::placeholder {
+    font-style: italic;
+    color: #999;
+}

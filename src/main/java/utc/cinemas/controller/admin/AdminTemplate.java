@@ -122,7 +122,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/users")
-    public String user() {
+    public String users() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -130,6 +130,28 @@ public class AdminTemplate {
             return "redirect:/utc-cinemas/access-denied";
         }
         return "users/view";
+    }
+
+    @GetMapping("/users/create")
+    public String createUsers() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "users/form";
+    }
+
+    @GetMapping("/users/edit")
+    public String editUsers(@RequestParam String id) {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "users/form";
     }
 
     @GetMapping("/movies")
@@ -144,13 +166,24 @@ public class AdminTemplate {
     }
 
     @GetMapping("/movies/create")
-    public String createMovie() {
+    public String createMovies() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
         if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
             return "redirect:/utc-cinemas/access-denied";
         }
-        return "movies/create";
+        return "movies/form";
+    }
+
+    @GetMapping("/movies/edit")
+    public String editMovies(@RequestParam String id) {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "movies/form";
     }
 }

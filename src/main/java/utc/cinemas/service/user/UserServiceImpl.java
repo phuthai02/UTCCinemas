@@ -4,14 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import utc.cinemas.model.dto.AuthRequest;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
+import utc.cinemas.model.dto.UserDto;
 import utc.cinemas.model.entity.User;
 import utc.cinemas.repository.UserRepository;
+import utc.cinemas.util.DatabaseUtils;
+import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -24,30 +27,6 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Response registerUser(AuthRequest authRequest, Integer role) {
-        Response response = Utils.createResponse(ResponseCode.ERROR);
-        try {
-            User user = userRepository.findByUsername(authRequest.getUsername()).orElse(null);
-            if (user != null) {
-                log.info("Username already exists");
-                response = Utils.createResponse(ResponseCode.USER_ALREADY_EXISTS);
-                return response;
-            }
-            user = new User();
-            user.setUsername(authRequest.getUsername());
-            user.setPassword(passwordEncoder.encode(authRequest.getPassword()));
-            user.setEmail(authRequest.getEmail());
-            user.setPhoneNumber(authRequest.getPhoneNumber());
-            user.setRole(role);
-            userRepository.save(user);
-            response = Utils.createResponse(ResponseCode.SUCCESS);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return response;
-    }
-
-    @Override
     public Response getDirectors() {
         Response response = Utils.createResponse(ResponseCode.ERROR);
         try {
@@ -57,5 +36,61 @@ public class UserServiceImpl implements UserService {
             log.error(e.getMessage(), e);
         }
         return response;
+    }
+
+    @Override
+    public Response getListOfUsers(Map<String, String> filters) {
+        try {
+            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            Integer role = JsonUtils.convert(filters.get("role"), Integer.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> userRepository.findAll("%" + search + "%", role, pageable));
+            return Utils.createResponse(ResponseCode.SUCCESS, result);
+        } catch (Exception e) {
+            log.error("Error fetching users: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response getUserById(Long id) {
+        try {
+            User user = userRepository.findById(id).orElse(null);
+            return Utils.createResponse(ResponseCode.SUCCESS, UserDto.getDto(user));
+        } catch (Exception e) {
+            log.error("Error getting user: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Tìm kiếm người thất bại");
+        }
+    }
+
+    @Override
+    public Response create(UserDto userDto) {
+        try {
+            User user = userDto.getEntity();
+            if (user == null) {
+                return Utils.createResponse(ResponseCode.ERROR, "Mật khẩu không trùng khớp vui lòng kiểm tra lại");
+            }
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            DatabaseUtils.createEntity(user, userRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS, "Thêm người dùng mới thành công");
+        } catch (Exception e) {
+            log.error("Error adding user: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Thêm người dùng mới thất bại");
+        }
+    }
+
+    @Override
+    public Response update(UserDto userDto) {
+        try {
+            User user = userDto.getEntity();
+            if (user == null) {
+                return Utils.createResponse(ResponseCode.ERROR, "Mật khẩu không trùng khớp vui lòng kiểm tra lại");
+            }
+            if (user.getPassword() != null) user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            DatabaseUtils.updateEntity(user, userRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật người dùng thành công");
+        } catch (Exception e) {
+            log.error("Error editing user: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Cập nhật người dùng thất bại");
+        }
     }
 }

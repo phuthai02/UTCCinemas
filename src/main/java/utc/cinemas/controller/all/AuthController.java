@@ -20,8 +20,6 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.entity.User;
 import utc.cinemas.repository.UserRepository;
 import utc.cinemas.service.user.UserService;
-import utc.cinemas.util.Constants;
-
 
 import java.util.Map;
 

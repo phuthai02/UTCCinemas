@@ -1,12 +1,14 @@
 package utc.cinemas.service.user;
 
-import utc.cinemas.model.dto.AuthRequest;
 import utc.cinemas.model.dto.Response;
-import utc.cinemas.model.entity.User;
+import utc.cinemas.model.dto.UserDto;
 
-import java.util.List;
+import java.util.Map;
 
 public interface UserService {
-    Response registerUser(AuthRequest user, Integer role);
     Response getDirectors();
+    Response getListOfUsers(Map<String, String> filters);
+    Response getUserById(Long id);
+    Response create(UserDto userDto);
+    Response update(UserDto userDto);
 }
