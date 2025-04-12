@@ -31,6 +31,10 @@
                 <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
             </li>
 
+            <li onclick="navigateTo('/utc-cinemas/seats')">
+                <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Quản lý ghế ngồi
+            </li>
+
             <li onclick="navigateTo('/utc-cinemas/movies')">
                 <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
             </li>
@@ -60,6 +64,9 @@
                 <div class="top-left">
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
+                        <select id="search-select">
+                            <option value="-1">Tất cả rạp chiếu&emsp;&emsp;</option>
+                        </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
@@ -100,9 +107,9 @@
                 <div class="records-per-page">
                     <label for="records-select">Số bản ghi mỗi trang:</label>
                     <select id="records-select">
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="20">20&emsp;</option>
+                        <option value="50">50&emsp;</option>
+                        <option value="100">100&emsp;</option>
                     </select>
                 </div>
             </div>
@@ -123,10 +130,14 @@
             const response = await httpRequest('/api/admin/cinemas/get-all', {
                 method: 'GET'
             });
-
+            const selectElement = document.getElementById('search-select');
             if (response.code === 1 && response.data) {
                 response.data.forEach(cinema => {
                     cinemaMap[cinema.id] = cinema.name;
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    selectElement.appendChild(option);
                 });
             } else {
                 console.error('Không thể tải danh sách rạp chiếu:', response.message);
@@ -158,7 +169,8 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const result = await httpRequest('/api/admin/rooms/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
+            const cinemaId = document.getElementById("search-select").value;
+            const result = await httpRequest('/api/admin/rooms/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&cinemaId=' + cinemaId);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;

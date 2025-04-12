@@ -9,6 +9,7 @@ import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
 import utc.cinemas.repository.CinemaRepository;
 import utc.cinemas.util.DatabaseUtils;
+import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class CinemaServiceImpl implements CinemaService {
     @Override
     public Response getListOfCinemas(Map<String, String> filters) {
         try {
-            String search = filters.getOrDefault("search", "").trim();
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> cinemaRepository.findAll("%" + search + "%", pageable));
+            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            Long directorId = JsonUtils.convert(filters.get("directorId"), Long.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> cinemaRepository.findAll("%" + search + "%",  directorId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching cinemas: {}", e.getMessage());

@@ -9,6 +9,7 @@ import utc.cinemas.model.dto.RoomDto;
 import utc.cinemas.model.entity.Room;
 import utc.cinemas.repository.RoomRepository;
 import utc.cinemas.util.DatabaseUtils;
+import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.Map;
@@ -23,8 +24,9 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Response getListOfRooms(Map<String, String> filters) {
         try {
-            String search = filters.getOrDefault("search", "").trim();
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> roomRepository.findAll("%" + search + "%", pageable));
+            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            Long cinemaId = JsonUtils.convert(filters.get("cinemaId"), Long.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> roomRepository.findAll("%" + search + "%", cinemaId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching rooms: {}", e.getMessage());

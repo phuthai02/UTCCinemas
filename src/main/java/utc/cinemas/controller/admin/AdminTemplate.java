@@ -88,6 +88,39 @@ public class AdminTemplate {
         return "rooms/form";
     }
 
+    @GetMapping("/seats")
+    public String seats() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "seats/view";
+    }
+
+    @GetMapping("/seats/create")
+    public String createSeats() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "seats/form";
+    }
+
+    @GetMapping("/seats/edit")
+    public String editSeats(@RequestParam String id) {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "seats/form";
+    }
+
     @GetMapping("/users")
     public String user() {
         if (!AuthUtils.isAuthenticated()) {
