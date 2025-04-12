@@ -33,4 +33,19 @@ public class Cinema {
 
     @Column(name = "STATUS")
     private Integer status; // Trạng thái
+
+    @Column(name = "CINEMA_DIRECTOR")
+    private Long cinemaDirector; // Giám đốc cơ sở
+
+    @Column(name = "EMAIL")
+    private String email; // Email
+
+    @Column(name = "PHONE_NUMBER")
+    private String phoneNumber; // Số điện thoại
+
+    @Column(name = "OPENING_TIME")
+    private String openingTime; // Giờ mở cửa
+
+    @Column(name = "CLOSING_TIME")
+    private String closingTime; // Giờ đóng cửa
 }

@@ -21,18 +21,30 @@ public class CinemaController {
     private CinemaService cinemaService;
 
     @GetMapping("get-list")
-    public ResponseEntity<Response> getCinemas(
-            @RequestParam Map<String, String> filters) {
+    public ResponseEntity<Response> getCinemas(@RequestParam Map<String, String> filters) {
         log.info("Get list cinemas with params: filters={}", filters);
         Response response = cinemaService.getListOfCinemas(filters);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<Response> getCinemaById(@PathVariable Long id) {
+        log.info("Get cinema by id: id={}", id);
+        Response response = cinemaService.getCinemaById(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("create")
-    public ResponseEntity<Response> createCinema(
-            @RequestBody CinemasDto cinemasDto) {
+    public ResponseEntity<Response> createCinema(@RequestBody CinemasDto cinemasDto) {
         log.info("Create cinemas with params: dto={}", JsonUtils.toString(cinemasDto));
         Response response = cinemaService.create(cinemasDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<Response> updateCinema(@RequestBody CinemasDto cinemasDto) {
+        log.info("Update cinemas with params: dto={}", JsonUtils.toString(cinemasDto));
+        Response response = cinemaService.update(cinemasDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -9,8 +9,9 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.User;
 import utc.cinemas.repository.UserRepository;
-import utc.cinemas.util.Constants;
 import utc.cinemas.util.Utils;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -40,6 +41,18 @@ public class UserServiceImpl implements UserService {
             user.setRole(role);
             userRepository.save(user);
             response = Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
+    }
+
+    @Override
+    public Response getDirectors() {
+        Response response = Utils.createResponse(ResponseCode.ERROR);
+        try {
+            List<User> directors = userRepository.findAll();
+            response = Utils.createResponse(ResponseCode.SUCCESS, directors);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

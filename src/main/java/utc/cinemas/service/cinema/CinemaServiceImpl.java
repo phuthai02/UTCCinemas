@@ -39,7 +39,30 @@ public class CinemaServiceImpl implements CinemaService {
             DatabaseUtils.createEntity(cinema, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
         } catch (Exception e) {
-            log.error("Error adding cinemas: {}", e.getMessage());
+            log.error("Error adding cinema: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
+        }
+    }
+
+    @Override
+    public Response getCinemaById(Long id) {
+        try {
+            Cinema cinema = cinemaRepository.findById(id).orElse(null);
+            return Utils.createResponse(ResponseCode.SUCCESS, cinema);
+        } catch (Exception e) {
+            log.error("Error getting cinema: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
+        }
+    }
+
+    @Override
+    public Response update(CinemasDto cinemasDto) {
+        try {
+            Cinema cinema = cinemasDto.getEntity();
+            DatabaseUtils.updateEntity(cinema, cinemaRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
+        } catch (Exception e) {
+            log.error("Error editing cinema: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
         }
     }

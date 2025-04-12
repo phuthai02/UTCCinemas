@@ -77,8 +77,14 @@
                         <th>#</th>
                         <th>Tên rạp</th>
                         <th>Địa chỉ</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Giờ mở cửa</th>
+                        <th>Giờ đóng cửa</th>
+                        <th>Giám đốc cơ sở</th>
                         <th>Ngày tạo</th>
                         <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -112,7 +118,26 @@
 <script src="/javascript/main.js"></script>
 <script>
     let page = 0;
-    let totalPages = 0
+    let totalPages = 0;
+    let directorMap = {};
+
+    async function loadDirectors() {
+        try {
+            const response = await httpRequest('/api/admin/users/directors', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                response.data.forEach(director => {
+                    directorMap[director.id] = director.name;
+                });
+            } else {
+                console.error('Không thể tải danh sách giám đốc:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách giám đốc:', error);
+        }
+    }
 
     async function loadData() {
         try {
@@ -127,16 +152,36 @@
             const tableBody = document.querySelector("#tableData tbody");
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
+                const directorName = directorMap[item.cinemaDirector] || 'Chưa phân công';
+
                 const row = document.createElement("tr");
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
                 <td>${item.name}</td>
                 <td>${item.location}</td>
+                <td>${item.phoneNumber || '-'}</td>
+                <td>${item.email || '-'}</td>
+                <td>${item.openingTime || '-'}</td>
+                <td>${item.closingTime || '-'}</td>
+                <td>${directorName}</td>
                 <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
                   <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
                     ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
                   </span>
+                </td>
+                <td class="actions">
+                  <button class="edit-btn" onclick="navigateTo('/utc-cinemas/cinemas/edit?id=${item.id}')" title="Chỉnh sửa" style="color: #0d6efd;">
+                    <span class="iconify" data-icon="mdi:pencil" style="font-size: 20px;"></span>
+                  </button>
+                  <button class="delete-btn" onclick="toggleStatus(${item.id}, ${item.status})"
+                          title="${item.status === 1 ? 'Dừng hoạt động' : 'Kích hoạt lại'}"
+                          style="color: ${item.status === 1 ? '#dc3545' : '#198754'};">
+                    <span class="iconify"
+                          data-icon="${item.status === 1 ? 'mdi:close-circle-outline' : 'mdi:check-circle-outline'}"
+                          style="font-size: 20px;">
+                    </span>
+                  </button>
                 </td>
             `;
                 tableBody.appendChild(row);
@@ -152,6 +197,30 @@
         }
     }
 
+    async function toggleStatus(id, currentStatus) {
+        try {
+            const newStatus = currentStatus === 1 ? 0 : 1;
+            const statusText = newStatus === 1 ? 'kích hoạt' : 'vô hiệu hóa';
+
+            if (confirm(`Bạn có chắc chắn muốn ${statusText} rạp chiếu này không?`)) {
+                const response = await httpRequest(`/api/admin/cinemas/toggle-status/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (response.code === 1) {
+                    showModal('success', 'Thành công!', response.message);
+                    await loadData();
+                } else {
+                    showModal('error', 'Ôi xong!', response.message);
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi khi thay đổi trạng thái:", error);
+            showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi thay đổi trạng thái.');
+        }
+    }
+
     function prevPage() {
         if (page === 0) return;
         page--;
@@ -164,7 +233,7 @@
         loadData();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         checkToken();
         document.getElementById('nextPageBtn').addEventListener('click', nextPage);
         document.getElementById('prevPageBtn').addEventListener('click', prevPage);
@@ -174,7 +243,9 @@
         document.querySelector(".add-btn").addEventListener("click", function () {
             navigateTo("/utc-cinemas/cinemas/create")
         });
-        loadData();
+
+        await loadDirectors();
+        await loadData();
     });
 </script>
 </body>

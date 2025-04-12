@@ -3,6 +3,7 @@ package utc.cinemas.controller.admin;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import utc.cinemas.util.AuthUtils;
 import utc.cinemas.util.Constants;
 
@@ -40,7 +41,18 @@ public class AdminTemplate {
         if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
             return "redirect:/utc-cinemas/access-denied";
         }
-        return "cinemas/create";
+        return "cinemas/form";
+    }
+
+    @GetMapping("/cinemas/edit")
+    public String editCinemas(@RequestParam String id) {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "cinemas/form";
     }
 
     @GetMapping("/users")
