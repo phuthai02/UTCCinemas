@@ -1,6 +1,5 @@
 package utc.cinemas.model.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import utc.cinemas.model.entity.Cinema;
@@ -8,7 +7,7 @@ import utc.cinemas.model.entity.Cinema;
 import java.sql.Timestamp;
 
 @Data
-public class CinemasDto {
+public class CinemaDto {
     private Long id;
     private String name;
     private String location;

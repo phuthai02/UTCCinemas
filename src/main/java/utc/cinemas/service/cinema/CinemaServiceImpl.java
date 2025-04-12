@@ -3,7 +3,7 @@ package utc.cinemas.service.cinema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utc.cinemas.model.dto.CinemasDto;
+import utc.cinemas.model.dto.CinemaDto;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
@@ -33,9 +33,9 @@ public class CinemaServiceImpl implements CinemaService {
     }
 
     @Override
-    public Response create(CinemasDto cinemasDto) {
+    public Response create(CinemaDto cinemaDto) {
         try {
-            Cinema cinema = cinemasDto.getEntity();
+            Cinema cinema = cinemaDto.getEntity();
             DatabaseUtils.createEntity(cinema, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
         } catch (Exception e) {
@@ -56,9 +56,9 @@ public class CinemaServiceImpl implements CinemaService {
     }
 
     @Override
-    public Response update(CinemasDto cinemasDto) {
+    public Response update(CinemaDto cinemaDto) {
         try {
-            Cinema cinema = cinemasDto.getEntity();
+            Cinema cinema = cinemaDto.getEntity();
             DatabaseUtils.updateEntity(cinema, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
         } catch (Exception e) {

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utc.cinemas.model.dto.CinemasDto;
+import utc.cinemas.model.dto.CinemaDto;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.service.cinema.CinemaService;
 import utc.cinemas.util.JsonUtils;
@@ -35,14 +35,14 @@ public class CinemaController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<Response> createCinema(@RequestBody CinemasDto cinemasDto) {
+    public ResponseEntity<Response> createCinema(@RequestBody CinemaDto cinemasDto) {
         log.info("Create cinemas with params: dto={}", JsonUtils.toString(cinemasDto));
         Response response = cinemaService.create(cinemasDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("update")
-    public ResponseEntity<Response> updateCinema(@RequestBody CinemasDto cinemasDto) {
+    public ResponseEntity<Response> updateCinema(@RequestBody CinemaDto cinemasDto) {
         log.info("Update cinemas with params: dto={}", JsonUtils.toString(cinemasDto));
         Response response = cinemaService.update(cinemasDto);
         return new ResponseEntity<>(response, HttpStatus.OK);

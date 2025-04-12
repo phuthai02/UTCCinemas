@@ -7,7 +7,7 @@ import utc.cinemas.model.entity.Movie;
 import java.sql.Timestamp;
 
 @Data
-public class MoviesDto {
+public class MovieDto {
     private Long id;
     private String title;
     private String genre;

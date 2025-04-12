@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import utc.cinemas.model.dto.MoviesDto;
+import utc.cinemas.model.dto.MovieDto;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Movie;
@@ -34,9 +34,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Response create(MoviesDto moviesDto) {
+    public Response create(MovieDto movieDto) {
         try {
-            Movie movie = moviesDto.getEntity();
+            Movie movie = movieDto.getEntity();
             DatabaseUtils.createEntity(movie, movieRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm phim mới thành công");
         } catch (DataIntegrityViolationException e) {

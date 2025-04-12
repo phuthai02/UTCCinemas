@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utc.cinemas.model.dto.MoviesDto;
+import utc.cinemas.model.dto.MovieDto;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.service.movie.MovieService;
 import utc.cinemas.util.JsonUtils;
@@ -30,7 +30,7 @@ public class MovieController {
 
     @PostMapping("create")
     public ResponseEntity<Response> createMovie(
-            @RequestBody MoviesDto moviesDto) {
+            @RequestBody MovieDto moviesDto) {
         log.info("Create movie with params: dto={}", JsonUtils.toString(moviesDto));
         Response response = movieService.create(moviesDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
