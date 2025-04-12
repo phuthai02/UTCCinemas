@@ -185,30 +185,6 @@
         }
     }
 
-    async function toggleStatus(id, currentStatus) {
-        try {
-            const newStatus = currentStatus === 1 ? 0 : 1;
-            const statusText = newStatus === 1 ? 'kích hoạt' : 'vô hiệu hóa';
-
-            if (confirm(`Bạn có chắc chắn muốn ${statusText} rạp chiếu này không?`)) {
-                const response = await httpRequest(`/api/admin/cinemas/toggle-status/${id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ status: newStatus })
-                });
-
-                if (response.code === 1) {
-                    showModal('success', 'Thành công!', response.message);
-                    await loadData();
-                } else {
-                    showModal('error', 'Ôi xong!', response.message);
-                }
-            }
-        } catch (error) {
-            console.error("Lỗi khi thay đổi trạng thái:", error);
-            showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi thay đổi trạng thái.');
-        }
-    }
-
     function prevPage() {
         if (page === 0) return;
         page--;

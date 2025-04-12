@@ -121,9 +121,9 @@
                         <div class="form-group">
                             <label for="status">Trạng thái <span class="required">*</span></label>
                             <select id="status" name="status">
-                                <option value="">--- Chọn trạng thái ---</option>
+                                <option value="">Chọn trạng thái</option>
                                 <option value="0">Dừng hoạt động</option>
-                                <option value="1">Đang hoạt động</option>
+                                <option value="1" selected>Đang hoạt động</option>
                             </select>
                             <div class="error-message" id="status-error"></div>
                         </div>
@@ -399,7 +399,7 @@
     function handleApiResponse(response) {
         if (response.code === 1) {
             const actionText = isEditMode ? 'cập nhật' : 'thêm mới';
-            showModal('success', 'Thành công!', `Rạp chiếu đã được ${actionText} thành công.`, '/utc-cinemas/cinemas');
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/cinemas');
         } else {
             showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
         }

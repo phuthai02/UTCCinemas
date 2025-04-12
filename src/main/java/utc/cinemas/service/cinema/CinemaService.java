@@ -10,4 +10,5 @@ public interface CinemaService {
     Response create(CinemaDto cinemaDto);
     Response getCinemaById(Long id);
     Response update(CinemaDto cinemaDto);
+    Response getAll();
 }

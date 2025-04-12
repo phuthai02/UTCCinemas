@@ -11,6 +11,7 @@ import utc.cinemas.repository.CinemaRepository;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.Utils;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -64,6 +65,17 @@ public class CinemaServiceImpl implements CinemaService {
         } catch (Exception e) {
             log.error("Error editing cinema: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật rạp chiếu thất bại");
+        }
+    }
+
+    @Override
+    public Response getAll() {
+        try {
+            List<Cinema> cinemas = cinemaRepository.findAll();
+            return Utils.createResponse(ResponseCode.SUCCESS, cinemas);
+        } catch (Exception e) {
+            log.error("Error fetching cinemas activated: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 }

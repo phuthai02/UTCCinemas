@@ -75,14 +75,11 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Tên rạp</th>
-                        <th>Địa chỉ</th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
-                        <th>Giờ mở cửa</th>
-                        <th>Giờ đóng cửa</th>
-                        <th>Giám đốc cơ sở</th>
+                        <th>Tên phòng chiếu</th>
+                        <th>Số ghế tối đa</th>
+                        <th>Rạp chiếu</th>
                         <th>Ngày tạo</th>
+                        <th>Người tạo</th>
                         <th>Trạng thái</th>
                     </tr>
                     </thead>
@@ -118,23 +115,42 @@
 <script>
     let page = 0;
     let totalPages = 0;
-    let directorMap = {};
+    let cinemaMap = {};
+    let userMap = {};
 
-    async function loadDirectors() {
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                response.data.forEach(cinema => {
+                    cinemaMap[cinema.id] = cinema.name;
+                });
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    async function loadUsers() {
         try {
             const response = await httpRequest('/api/admin/users/directors', {
                 method: 'GET'
             });
 
             if (response.code === 1 && response.data) {
-                response.data.forEach(director => {
-                    directorMap[director.id] = director.name;
+                response.data.forEach(user => {
+                    userMap[user.id] = user.name;
                 });
             } else {
-                console.error('Không thể tải danh sách giám đốc:', response.message);
+                console.error('Không thể tải danh sách người dùng:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách giám đốc:', error);
+            console.error('Lỗi khi tải danh sách người dùng:', error);
         }
     }
 
@@ -142,7 +158,7 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const result = await httpRequest('/api/admin/cinemas/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
+            const result = await httpRequest('/api/admin/rooms/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -151,21 +167,19 @@
             const tableBody = document.querySelector("#tableData tbody");
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
-                const directorName = directorMap[item.cinemaDirector] || 'Chưa phân công';
+                const cinemaName = cinemaMap[item.cinemaId] || 'Không xác định';
+                const createdUser = userMap[item.createdUser] || 'Không xác định';
                 const row = document.createElement("tr");
                 row.onclick = () => {
-                    navigateTo(`/utc-cinemas/cinemas/edit?id=${item.id}`);
+                    navigateTo(`/utc-cinemas/rooms/edit?id=${item.id}`);
                 };
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
                 <td>${item.name}</td>
-                <td>${item.location}</td>
-                <td>${item.phoneNumber || '-'}</td>
-                <td>${item.email || '-'}</td>
-                <td>${item.openingTime || '-'}</td>
-                <td>${item.closingTime || '-'}</td>
-                <td>${directorName}</td>
+                <td>${item.seatCapacity}</td>
+                <td>${cinemaName}</td>
                 <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
+                <td>${createdUser}</td>
                 <td>
                   <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
                     ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
@@ -182,30 +196,6 @@
             document.getElementById("pageInfo").placeholder = (totalPages == 0 ? 0 : (page + 1)) + " / " + totalPages;
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
-        }
-    }
-
-    async function toggleStatus(id, currentStatus) {
-        try {
-            const newStatus = currentStatus === 1 ? 0 : 1;
-            const statusText = newStatus === 1 ? 'kích hoạt' : 'vô hiệu hóa';
-
-            if (confirm(`Bạn có chắc chắn muốn ${statusText} rạp chiếu này không?`)) {
-                const response = await httpRequest(`/api/admin/cinemas/toggle-status/${id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ status: newStatus })
-                });
-
-                if (response.code === 1) {
-                    showModal('success', 'Thành công!', response.message);
-                    await loadData();
-                } else {
-                    showModal('error', 'Ôi xong!', response.message);
-                }
-            }
-        } catch (error) {
-            console.error("Lỗi khi thay đổi trạng thái:", error);
-            showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi thay đổi trạng thái.');
         }
     }
 
@@ -229,10 +219,10 @@
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
         document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/cinemas/create")
+            navigateTo("/utc-cinemas/rooms/create")
         });
 
-        await loadDirectors();
+        await Promise.all([loadCinemas(), loadUsers()]);
         await loadData();
     });
 </script>
