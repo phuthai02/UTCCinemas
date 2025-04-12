@@ -51,7 +51,7 @@ public class CinemaServiceImpl implements CinemaService {
             return Utils.createResponse(ResponseCode.SUCCESS, cinema);
         } catch (Exception e) {
             log.error("Error getting cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Tìm kiếm rạp chiếu thất bại");
         }
     }
 
@@ -60,10 +60,10 @@ public class CinemaServiceImpl implements CinemaService {
         try {
             Cinema cinema = cinemaDto.getEntity();
             DatabaseUtils.updateEntity(cinema, cinemaRepository);
-            return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
+            return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật rạp chiếu thành công");
         } catch (Exception e) {
             log.error("Error editing cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Cập nhật rạp chiếu thất bại");
         }
     }
 }

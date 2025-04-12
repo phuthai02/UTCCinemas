@@ -1,6 +1,7 @@
 package utc.cinemas.service.room;
 
 import utc.cinemas.model.dto.Response;
+import utc.cinemas.model.dto.RoomDto;
 
 import java.util.Map;
 
