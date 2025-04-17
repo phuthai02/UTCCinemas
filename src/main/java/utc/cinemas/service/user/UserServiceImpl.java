@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
             return Utils.createResponse(ResponseCode.SUCCESS, UserDto.getDto(user));
         } catch (Exception e) {
             log.error("Error getting user: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Tìm kiếm người thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin người dùng");
         }
     }
 

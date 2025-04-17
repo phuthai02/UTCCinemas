@@ -47,4 +47,11 @@ public class RoomController {
         Response response = roomService.update(roomDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("get-all")
+    public ResponseEntity<Response> getRooms() {
+        log.info("Get all rooms");
+        Response response = roomService.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

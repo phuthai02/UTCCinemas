@@ -45,4 +45,10 @@ public class Movie {
 
     @Column(name = "STATUS")
     private Integer status; // Trạng thái
+
+    @Column(name = "DIRECTOR")
+    private String director; // Đạo diễn
+
+    @Column(name = "IMAGE")
+    private String image; // Đường dẫn hoặc URL hình ảnh
 }

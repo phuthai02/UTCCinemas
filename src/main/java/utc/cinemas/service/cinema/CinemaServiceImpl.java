@@ -54,7 +54,7 @@ public class CinemaServiceImpl implements CinemaService {
             return Utils.createResponse(ResponseCode.SUCCESS, cinema);
         } catch (Exception e) {
             log.error("Error getting cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Tìm kiếm rạp chiếu thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin rạp chiếu");
         }
     }
 
@@ -76,7 +76,7 @@ public class CinemaServiceImpl implements CinemaService {
             List<Cinema> cinemas = cinemaRepository.findAll();
             return Utils.createResponse(ResponseCode.SUCCESS, cinemas);
         } catch (Exception e) {
-            log.error("Error fetching cinemas activated: {}", e.getMessage());
+            log.error("Error fetching cinemas all: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

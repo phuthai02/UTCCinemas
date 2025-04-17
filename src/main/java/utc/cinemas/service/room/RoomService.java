@@ -10,4 +10,5 @@ public interface RoomService {
     Response create(RoomDto roomDto);
     Response getRoomById(Long id);
     Response update(RoomDto roomDto);
+    Response getAll();
 }

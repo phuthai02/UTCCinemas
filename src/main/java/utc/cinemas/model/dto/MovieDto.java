@@ -20,6 +20,8 @@ public class MovieDto {
     private Timestamp createdDate;
     private Timestamp modifiedDate;
     private Integer status;
+    private String director;
+    private String image;
 
     public Movie getEntity() {
         Movie movie = new Movie();

@@ -12,6 +12,7 @@ import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -53,7 +54,7 @@ public class RoomServiceImpl implements RoomService {
             return Utils.createResponse(ResponseCode.SUCCESS, room);
         } catch (Exception e) {
             log.error("Error getting room: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Tìm kiếm phòng chiếu thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin phòng chiếu");
         }
     }
 
@@ -66,6 +67,17 @@ public class RoomServiceImpl implements RoomService {
         } catch (Exception e) {
             log.error("Error editing room: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật phòng chiếu thất bại");
+        }
+    }
+
+    @Override
+    public Response getAll() {
+        try {
+            List<Room> rooms = roomRepository.findAll();
+            return Utils.createResponse(ResponseCode.SUCCESS, rooms);
+        } catch (Exception e) {
+            log.error("Error fetching rooms all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 }
