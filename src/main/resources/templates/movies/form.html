@@ -64,78 +64,89 @@
     <div class="main-content">
         <div class="content-box">
             <div class="edit-header">
-                <h2 id="pageTitle">Thêm rạp chiếu mới</h2>
+                <h2 id="pageTitle">Thêm phim mới</h2>
                 <div class="edit-actions">
-                    <button onclick="navigateTo('/utc-cinemas/cinemas')">
+                    <button onclick="navigateTo('/utc-cinemas/movies')">
                         Quay lại
                     </button>
                 </div>
             </div>
 
             <div class="edit-container">
-                <form id="cinemaForm">
-                    <input type="hidden" id="cinemaId" name="cinemaId">
+                <form id="movieForm" enctype="multipart/form-data">
+                    <input type="hidden" id="movieId" name="id">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="name">Tên rạp chiếu <span class="required">*</span></label>
-                            <input type="text" id="name" name="name" maxlength="255">
-                            <div class="error-message" id="name-error"></div>
+                            <label for="title">Tên phim <span class="required">*</span></label>
+                            <input type="text" id="title" name="title" maxlength="255">
+                            <div class="error-message" id="title-error"></div>
                         </div>
                         <div class="form-group">
-                            <label for="location">Địa chỉ <span class="required">*</span></label>
-                            <input type="text" id="location" name="location" maxlength="255">
-                            <div class="error-message" id="location-error"></div>
+                            <label for="genre">Thể loại <span class="required">*</span></label>
+                            <input type="text" id="genre" name="genre" maxlength="255">
+                            <div class="error-message" id="genre-error"></div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="phoneNumber">Số điện thoại <span class="required">*</span></label>
-                            <input type="tel" id="phoneNumber" name="phoneNumber" maxlength="15">
-                            <div class="error-message" id="phoneNumber-error"></div>
+                            <label for="duration">Thời lượng (phút) <span class="required">*</span></label>
+                            <input type="number" id="duration" name="duration" min="1" max="1000">
+                            <div class="error-message" id="duration-error"></div>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email <span class="required">*</span></label>
-                            <input type="email" id="email" name="email" maxlength="255">
-                            <div class="error-message" id="email-error"></div>
+                            <label for="director">Đạo diễn <span class="required">*</span></label>
+                            <input type="text" id="director" name="director" maxlength="255">
+                            <div class="error-message" id="director-error"></div>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="openingTime">Giờ mở cửa <span class="required">*</span></label>
-                            <input type="time" id="openingTime" name="openingTime">
-                            <div class="error-message" id="openingTime-error"></div>
+                        <div class="form-group date-input">
+                            <label for="releaseDate">Ngày phát hành <span class="required">*</span></label>
+                            <input type="date" id="releaseDate" name="releaseDate">
+                            <div class="error-message" id="releaseDate-error"></div>
                         </div>
                         <div class="form-group">
-                            <label for="closingTime">Giờ đóng cửa <span class="required">*</span></label>
-                            <input type="time" id="closingTime" name="closingTime">
-                            <div class="error-message" id="closingTime-error"></div>
+                            <label for="rating">Xếp hạng (1-10) <span class="required">*</span></label>
+                            <input type="number" id="rating" name="rating" min="1" max="10" step="1">
+                            <div class="error-message" id="rating-error"></div>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="directorSearch">Giám đốc cơ sở <span class="required">*</span></label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="directorSearch" placeholder="Nhập tên giám đốc để tìm kiếm..." autocomplete="off">
-                                <div class="autocomplete-dropdown" id="directorDropdown"></div>
-                                <div class="selected-director" id="selectedDirector"></div>
-                                <input type="hidden" id="cinemaDirector" name="cinemaDirector">
-                                <div class="error-message" id="cinemaDirector-error"></div>
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label for="status">Trạng thái <span class="required">*</span></label>
                             <select id="status" name="status">
                                 <option value="">Chọn trạng thái</option>
-                                <option value="0">Dừng hoạt động</option>
-                                <option value="1" selected>Đang hoạt động</option>
+                                <option value="0">Ngừng chiếu</option>
+                                <option value="1" selected>Đang chiếu</option>
+                                <option value="2">Sắp chiếu</option>
                             </select>
                             <div class="error-message" id="status-error"></div>
                         </div>
+                        <div class="form-group">
+                            <label for="imageFile">Hình ảnh phim <span id="image-required"
+                                                                       class="required">*</span></label>
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*">
+                            <input type="hidden" id="image" name="image">
+                            <div class="error-message" id="imageFile-error"></div>
+                            <div class="image-preview" id="imagePreview" style="display: none;">
+                                <img id="previewImg" src="" alt="Movie Preview">
+                                <div class="remove-image" onclick="removeImage()">
+                                    <span class="iconify" data-icon="mdi:close" data-inline="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="width: 100%;">
+                            <label for="description">Mô tả phim <span class="required">*</span></label>
+                            <textarea id="description" name="description" class="description-area"
+                                      maxlength="2000"></textarea>
+                            <div class="error-message" id="description-error"></div>
+                        </div>
                     </div>
                     <div class="form-actions">
-                        <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/cinemas')">Hủy bỏ
-                        </button>
-                        <button type="submit" id="saveBtn">Lưu rạp chiếu</button>
+                        <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/movies')">Hủy bỏ</button>
+                        <button type="submit" id="saveBtn">Lưu phim</button>
                     </div>
                 </form>
             </div>
@@ -145,169 +156,119 @@
 
 <script src="/javascript/main.js"></script>
 <script>
-    let directorsData = [];
     let isEditMode = false;
+    let originalImageUrl = '';
+    let imageChanged = false;
 
     document.addEventListener('DOMContentLoaded', function () {
         initializePage();
-        loadCinemaDirectors();
-        setupDirectorAutocomplete();
-        document.getElementById('cinemaForm').addEventListener('submit', handleFormSubmit);
+        setupImagePreview();
+        document.getElementById('movieForm').addEventListener('submit', handleFormSubmit);
     });
 
     function initializePage() {
         checkToken();
         document.getElementById('logoutBtn').addEventListener('click', logout);
+        checkForEditMode();
     }
 
     function checkForEditMode() {
         const urlParams = new URLSearchParams(window.location.search);
-        const cinemaId = urlParams.get('id');
+        const movieId = urlParams.get('id');
 
-        if (cinemaId) {
+        if (movieId) {
             isEditMode = true;
-            document.getElementById('pageTitle').textContent = 'Chỉnh sửa rạp chiếu';
-            document.getElementById('saveBtn').textContent = 'Cập nhật rạp chiếu';
-            loadCinemaDetails(cinemaId);
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa phim';
+            document.getElementById('saveBtn').textContent = 'Cập nhật phim';
+            document.getElementById('image-required').style.display = 'none';
+            loadMovieDetails(movieId);
         }
     }
 
-    async function loadCinemaDetails(cinemaId) {
+    async function loadMovieDetails(movieId) {
         try {
-            const response = await httpRequest(`/api/admin/cinemas/${cinemaId}`, {
+            const response = await httpRequest(`/api/admin/movies/${movieId}`, {
                 method: 'GET'
             });
 
             if (response.code === 1 && response.data) {
                 populateForm(response.data);
             } else {
-                showModal('error', 'Ôi xong!', 'Không thể tải thông tin rạp chiếu.');
-                setTimeout(() => navigateTo('/utc-cinemas/cinemas'), 2000);
+                showModal('error', 'Ôi xong!', 'Không thể tải thông tin phim.');
+                setTimeout(() => navigateTo('/utc-cinemas/movies'), 2000);
             }
         } catch (error) {
-            console.error('Lỗi khi tải thông tin rạp chiếu:', error);
-            showModal('error', 'Ôi xong!', 'Không thể tải thông tin rạp chiếu.');
+            console.error('Lỗi khi tải thông tin phim:', error);
+            showModal('error', 'Ôi xong!', 'Không thể tải thông tin phim.');
         }
     }
 
-    function populateForm(cinema) {
-        document.getElementById('cinemaId').value = cinema.id;
-        document.getElementById('name').value = cinema.name;
-        document.getElementById('location').value = cinema.location;
-        document.getElementById('phoneNumber').value = cinema.phoneNumber;
-        document.getElementById('email').value = cinema.email;
-        document.getElementById('openingTime').value = cinema.openingTime;
-        document.getElementById('closingTime').value = cinema.closingTime;
-        document.getElementById('status').value = cinema.status;
+    function populateForm(movie) {
+        document.getElementById('movieId').value = movie.id;
+        document.getElementById('title').value = movie.title;
+        document.getElementById('genre').value = movie.genre;
+        document.getElementById('duration').value = movie.duration;
+        document.getElementById('director').value = movie.director;
+        document.getElementById('description').value = movie.description;
+        document.getElementById('rating').value = movie.rating;
+        document.getElementById('status').value = movie.status;
 
-        if (cinema.cinemaDirector) {
-            document.getElementById('cinemaDirector').value = cinema.cinemaDirector;
-            const director = directorsData.find(d => d.id === cinema.cinemaDirector);
-            if (director) {
-                const selectedDisplay = document.getElementById('selectedDirector');
-                selectedDisplay.textContent = `Đã chọn: ${director.name}`;
-                selectedDisplay.classList.add('show');
-            }
+        if (movie.releaseDate) {
+            const date = new Date(movie.releaseDate);
+            const formattedDate = date.toISOString().split('T')[0];
+            document.getElementById('releaseDate').value = formattedDate;
+        }
+
+        if (movie.image) {
+            originalImageUrl = movie.image;
+            document.getElementById('image').value = movie.image;
+            displayServerImage(movie.image);
         }
     }
 
-    async function loadCinemaDirectors() {
-        try {
-            const response = await httpRequest('/api/admin/users/directors', {
-                method: 'GET'
-            });
-
-            if (response.code === 1 && response.data) {
-                directorsData = response.data;
-                checkForEditMode();
-            } else {
-                console.error('Không thể tải danh sách giám đốc:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách giám đốc:', error);
-        }
+    function displayServerImage(imagePath) {
+        const previewContainer = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const imageUrl = `/api/admin/movies/get-image?imagePath=${imagePath}`;
+        previewImg.src = imageUrl;
+        previewContainer.style.display = 'block';
     }
 
-    function setupDirectorAutocomplete() {
-        const searchInput = document.getElementById('directorSearch');
-        const dropdown = document.getElementById('directorDropdown');
-        const selectedDisplay = document.getElementById('selectedDirector');
-
-        searchInput.addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            filterDirectors(searchTerm);
-        });
-
-        searchInput.addEventListener('focus', function () {
-            if (directorsData.length > 0) {
-                filterDirectors(this.value.toLowerCase());
-            }
-        });
-
-        selectedDisplay.addEventListener('click', function () {
-            document.getElementById('cinemaDirector').value = '';
-            selectedDisplay.textContent = '';
-            selectedDisplay.classList.remove('show');
-            searchInput.focus();
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
-                dropdown.classList.remove('show');
+    function setupImagePreview() {
+        const imageInput = document.getElementById('imageFile');
+        imageInput.addEventListener('change', function (event) {
+            if (event.target.files && event.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    displayImagePreview(e.target.result);
+                    imageChanged = true;
+                }
+                reader.readAsDataURL(event.target.files[0]);
             }
         });
     }
 
-    function filterDirectors(searchTerm) {
-        const dropdown = document.getElementById('directorDropdown');
-        dropdown.innerHTML = '';
-
-        if (!directorsData.length) return;
-
-        const filteredDirectors = directorsData.filter(director => {
-            const directorName = (director.name || '').toLowerCase();
-            return directorName.includes(searchTerm);
-        });
-
-        if (filteredDirectors.length > 0) {
-            filteredDirectors.forEach(director => {
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item';
-                item.textContent = director.name;
-                item.setAttribute('data-id', director.id);
-
-                item.addEventListener('click', function () {
-                    selectDirector(director);
-                    dropdown.classList.remove('show');
-                });
-
-                dropdown.appendChild(item);
-            });
-
-            dropdown.classList.add('show');
-        } else {
-            dropdown.classList.remove('show');
-        }
+    function displayImagePreview(src) {
+        const previewContainer = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        previewImg.src = src;
+        previewContainer.style.display = 'block';
     }
 
-    function selectDirector(director) {
-        const searchInput = document.getElementById('directorSearch');
-        const hiddenInput = document.getElementById('cinemaDirector');
-        const selectedDisplay = document.getElementById('selectedDirector');
+    function removeImage() {
+        const imagePreview = document.getElementById('imagePreview');
+        const imageInput = document.getElementById('imageFile');
+        const imageUrl = document.getElementById('image');
 
-        hiddenInput.value = director.id;
-        searchInput.value = '';
-        const directorName = director.name;
-        selectedDisplay.textContent = `Đã chọn: ${directorName}`;
-        selectedDisplay.classList.add('show');
-
-        document.getElementById('cinemaDirector-error').textContent = '';
+        imagePreview.style.display = 'none';
+        imageInput.value = '';
+        imageUrl.value = '';
+        imageChanged = true;
     }
 
     async function handleFormSubmit(event) {
         event.preventDefault();
         clearErrorMessages();
-
         if (!validateForm()) return;
         await submitFormData();
     }
@@ -318,23 +279,31 @@
 
     function validateForm() {
         const validationRules = [
-            {id: 'name', validation: value => value.trim() !== '', message: 'Vui lòng nhập tên rạp chiếu'},
-            {id: 'location', validation: value => value.trim() !== '', message: 'Vui lòng nhập địa chỉ'},
+            {id: 'title', validation: value => value.trim() !== '', message: 'Vui lòng nhập tên phim'},
+            {id: 'genre', validation: value => value.trim() !== '', message: 'Vui lòng nhập thể loại phim'},
             {
-                id: 'phoneNumber',
-                validation: value => value.trim() !== '' && /^\d{10,15}$/.test(value.trim()),
-                message: 'Vui lòng nhập số điện thoại hợp lệ'
+                id: 'duration',
+                validation: value => value !== '' && parseInt(value) > 0,
+                message: 'Vui lòng nhập thời lượng phim hợp lệ'
             },
+            {id: 'director', validation: value => value.trim() !== '', message: 'Vui lòng nhập tên đạo diễn'},
+            {id: 'releaseDate', validation: value => value !== '', message: 'Vui lòng chọn ngày phát hành'},
             {
-                id: 'email',
-                validation: value => value.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
-                message: 'Vui lòng nhập email hợp lệ'
+                id: 'rating',
+                validation: value => value !== '' && parseInt(value) >= 1 && parseInt(value) <= 10,
+                message: 'Vui lòng nhập xếp hạng từ 1-10'
             },
-            {id: 'openingTime', validation: value => value !== '', message: 'Vui lòng chọn giờ mở cửa'},
-            {id: 'closingTime', validation: value => value !== '', message: 'Vui lòng chọn giờ đóng cửa'},
-            {id: 'cinemaDirector', validation: value => value !== '', message: 'Vui lòng chọn giám đốc cơ sở'},
-            {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}
+            {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'},
+            {id: 'description', validation: value => value.trim() !== '', message: 'Vui lòng nhập mô tả phim'}
         ];
+
+        if (!isEditMode || (isEditMode && imageChanged && !document.getElementById('image').value)) {
+            validationRules.push({
+                id: 'imageFile',
+                validation: value => document.getElementById('imageFile').files.length > 0,
+                message: 'Vui lòng chọn hình ảnh phim'
+            });
+        }
 
         let isValid = true;
 
@@ -348,29 +317,37 @@
             }
         });
 
-        const openingTime = document.getElementById('openingTime').value;
-        const closingTime = document.getElementById('closingTime').value;
-
-        if (openingTime && closingTime && openingTime >= closingTime) {
-            document.getElementById('closingTime-error').textContent = 'Giờ đóng cửa phải sau giờ mở cửa';
-            isValid = false;
-        }
-
         return isValid;
     }
 
     async function submitFormData() {
         try {
-            const formData = getFormData();
-            const endpoint = isEditMode
-                ? `/api/admin/cinemas/update`
-                : '/api/admin/cinemas/create';
+            const formData = new FormData(document.getElementById('movieForm'));
 
-            const method = isEditMode ? 'PUT' : 'POST';
+            if (formData.get('releaseDate')) {
+                const date = new Date(formData.get('releaseDate'));
+                formData.set('releaseDate', date.toISOString());
+            }
+
+            if (isEditMode) {
+                if (imageChanged) {
+                    formData.set('image', originalImageUrl);
+                } else {
+                    formData.delete('image');
+                    formData.delete('imageFile');
+                }
+            }
+
+            const endpoint = isEditMode
+                ? `/api/admin/movies/update`
+                : '/api/admin/movies/create';
+
+            console.log(`Gửi yêu cầu ${isEditMode ? 'cập nhật' : 'tạo mới'} phim đến ${endpoint}`);
 
             const response = await httpRequest(endpoint, {
-                method: method,
-                body: JSON.stringify(formData)
+                method: isEditMode ? 'PUT' : 'POST',
+                body: formData,
+                headers: {}
             });
 
             handleApiResponse(response);
@@ -380,30 +357,9 @@
         }
     }
 
-    function getFormData() {
-        const data = {
-            name: document.getElementById('name').value.trim(),
-            location: document.getElementById('location').value.trim(),
-            phoneNumber: document.getElementById('phoneNumber').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            openingTime: document.getElementById('openingTime').value,
-            closingTime: document.getElementById('closingTime').value,
-            cinemaDirector: document.getElementById('cinemaDirector').value,
-            status: document.getElementById('status').value
-        };
-
-        const cinemaId = document.getElementById('cinemaId').value;
-        if (cinemaId) {
-            data.id = cinemaId;
-        }
-
-        return data;
-    }
-
     function handleApiResponse(response) {
         if (response.code === 1) {
-            const actionText = isEditMode ? 'cập nhật' : 'thêm mới';
-            showModal('success', 'Thành công!', response.message, '/utc-cinemas/cinemas');
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/movies');
         } else {
             showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
         }

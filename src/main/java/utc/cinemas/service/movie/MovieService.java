@@ -8,4 +8,6 @@ import java.util.Map;
 public interface MovieService {
     Response getListOfMovies(Map<String, String> filters);
     Response create(MovieDto movieDto);
+    Response getMovieById(Long id);
+    Response update(MovieDto movieDto);
 }

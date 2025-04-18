@@ -50,5 +50,5 @@ public class Movie {
     private String director; // Đạo diễn
 
     @Column(name = "IMAGE")
-    private String image; // Đường dẫn hoặc URL hình ảnh
+    private String image; // Đường dẫn URL hình ảnh
 }

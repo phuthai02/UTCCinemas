@@ -36,14 +36,14 @@ public class CinemaController {
 
     @PostMapping("create")
     public ResponseEntity<Response> createCinema(@RequestBody CinemaDto cinemaDto) {
-        log.info("Create cinemas with params: dto={}", JsonUtils.toString(cinemaDto));
+        log.info("Create cinema with params: dto={}", JsonUtils.toString(cinemaDto));
         Response response = cinemaService.create(cinemaDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("update")
     public ResponseEntity<Response> updateCinema(@RequestBody CinemaDto cinemaDto) {
-        log.info("Update cinemas with params: dto={}", JsonUtils.toString(cinemaDto));
+        log.info("Update cinema with params: dto={}", JsonUtils.toString(cinemaDto));
         Response response = cinemaService.update(cinemaDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

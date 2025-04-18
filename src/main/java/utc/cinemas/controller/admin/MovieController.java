@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import utc.cinemas.model.dto.MovieDto;
 import utc.cinemas.model.dto.Response;
 import utc.cinemas.service.movie.MovieService;
+import utc.cinemas.util.ImageUtils;
 import utc.cinemas.util.JsonUtils;
 
 import java.util.Map;
@@ -28,11 +29,30 @@ public class MovieController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("create")
-    public ResponseEntity<Response> createMovie(
-            @RequestBody MovieDto moviesDto) {
-        log.info("Create movie with params: dto={}", JsonUtils.toString(moviesDto));
-        Response response = movieService.create(moviesDto);
+    @GetMapping("{id}")
+    public ResponseEntity<Response> getCinemaById(@PathVariable Long id) {
+        log.info("Get movie by id: id={}", id);
+        Response response = movieService.getMovieById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("create")
+    public ResponseEntity<Response> createMovie(@ModelAttribute MovieDto movieDto) {
+        log.info("Create movie with params: dto={}", JsonUtils.toString(movieDto));
+        Response response = movieService.create(movieDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<Response> updateCinema(@ModelAttribute MovieDto movieDto) {
+        log.info("Update movie with params: dto={}", JsonUtils.toString(movieDto));
+        Response response = movieService.update(movieDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("get-image")
+    public ResponseEntity<byte[]> getImageMovie(@RequestParam String imagePath) {
+        log.info("Get image movie");
+        return new ResponseEntity<>(ImageUtils.getImage(imagePath), HttpStatus.OK);
     }
 }

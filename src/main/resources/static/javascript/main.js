@@ -17,9 +17,15 @@ function httpRequest(url, options = {}) {
         logout();
         return Promise.reject('Không có token, cần đăng nhập lại.');
     }
-    options.headers = {
-        ...options.headers, 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`
-    };
+
+    options.headers = options.headers || {};
+
+    if (!(options.body instanceof FormData)) {
+        options.headers['Content-Type'] = 'application/json';
+    }
+
+    options.headers['Authorization'] = `Bearer ${token}`;
+
     return fetch(url, options)
         .then(response => {
             if (response.status === 401) {

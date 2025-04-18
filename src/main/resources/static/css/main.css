@@ -436,7 +436,7 @@ img {
     border-radius: 4px;
 }
 
-input[type="time"] {
+input[type="time"], input[type = "file"] {
     padding: 7.45px 10px;
 }
 
@@ -849,4 +849,51 @@ button:focus-visible {
 .password-group input::placeholder {
     font-style: italic;
     color: #999;
+}
+
+.image-preview {
+    width: 100%;
+    max-height: 200px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.image-preview img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    display: block;
+}
+
+.image-preview .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.form-group.date-input input[type="date"] {
+    padding: 8px 12px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+textarea.description-area {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
