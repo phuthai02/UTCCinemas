@@ -52,7 +52,6 @@ public class MovieController {
 
     @GetMapping("get-image")
     public ResponseEntity<byte[]> getImageMovie(@RequestParam String imagePath) {
-        log.info("Get image movie");
         return new ResponseEntity<>(ImageUtils.getImage(imagePath), HttpStatus.OK);
     }
 }

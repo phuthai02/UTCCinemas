@@ -11,6 +11,7 @@ import utc.cinemas.model.entity.Movie;
 import utc.cinemas.repository.MovieRepository;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.ImageUtils;
+import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.Map;
@@ -25,8 +26,9 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public Response getListOfMovies(Map<String, String> filters) {
         try {
-            String search = filters.getOrDefault("search", "").trim();
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> movieRepository.findAll("%" + search + "%", pageable));
+            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            Integer status = JsonUtils.convert(filters.get("status"), Integer.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> movieRepository.findAll("%" + search + "%", status, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching movies: {}", e.getMessage());

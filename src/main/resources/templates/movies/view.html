@@ -64,15 +64,18 @@
                 <div class="top-left">
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                        <select id="search-select">
-                            <option value="-1">Tất cả giám đốc&emsp;&emsp;</option>
+                        <select id="status-select">
+                            <option value="-1">Tất cả trạng thái&emsp;&emsp;</option>
+                            <option value="0">Đang chiếu</option>
+                            <option value="1">Sắp chiếu</option>
+                            <option value="2">Dừng chiếu</option>
                         </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
 
                 <div class="top-right">
-                    <button class="add-btn">Thêm mới</button>
+                    <button class="add-btn" onclick="navigateTo('/utc-cinemas/movies/create')">Thêm mới</button>
                 </div>
             </div>
 
@@ -82,14 +85,13 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Tên rạp</th>
-                        <th>Địa chỉ</th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
-                        <th>Giờ mở cửa</th>
-                        <th>Giờ đóng cửa</th>
-                        <th>Giám đốc cơ sở</th>
-                        <th>Ngày tạo</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên phim</th>
+                        <th>Thể loại</th>
+                        <th>Thời lượng</th>
+                        <th>Đạo diễn</th>
+                        <th>Ngày phát hành</th>
+                        <th>Xếp hạng</th>
                         <th>Trạng thái</th>
                     </tr>
                     </thead>
@@ -125,67 +127,65 @@
 <script>
     let page = 0;
     let totalPages = 0;
-    let directorMap = {};
-
-    async function loadDirectors() {
-        try {
-            const response = await httpRequest('/api/admin/users/directors', {
-                method: 'GET'
-            });
-            const selectElement = document.getElementById('search-select');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(director => {
-                    directorMap[director.id] = director.name;
-                    const option = document.createElement('option');
-                    option.value = director.id;
-                    option.textContent = director.name;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách giám đốc:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách giám đốc:', error);
-        }
-    }
+    const statusLabels = {
+        2: 'Dừng chiếu',
+        0: 'Đang chiếu',
+        1: 'Sắp chiếu'
+    };
+    const statusClasses = {
+        2: 'bg-danger',
+        0: 'bg-success',
+        1: 'bg-secondary'
+    };
 
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const directorId = document.getElementById("search-select").value;
-            const result = await httpRequest('/api/admin/cinemas/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&directorId=' + directorId);
+            const status = document.getElementById("status-select").value;
+
+            const apiUrl = `/api/admin/movies/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}&status=${status}`;
+            const result = await httpRequest(apiUrl);
+
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
             }
+
             const datas = result.data.data;
             const tableBody = document.querySelector("#tableData tbody");
             tableBody.innerHTML = "";
+
             datas.forEach((item, index) => {
-                const directorName = directorMap[item.cinemaDirector] || 'Chưa phân công';
                 const row = document.createElement("tr");
                 row.onclick = () => {
-                    navigateTo(`/utc-cinemas/cinemas/edit?id=${item.id}`);
+                    navigateTo(`/utc-cinemas/movies/edit?id=${item.id}`);
                 };
+
+                const releaseDate = item.releaseDate ? new Date(item.releaseDate).toLocaleDateString('vi-VN') : '-';
+
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.name}</td>
-                <td>${item.location}</td>
-                <td>${item.phoneNumber || '-'}</td>
-                <td>${item.email || '-'}</td>
-                <td>${item.openingTime || '-'}</td>
-                <td>${item.closingTime || '-'}</td>
-                <td>${directorName}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
+                <td style="text-align: center">
+                    <img src="/api/admin/movies/get-image?imagePath=${item.image}"
+                         alt="${item.title}"
+                         style="max-height: 80px; max-width: 60px; object-fit: cover;">
+                </td>
+                <td>${item.title}</td>
+                <td>${item.genre}</td>
+                <td>${item.duration} phút</td>
+                <td>${item.director}</td>
+                <td>${releaseDate}</td>
+                <td>${item.rating}/10</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
+                  <span class="badge ${statusClasses[item.status]}">
+                    ${statusLabels[item.status]}
                   </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
             });
+
             totalPages = result.data.totalPages;
             if (totalPages > 0 && page > totalPages - 1) {
                 page = 0;
@@ -216,11 +216,6 @@
         document.getElementById('logoutBtn').addEventListener('click', logout);
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
-        document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/cinemas/create")
-        });
-
-        await loadDirectors();
         await loadData();
     });
 </script>
