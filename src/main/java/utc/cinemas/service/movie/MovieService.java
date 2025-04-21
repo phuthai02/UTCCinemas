@@ -10,4 +10,5 @@ public interface MovieService {
     Response create(MovieDto movieDto);
     Response getMovieById(Long id);
     Response update(MovieDto movieDto);
+    Response getAll();
 }

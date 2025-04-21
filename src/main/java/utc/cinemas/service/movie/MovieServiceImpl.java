@@ -14,6 +14,7 @@ import utc.cinemas.util.ImageUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -85,6 +86,17 @@ public class MovieServiceImpl implements MovieService {
             if (imagePath != null) rollbackImage(imagePath);
             log.error("Error editing movie: {}", e.getMessage(), e);
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật phim thất bại");
+        }
+    }
+
+    @Override
+    public Response getAll() {
+        try {
+            List<Movie> movies = movieRepository.findAll();
+            return Utils.createResponse(ResponseCode.SUCCESS, movies);
+        } catch (Exception e) {
+            log.error("Error fetching movies all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 

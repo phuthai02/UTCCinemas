@@ -830,7 +830,7 @@ button:focus-visible {
     background-color: #dadada;
 }
 
-.selected-director, .selected-cinema, .selected-room {
+.selected-director, .selected-cinema, .selected-room, .selected-movie {
     display: none;
     margin-top: 8px;
     padding: 8px;
@@ -839,7 +839,7 @@ button:focus-visible {
     font-size: 14px;
 }
 
-.selected-director.show, .selected-cinema.show, .selected-room.show {
+.selected-director.show, .selected-cinema.show, .selected-room.show, .selected-movie.show {
     display: block;
 }
 

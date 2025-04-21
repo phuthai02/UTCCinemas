@@ -54,4 +54,11 @@ public class MovieController {
     public ResponseEntity<byte[]> getImageMovie(@RequestParam String imagePath) {
         return new ResponseEntity<>(ImageUtils.getImage(imagePath), HttpStatus.OK);
     }
+
+    @GetMapping("get-all")
+    public ResponseEntity<Response> getCinemas() {
+        log.info("Get all movies");
+        Response response = movieService.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

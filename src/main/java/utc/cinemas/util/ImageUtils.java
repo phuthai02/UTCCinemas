@@ -19,6 +19,7 @@ public class ImageUtils {
     public static String storeImage(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
+            assert originalFilename != null;
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String newFileName = UUID.randomUUID() + extension;
 
@@ -62,7 +63,7 @@ public class ImageUtils {
                 return Files.readAllBytes(filePath);
             }
         } catch (IOException e) {
-            log.error("Lỗi khi đọc ảnh: {}", e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return null;
     }

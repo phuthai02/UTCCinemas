@@ -13,5 +13,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
             "WHERE (s.seatNumber LIKE :search) " +
             "AND (:cinemaId = -1 OR c.id = :cinemaId) " +
             "AND (:roomId = -1 OR s.roomId = :roomId)")
-    Page<Object> findAll(String search, Long cinemaId, Long roomId, Pageable pageable);
+    Page<Seat> findAll(String search, Long cinemaId, Long roomId, Pageable pageable);
 }

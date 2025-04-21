@@ -34,7 +34,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/cinemas/create")
-    public String createCinemas() {
+    public String createCinema() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -45,7 +45,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/cinemas/edit")
-    public String editCinemas(@RequestParam String id) {
+    public String editCinema(@RequestParam String id) {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -67,7 +67,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/rooms/create")
-    public String createRooms() {
+    public String createRoom() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -78,7 +78,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/rooms/edit")
-    public String editRooms(@RequestParam String id) {
+    public String editRoom(@RequestParam String id) {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -100,7 +100,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/seats/create")
-    public String createSeats() {
+    public String createSeat() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -111,7 +111,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/seats/edit")
-    public String editSeats(@RequestParam String id) {
+    public String editSeat(@RequestParam String id) {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -133,7 +133,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/users/create")
-    public String createUsers() {
+    public String createUser() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -144,7 +144,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/users/edit")
-    public String editUsers(@RequestParam String id) {
+    public String editUser(@RequestParam String id) {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -166,7 +166,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/movies/create")
-    public String createMovies() {
+    public String createMovie() {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -177,7 +177,7 @@ public class AdminTemplate {
     }
 
     @GetMapping("/movies/edit")
-    public String editMovies(@RequestParam String id) {
+    public String editMovie(@RequestParam String id) {
         if (!AuthUtils.isAuthenticated()) {
             return "redirect:/utc-cinemas/login";
         }
@@ -185,5 +185,38 @@ public class AdminTemplate {
             return "redirect:/utc-cinemas/access-denied";
         }
         return "movies/form";
+    }
+
+    @GetMapping("/showtimes")
+    public String showtimes() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "showtimes/view";
+    }
+
+    @GetMapping("/showtimes/create")
+    public String createShowtime() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "showtimes/form";
+    }
+
+    @GetMapping("/showtimes/edit")
+    public String editShowtime(@RequestParam String id) {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "showtimes/form";
     }
 }
