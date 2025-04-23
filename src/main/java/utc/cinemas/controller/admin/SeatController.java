@@ -47,4 +47,11 @@ public class SeatController {
         Response response = seatService.update(seatDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("count-by-room-id")
+    public ResponseEntity<Response> getSeatCountByRoomId(@RequestParam Long roomId) {
+        log.info("Get seat count by room id: id={}", roomId);
+        Response response = seatService.getSeatCountByRoomId(roomId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

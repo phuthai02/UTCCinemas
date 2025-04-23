@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>UTC Cinemas - Báo cáo thống kê</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="top-bar">
+    <div class="logo-container">
+        <img src="/image/logo.png" alt="UTC Cinemas Logo">
+        <h2>UTC Cinemas</h2>
+    </div>
+    <h4 id="welcomeUser">Chào mừng...</h4>
+</div>
+
+<div class="container">
+    <aside class="aside">
+        <ul>
+            <li onclick="navigateTo('/utc-cinemas/home')">
+                <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/cinemas')">
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/rooms')">
+                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/seats')">
+                <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Quản lý ghế ngồi
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/movies')">
+                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/showtimes')">
+                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/tickets')">
+                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
+            </li>
+
+            <li onclick="navigateTo('/utc-cinemas/users')">
+                <span class="iconify" data-icon="mdi:account-circle-outline" data-inline="true"></span> Quản lý người dùng
+            </li>
+
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/reports')">
+                <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo
+            </li>
+        </ul>
+        <button id="logoutBtn">Đăng xuất</button>
+    </aside>
+
+    <div class="main-content">
+        <div class="content-box">
+            <h2>Báo cáo thống kê</h2>
+
+            <div class="report-filters">
+                <div class="filter-group">
+                    <label for="report-type">Loại báo cáo:</label>
+                    <select id="report-type">
+                        <option value="cinema">Theo rạp chiếu</option>
+                        <option value="room">Theo phòng chiếu</option>
+                        <option value="movie">Theo phim</option>
+                    </select>
+
+                    <div id="cinema-filter" class="sub-filter">
+                        <label for="cinema-select">Rạp chiếu:</label>
+                        <select id="cinema-select">
+                            <option value="-1">Tất cả rạp chiếu</option>
+                        </select>
+                    </div>
+
+                    <div id="room-filter" class="sub-filter" style="display: none;">
+                        <label for="room-select">Phòng chiếu:</label>
+                        <select id="room-select">
+                            <option value="-1">Tất cả phòng chiếu</option>
+                        </select>
+                    </div>
+
+                    <div id="movie-filter" class="sub-filter" style="display: none;">
+                        <label for="movie-select">Phim:</label>
+                        <select id="movie-select">
+                            <option value="-1">Tất cả phim</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="date-range">Thời gian:</label>
+                    <select id="date-range">
+                        <option value="today">Hôm nay</option>
+                        <option value="last7days">7 ngày gần nhất</option>
+                        <option value="last15days">15 ngày gần nhất</option>
+                        <option value="last30days">30 ngày gần nhất</option>
+                        <option value="alltime">Tất cả các ngày</option>
+                    </select>
+                </div>
+
+                <button id="generate-report" class="primary-btn">Tạo báo cáo</button>
+                <button id="export-report" class="secondary-btn">Xuất báo cáo</button>
+            </div>
+
+            <div class="report-results">
+                <div class="report-summary">
+                    <div class="summary-card">
+                        <div class="summary-title">Tổng vé bán ra</div>
+                        <div class="summary-value" id="total-tickets">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-title">Tổng doanh thu</div>
+                        <div class="summary-value" id="total-revenue">0 VND</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-title">Lượt xem phim</div>
+                        <div class="summary-value" id="total-views">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-title">Suất chiếu</div>
+                        <div class="summary-value" id="total-showtimes">0</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="revenue-chart"></canvas>
+                </div>
+
+                <div class="data-table-container">
+                    <h3 id="table-title">Chi tiết báo cáo</h3>
+                    <table id="report-table" class="display">
+                        <thead>
+                        <tr id="report-table-header">
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Số vé</th>
+                            <th>Doanh thu</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                        </thead>
+                        <tbody id="report-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/javascript/main.js"></script>
+<script>
+    let revenueChart = null;
+
+    // Khởi tạo dropdown và sự kiện
+    async function initializeFilters() {
+        const reportType = document.getElementById('report-type');
+        reportType.addEventListener('change', function() {
+            document.getElementById('cinema-filter').style.display = 'none';
+            document.getElementById('room-filter').style.display = 'none';
+            document.getElementById('movie-filter').style.display = 'none';
+
+            switch(this.value) {
+                case 'cinema':
+                    document.getElementById('cinema-filter').style.display = 'inline-block';
+                    break;
+                case 'room':
+                    document.getElementById('room-filter').style.display = 'inline-block';
+                    break;
+                case 'movie':
+                    document.getElementById('movie-filter').style.display = 'inline-block';
+                    break;
+            }
+        });
+
+        // Tải danh sách rạp chiếu
+        await loadCinemas();
+        // Tải danh sách phòng chiếu
+        await loadRooms();
+        // Tải danh sách phim
+        await loadMovies();
+
+        // Sự kiện tạo báo cáo
+        document.getElementById('generate-report').addEventListener('click', generateReport);
+        document.getElementById('export-report').addEventListener('click', exportReport);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    }
+
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const selectElement = document.getElementById('cinema-select');
+                response.data.forEach(cinema => {
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    selectElement.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    async function loadRooms() {
+        try {
+            const response = await httpRequest('/api/admin/rooms/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const selectElement = document.getElementById('room-select');
+                response.data.forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.id;
+                    option.textContent = room.name;
+                    selectElement.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách phòng chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phòng chiếu:', error);
+        }
+    }
+
+    async function loadMovies() {
+        try {
+            const response = await httpRequest('/api/admin/movies/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const selectElement = document.getElementById('movie-select');
+                response.data.forEach(movie => {
+                    const option = document.createElement('option');
+                    option.value = movie.id;
+                    option.textContent = movie.title;
+                    selectElement.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách phim:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phim:', error);
+        }
+    }
+
+    async function generateReport() {
+        try {
+            const reportType = document.getElementById('report-type').value;
+            const dateRange = document.getElementById('date-range').value;
+
+            let entityId = -1;
+            switch(reportType) {
+                case 'cinema':
+                    entityId = document.getElementById('cinema-select').value;
+                    break;
+                case 'room':
+                    entityId = document.getElementById('room-select').value;
+                    break;
+                case 'movie':
+                    entityId = document.getElementById('movie-select').value;
+                    break;
+            }
+
+            const response = await httpRequest('/api/admin/reports/generate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    reportType: reportType,
+                    dateRange: dateRange,
+                    entityId: entityId
+                })
+            });
+
+            if (response.code === 1 && response.data) {
+                updateReportDisplay(response.data, reportType);
+            } else {
+                console.error('Không thể tạo báo cáo:', response.message);
+                alert('Không thể tạo báo cáo: ' + response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tạo báo cáo:', error);
+            alert('Lỗi khi tạo báo cáo');
+        }
+    }
+
+    function updateReportDisplay(data, reportType) {
+        // Cập nhật thông tin tổng quan
+        document.getElementById('total-tickets').textContent = data.summary.totalTickets.toLocaleString();
+        document.getElementById('total-revenue').textContent = data.summary.totalRevenue.toLocaleString() + ' VND';
+        document.getElementById('total-views').textContent = data.summary.totalViews.toLocaleString();
+        document.getElementById('total-showtimes').textContent = data.summary.totalShowtimes.toLocaleString();
+
+        // Cập nhật biểu đồ
+        updateChart(data.chartData);
+
+        // Cập nhật bảng dữ liệu
+        updateTable(data.tableData, reportType);
+    }
+
+    function updateChart(chartData) {
+        const ctx = document.getElementById('revenue-chart').getContext('2d');
+
+        // Nếu đã có biểu đồ, hủy nó để tạo biểu đồ mới
+        if (revenueChart !== null) {
+            revenueChart.destroy();
+        }
+
+        revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Doanh thu (VND)',
+                    data: chartData.values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function updateTable(tableData, reportType) {
+        const tableBody = document.getElementById('report-table-body');
+        tableBody.innerHTML = '';
+
+        // Cập nhật tiêu đề của bảng
+        let tableTitle = '';
+        switch(reportType) {
+            case 'cinema':
+                tableTitle = 'Chi tiết theo rạp chiếu';
+                break;
+            case 'room':
+                tableTitle = 'Chi tiết theo phòng chiếu';
+                break;
+            case 'movie':
+                tableTitle = 'Chi tiết theo phim';
+                break;
+        }
+        document.getElementById('table-title').textContent = tableTitle;
+
+        // Tạo các hàng dữ liệu cho bảng
+        tableData.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.name}</td>
+                <td>${item.ticketCount.toLocaleString()}</td>
+                <td>${item.revenue.toLocaleString()} VND</td>
+                <td>${item.percentage.toFixed(2)}%</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function exportReport() {
+        const reportType = document.getElementById('report-type').value;
+        const dateRange = document.getElementById('date-range').value;
+
+        let entityId = -1;
+        switch(reportType) {
+            case 'cinema':
+                entityId = document.getElementById('cinema-select').value;
+                break;
+            case 'room':
+                entityId = document.getElementById('room-select').value;
+                break;
+            case 'movie':
+                entityId = document.getElementById('movie-select').value;
+                break;
+        }
+
+        // Tạo URL để download file báo cáo
+        const downloadUrl = `/api/admin/reports/export?reportType=${reportType}&dateRange=${dateRange}&entityId=${entityId}`;
+
+        // Tạo thẻ a ẩn để tải xuống file
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `bao-cao-${reportType}-${dateRange}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        checkToken();
+        await initializeFilters();
+    });
+</script>
+</body>
+</html>

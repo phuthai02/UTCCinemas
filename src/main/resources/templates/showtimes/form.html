@@ -43,7 +43,7 @@
                 <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
 
-            <li onclick="navigateTo('/utc-cinemas/bookings')">
+            <li onclick="navigateTo('/utc-cinemas/tickets')">
                 <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
 
@@ -148,6 +148,7 @@
     let allRoomsData = [];
     let moviesData = [];
     let isEditMode = false;
+    let seatCount = 0;
 
     document.addEventListener('DOMContentLoaded', function () {
         initializePage();
@@ -184,7 +185,7 @@
             });
 
             if (response.code === 1 && response.data) {
-                populateForm(response.data);
+                await populateForm(response.data);
             } else {
                 showModal('error', 'Ôi xong!', 'Không thể tải thông tin suất chiếu.');
                 setTimeout(() => navigateTo('/utc-cinemas/showtimes'), 2000);
@@ -192,6 +193,25 @@
         } catch (error) {
             console.error('Lỗi khi tải thông tin suất chiếu:', error);
             showModal('error', 'Ôi xong!', 'Không thể tải thông tin suất chiếu.');
+        }
+    }
+
+    async function loadSeatCount(roomId) {
+        try {
+            const response = await httpRequest('/api/admin/seats/count-by-room-id?roomId=' + roomId, {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data !== undefined) {
+                seatCount = response.data;
+                return seatCount;
+            } else {
+                console.error('Không thể tải số lượng ghế:', response.message);
+                return 0;
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải số lượng ghế:', error);
+            return 0;
         }
     }
 
@@ -229,27 +249,27 @@
         }
     }
 
-    function populateForm(showtime) {
+    async function populateForm(showtime) {
         document.getElementById('showtimeId').value = showtime.id;
         document.getElementById('status').value = showtime.status;
         document.getElementById('roomId').value = showtime.roomId;
         document.getElementById('movieId').value = showtime.movieId;
         document.getElementById('price').value = showtime.price;
 
-        // Format datetime for datetime-local input
         if (showtime.startTime) {
             const date = new Date(showtime.startTime);
             const formattedDate = date.toISOString().slice(0, 16);
             document.getElementById('startTime').value = formattedDate;
         }
 
-        // Set room
         if (showtime.roomId) {
             const room = roomsData.find(r => r.id === showtime.roomId);
             if (room) {
+                await loadSeatCount(showtime.roomId);
+
                 document.getElementById('cinemaId').value = room.cinemaId;
                 const selectedRoomDisplay = document.getElementById('selectedRoom');
-                selectedRoomDisplay.textContent = `Đã chọn: ${room.name}`;
+                selectedRoomDisplay.textContent = `Đã chọn: ${room.name} (${seatCount} ghế)`;
                 selectedRoomDisplay.classList.add('show');
 
                 const cinema = cinemasData.find(c => c.id === room.cinemaId);
@@ -263,7 +283,6 @@
             }
         }
 
-        // Set movie
         if (showtime.movieId) {
             const movie = moviesData.find(m => m.id === showtime.movieId);
             if (movie) {
@@ -442,15 +461,19 @@
         }
     }
 
-    function selectRoom(room) {
+    async function selectRoom(room) {
         const searchInput = document.getElementById('roomSearch');
         const hiddenInput = document.getElementById('roomId');
         const selectedDisplay = document.getElementById('selectedRoom');
 
         hiddenInput.value = room.id;
         searchInput.value = '';
+
+        // Lấy số lượng ghế
+        await loadSeatCount(room.id);
+
         const roomName = room.name;
-        selectedDisplay.textContent = `Đã chọn: ${roomName}`;
+        selectedDisplay.textContent = `Đã chọn: ${roomName} (${seatCount} ghế)`;
         selectedDisplay.classList.add('show');
 
         document.getElementById('roomId-error').textContent = '';

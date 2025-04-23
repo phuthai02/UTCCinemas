@@ -27,9 +27,9 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public Response getListOfMovies(Map<String, String> filters) {
         try {
-            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            String search = Utils.getSearch(filters);
             Integer status = JsonUtils.convert(filters.get("status"), Integer.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> movieRepository.findAll("%" + search + "%", status, pageable));
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> movieRepository.findAll(search, status, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching movies: {}", e.getMessage());

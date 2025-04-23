@@ -47,9 +47,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("directors")
-    public ResponseEntity<Response> getDirectors() {
-        log.info("Get directors");
-        return ResponseEntity.ok(userService.getDirectors());
+    @GetMapping("get-all")
+    public ResponseEntity<Response> getUsers() {
+        log.info("Get all users");
+        Response response = userService.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

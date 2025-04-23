@@ -43,7 +43,7 @@
                 <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
 
-            <li onclick="navigateTo('/utc-cinemas/bookings')">
+            <li onclick="navigateTo('/utc-cinemas/tickets')">
                 <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
 
@@ -234,7 +234,7 @@
 
     async function loadUsers() {
         try {
-            const response = await httpRequest('/api/admin/users/directors', {
+            const response = await httpRequest('/api/admin/users/get-all', {
                 method: 'GET'
             });
 
@@ -254,7 +254,7 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            let url = `/api/admin/showtimes/get-list?page=${page}&pageSize=${pageSize}&sortBy=startTime&sortOrder=desc&search=${search}`;
+            let url = `/api/admin/showtimes/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
             url += `&cinemaId=${selectedCinemaId}`;
             url += `&roomId=${selectedRoomId}`;
             url += `&movieId=${selectedMovieId}`;

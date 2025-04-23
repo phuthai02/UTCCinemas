@@ -25,9 +25,9 @@ public class CinemaServiceImpl implements CinemaService {
     @Override
     public Response getListOfCinemas(Map<String, String> filters) {
         try {
-            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            String search = Utils.getSearch(filters);
             Long directorId = JsonUtils.convert(filters.get("directorId"), Long.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> cinemaRepository.findAll("%" + search + "%",  directorId, pageable));
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> cinemaRepository.findAll(search,  directorId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching cinemas: {}", e.getMessage());

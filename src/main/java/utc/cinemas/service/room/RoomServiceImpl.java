@@ -25,9 +25,9 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Response getListOfRooms(Map<String, String> filters) {
         try {
-            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            String search = Utils.getSearch(filters);
             Long cinemaId = JsonUtils.convert(filters.get("cinemaId"), Long.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> roomRepository.findAll("%" + search + "%", cinemaId, pageable));
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> roomRepository.findAll(search, cinemaId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching rooms: {}", e.getMessage());

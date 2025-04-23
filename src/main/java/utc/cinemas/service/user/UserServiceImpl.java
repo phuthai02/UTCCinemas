@@ -27,23 +27,22 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Response getDirectors() {
-        Response response = Utils.createResponse(ResponseCode.ERROR);
+    public Response getAll() {
         try {
-            List<User> directors = userRepository.findAll();
-            response = Utils.createResponse(ResponseCode.SUCCESS, directors);
+            List<User> users = userRepository.findAll();
+            return Utils.createResponse(ResponseCode.SUCCESS, users);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error fetching users all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
-        return response;
     }
 
     @Override
     public Response getListOfUsers(Map<String, String> filters) {
         try {
-            String search = JsonUtils.convert(filters.get("search"), String.class).trim();
+            String search = Utils.getSearch(filters);
             Integer role = JsonUtils.convert(filters.get("role"), Integer.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> userRepository.findAll("%" + search + "%", role, pageable));
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> userRepository.findAll(search, role, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching users: {}", e.getMessage());

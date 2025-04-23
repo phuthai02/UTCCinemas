@@ -21,14 +21,7 @@ public class DatabaseUtils {
             Map<String, String> filters,
             Function<Pageable, Page<T>> fetchFunction
     ) {
-        int page = Integer.parseInt(filters.getOrDefault("page", "0"));
-        int pageSize = Integer.parseInt(filters.getOrDefault("pageSize", "20"));
-        String sortBy = filters.getOrDefault("sortBy", "id");
-        String sortOrder = filters.getOrDefault("sortOrder", "desc");
-
-        Sort.Direction direction = Sort.Direction.fromString(sortOrder);
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(direction, sortBy));
-
+        Pageable pageable = Utils.getPageable(filters);
         Page<T> resultPage = fetchFunction.apply(pageable);
 
         Map<String, Object> response = new HashMap<>();

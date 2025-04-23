@@ -219,4 +219,26 @@ public class AdminTemplate {
         }
         return "showtimes/form";
     }
+
+    @GetMapping("/tickets")
+    public String tickets() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "tickets/view";
+    }
+
+    @GetMapping("/reports")
+    public String reports() {
+        if (!AuthUtils.isAuthenticated()) {
+            return "redirect:/utc-cinemas/login";
+        }
+        if (!AuthUtils.hasRole(Constants.ROLE_ADMIN)) {
+            return "redirect:/utc-cinemas/access-denied";
+        }
+        return "reports/view";
+    }
 }

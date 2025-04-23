@@ -43,7 +43,7 @@
                 <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
 
-            <li onclick="navigateTo('/utc-cinemas/bookings')">
+            <li onclick="navigateTo('/utc-cinemas/tickets')">
                 <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
 
@@ -129,7 +129,7 @@
 
     async function loadDirectors() {
         try {
-            const response = await httpRequest('/api/admin/users/directors', {
+            const response = await httpRequest('/api/admin/users/get-all', {
                 method: 'GET'
             });
             const selectElement = document.getElementById('search-select');
@@ -142,10 +142,10 @@
                     selectElement.appendChild(option);
                 });
             } else {
-                console.error('Không thể tải danh sách giám đốc:', response.message);
+                console.error('Không thể tải danh sách người dùng:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách giám đốc:', error);
+            console.error('Lỗi khi tải danh sách người dùng:', error);
         }
     }
 

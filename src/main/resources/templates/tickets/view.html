@@ -31,7 +31,7 @@
                 <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
             </li>
 
-            <li class="aside-active" onclick="navigateTo('/utc-cinemas/seats')">
+            <li onclick="navigateTo('/utc-cinemas/seats')">
                 <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Quản lý ghế ngồi
             </li>
 
@@ -43,7 +43,7 @@
                 <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
             </li>
 
-            <li onclick="navigateTo('/utc-cinemas/tickets')">
+            <li class="aside-active" onclick="navigateTo('/utc-cinemas/tickets')">
                 <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
             </li>
 
@@ -70,23 +70,29 @@
                         <select id="room-select" disabled>
                             <option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>
                         </select>
+                        <select id="movie-select">
+                            <option value="-1">Tất cả phim&emsp;&emsp;</option>
+                        </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
                 </div>
 
                 <div class="top-right">
-                    <button class="add-btn">Thêm mới</button>
+                    <button class="add-btn" onclick="navigateTo('/utc-cinemas/showtimes/create')">Thêm mới</button>
                 </div>
             </div>
 
+            <!-- Bảng dữ liệu -->
             <div class="table-container">
                 <table id="tableData" class="display">
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Số ghế</th>
-                        <th>Phòng chiếu</th>
+                        <th>Phim</th>
                         <th>Rạp chiếu</th>
+                        <th>Phòng chiếu</th>
+                        <th>Số ghế</th>
+                        <th>Người mua</th>
                         <th>Ngày tạo</th>
                         <th>Người tạo</th>
                         <th>Trạng thái</th>
@@ -126,9 +132,11 @@
     let totalPages = 0;
     let cinemaMap = {};
     let roomMap = {};
+    let movieMap = {};
     let userMap = {};
     let selectedCinemaId = '-1';
     let selectedRoomId = '-1';
+    let selectedMovieId = '-1';
     let allRooms = [];
 
     async function loadCinemas() {
@@ -179,7 +187,7 @@
         const roomSelect = document.getElementById('room-select');
         roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>';
 
-        if (!cinemaId) {
+        if (cinemaId === '-1') {
             roomSelect.disabled = true;
             return;
         }
@@ -197,6 +205,31 @@
             });
         } else {
             roomSelect.disabled = true;
+        }
+    }
+
+    async function loadMovies() {
+        try {
+            const response = await httpRequest('/api/admin/movies/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const movieSelect = document.getElementById('movie-select');
+                movieSelect.innerHTML = '<option value="-1">Tất cả phim&emsp;&emsp;</option>';
+
+                response.data.forEach(movie => {
+                    movieMap[movie.id] = movie.title;
+                    const option = document.createElement('option');
+                    option.value = movie.id;
+                    option.textContent = movie.title;
+                    movieSelect.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách phim:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phim:', error);
         }
     }
 
@@ -222,9 +255,10 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            let url = `/api/admin/seats/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
+            let url = `/api/admin/ticket/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
             url += `&cinemaId=${selectedCinemaId}`;
             url += `&roomId=${selectedRoomId}`;
+            url += `&movieId=${selectedMovieId}`;
 
             const result = await httpRequest(url);
 
@@ -238,34 +272,27 @@
             tableBody.innerHTML = "";
 
             datas.forEach((item, index) => {
-                const roomId = item.roomId;
-                const room = allRooms.find(room => room.id === roomId);
-
-                const roomName = room.name || 'Không xác định';
-                const cinemaName = cinemaMap[room.cinemaId] || 'Không xác định';
-                const createdUser = userMap[item.createdUser] || 'Không xác định';
+                const createdUser = userMap[item.createdUser] || '-';
 
                 const row = document.createElement("tr");
-                row.onclick = () => {
-                    navigateTo(`/utc-cinemas/seats/edit?id=${item.id}`);
-                };
 
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.seatNumber}</td>
-                <td>${roomName}</td>
-                <td>${cinemaName}</td>
+                <td>${item.movie}</td>
+                <td>${item.cinema}</td>
+                <td>${item.room}</td>
+                <td>${item.seat}</td>
+                <td>${item.username || '-'}</td>
                 <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>${createdUser}</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
+                  <span class="badge ${item.status === 1 ? 'bg-secondary' : 'bg-success'}">
+                    ${item.status === 1 ? 'Chưa bán' : 'Đã bán' }
                   </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
             });
-
             totalPages = result.data.totalPages;
             if (totalPages > 0 && page > totalPages - 1) {
                 page = 0;
@@ -291,14 +318,11 @@
 
     document.addEventListener('DOMContentLoaded', async function () {
         checkToken();
-        document.getElementById('nextPageBtn').addEventListener('click', prevPage);
-        document.getElementById('prevPageBtn').addEventListener('click', nextPage);
+        document.getElementById('nextPageBtn').addEventListener('click', nextPage);
+        document.getElementById('prevPageBtn').addEventListener('click', prevPage);
         document.getElementById('logoutBtn').addEventListener('click', logout);
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
-        document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/seats/create")
-        });
 
         document.getElementById('cinema-select').addEventListener('change', function () {
             selectedCinemaId = this.value;
@@ -310,7 +334,11 @@
             selectedRoomId = this.value;
         });
 
-        await Promise.all([loadCinemas(), loadUsers(), loadRooms()]);
+        document.getElementById('movie-select').addEventListener('change', function () {
+            selectedMovieId = this.value;
+        });
+
+        await Promise.all([loadCinemas(), loadUsers(), loadRooms(), loadMovies()]);
         await loadData();
     });
 </script>
