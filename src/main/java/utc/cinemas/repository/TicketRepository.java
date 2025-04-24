@@ -4,9 +4,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import utc.cinemas.model.dto.ChartData;
 import utc.cinemas.model.dto.ReportResponse;
 import utc.cinemas.model.dto.TicketDto;
 import utc.cinemas.model.entity.Ticket;
+
+import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
     void deleteAllByShowtimeId(Long showtimeId);
@@ -37,4 +40,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
             "WHERE (:cinemaId = -1 OR c.id = :cinemaId)")
     ReportResponse getReportTotalByCinemaId(Long cinemaId);
+
+    @Query("SELECT c.name as name, " +
+            "COALESCE(SUM(CASE WHEN t.id IS NOT NULL AND t.status = 0 THEN st.price ELSE 0 END), 0) as revenue " +
+            "FROM Cinema c " +
+            "LEFT JOIN Room r ON r.cinemaId = c.id " +
+            "LEFT JOIN Showtime st ON st.roomId = r.id " +
+            "LEFT JOIN Ticket t ON t.showtimeId = st.id " +
+            "GROUP BY c.id, c.name " +
+            "ORDER BY c.id DESC")
+    List<Object[]> getAllCinemasWithRevenue();
 }

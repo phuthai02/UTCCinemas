@@ -3,6 +3,7 @@ package utc.cinemas.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 public class ReportResponse {
@@ -10,6 +11,8 @@ public class ReportResponse {
     private Long totalRevenue;
     private Long totalViews;
     private Long totalShowtimes;
+    private ChartData chartData;
+
 
     public ReportResponse(Long totalTickets, Long totalRevenue, Long totalViews, Long totalShowtimes) {
         this.totalTickets = totalTickets;

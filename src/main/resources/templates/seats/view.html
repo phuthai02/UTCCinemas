@@ -291,8 +291,8 @@
 
     document.addEventListener('DOMContentLoaded', async function () {
         checkToken();
-        document.getElementById('nextPageBtn').addEventListener('click', prevPage);
-        document.getElementById('prevPageBtn').addEventListener('click', nextPage);
+        document.getElementById('nextPageBtn').addEventListener('click', nextPage);
+        document.getElementById('prevPageBtn').addEventListener('click', prevPage);
         document.getElementById('logoutBtn').addEventListener('click', logout);
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);

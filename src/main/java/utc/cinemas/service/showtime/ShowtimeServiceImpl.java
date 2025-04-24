@@ -99,12 +99,4 @@ public class ShowtimeServiceImpl implements ShowtimeService {
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật suất chiếu thất bại");
         }
     }
-
-    private void createTicketBatch(Long showtimeId, List<Seat> seats) throws Exception {
-
-    }
-
-    private void deleteTicketBatch(Long showtimeId) throws Exception {
-
-    }
 }

@@ -386,7 +386,7 @@
                         <div class="summary-value" id="total-revenue">0 VND</div>
                     </div>
                     <div class="summary-card">
-                        <div class="summary-title">Lượt xem phim</div>
+                        <div class="summary-title">Tổng vé đã bán</div>
                         <div class="summary-value" id="total-views">0</div>
                     </div>
                     <div class="summary-card">
@@ -423,7 +423,6 @@
 <script>
     let revenueChart = null;
 
-    // Khởi tạo dropdown và sự kiện
     async function initializeFilters() {
         const reportType = document.getElementById('report-type');
         reportType.addEventListener('change', function() {
@@ -444,14 +443,9 @@
             }
         });
 
-        // Tải danh sách rạp chiếu
         await loadCinemas();
-        // Tải danh sách phòng chiếu
         await loadRooms();
-        // Tải danh sách phim
         await loadMovies();
-
-        // Sự kiện tạo báo cáo
         document.getElementById('generate-report').addEventListener('click', generateReport);
         document.getElementById('export-report').addEventListener('click', exportReport);
         document.getElementById('logoutBtn').addEventListener('click', logout);
@@ -563,23 +557,19 @@
     }
 
     function updateReportDisplay(data, reportType) {
-        // Cập nhật thông tin tổng quan
         document.getElementById('total-tickets').textContent = data.totalTickets.toLocaleString();
         document.getElementById('total-revenue').textContent = data.totalRevenue.toLocaleString() + ' VND';
         document.getElementById('total-views').textContent = data.totalViews.toLocaleString();
         document.getElementById('total-showtimes').textContent = data.totalShowtimes.toLocaleString();
 
-        // // Cập nhật biểu đồ
-        // updateChart(data.chartData);
-        //
-        // // Cập nhật bảng dữ liệu
+        updateChart(data.chartData);
+
         // updateTable(data.tableData, reportType);
     }
 
     function updateChart(chartData) {
         const ctx = document.getElementById('revenue-chart').getContext('2d');
 
-        // Nếu đã có biểu đồ, hủy nó để tạo biểu đồ mới
         if (revenueChart !== null) {
             revenueChart.destroy();
         }
@@ -591,8 +581,8 @@
                 datasets: [{
                     label: 'Doanh thu (VND)',
                     data: chartData.values,
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: '#4a5568',
+                    borderColor: '#2d3748',
                     borderWidth: 1
                 }]
             },
@@ -612,7 +602,6 @@
         const tableBody = document.getElementById('report-table-body');
         tableBody.innerHTML = '';
 
-        // Cập nhật tiêu đề của bảng
         let tableTitle = '';
         switch(reportType) {
             case 'cinema':
@@ -627,7 +616,6 @@
         }
         document.getElementById('table-title').textContent = tableTitle;
 
-        // Tạo các hàng dữ liệu cho bảng
         tableData.forEach((item, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -670,14 +658,10 @@
         document.body.removeChild(a);
     }
 
-    // Hàm để cập nhật cấu trúc HTML
     function updateReportStructure() {
-        // Thêm phần chuyển đổi chế độ xem vào sau phần report-summary
         if (!document.querySelector('.view-toggle')) {
             const reportResults = document.querySelector('.report-results');
             const summarySection = document.querySelector('.report-summary');
-
-            // Tạo phần chuyển đổi chế độ xem
             const viewToggle = document.createElement('div');
             viewToggle.className = 'view-toggle';
             viewToggle.innerHTML = `
@@ -686,38 +670,25 @@
             </button>
             <button class="view-toggle-btn" data-view="table">
                 <span class="iconify" data-icon="mdi:table" data-inline="true"></span> Bảng dữ liệu
-            </button>
-        `;
-
-            // Chèn phần chuyển đổi sau phần tổng quan
+            </button>`;
             reportResults.insertBefore(viewToggle, summarySection.nextSibling);
-
-            // Thêm sự kiện cho các nút chuyển đổi
             const toggleButtons = document.querySelectorAll('.view-toggle-btn');
             toggleButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // Cập nhật trạng thái active cho các nút
                     toggleButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
-
-                    // Chuyển đổi chế độ xem
                     const viewType = this.getAttribute('data-view');
                     toggleView(viewType);
                 });
             });
-
-            // Cấu trúc lại phần hiển thị biểu đồ và bảng
             const chartContainer = document.querySelector('.chart-container');
             const tableContainer = document.querySelector('.data-table-container');
-
-            // Bọc biểu đồ và bảng trong div có class view-content
             if (chartContainer && !chartContainer.parentElement.classList.contains('view-content')) {
                 const chartWrapper = document.createElement('div');
                 chartWrapper.className = 'view-content chart-view active';
                 chartContainer.parentNode.insertBefore(chartWrapper, chartContainer);
                 chartWrapper.appendChild(chartContainer);
             }
-
             if (tableContainer && !tableContainer.parentElement.classList.contains('view-content')) {
                 const tableWrapper = document.createElement('div');
                 tableWrapper.className = 'view-content table-view';
@@ -727,11 +698,9 @@
         }
     }
 
-    // Hàm chuyển đổi giữa chế độ xem
     function toggleView(viewType) {
         const chartView = document.querySelector('.chart-view');
         const tableView = document.querySelector('.table-view');
-
         if (viewType === 'chart') {
             chartView.classList.add('active');
             tableView.classList.remove('active');
@@ -739,8 +708,6 @@
             chartView.classList.remove('active');
             tableView.classList.add('active');
         }
-
-        // Điều chỉnh lại kích thước biểu đồ nếu cần
         if (viewType === 'chart' && revenueChart) {
             setTimeout(() => {
                 revenueChart.resize();
@@ -748,63 +715,34 @@
         }
     }
 
-    // Mở rộng function generateReport
-    async function enhancedGenerateReport() {
-        try {
-            // Gọi hàm generateReport gốc
-            await generateReport();
-
-            // Cập nhật cấu trúc báo cáo sau khi dữ liệu được tải
-            updateReportStructure();
-        } catch (error) {
-            console.error('Lỗi khi tạo báo cáo:', error);
-        }
-    }
-
-    // Ghi đè generateReport ban đầu
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lưu trữ hàm generateReport ban đầu
+    document.addEventListener('DOMContentLoaded', async function () {
+        checkToken();
+        await initializeFilters();
         const originalGenerateReport = window.generateReport;
-
-        // Thay thế hàm gốc bằng hàm đã cải tiến
         if (originalGenerateReport) {
             window.generateReport = async function() {
                 await originalGenerateReport.apply(this, arguments);
                 updateReportStructure();
             };
         }
-
-        // Lưu trữ hàm initializeFilters ban đầu
         const originalInitializeFilters = window.initializeFilters;
-
-        // Thay thế hàm gốc
         if (originalInitializeFilters) {
             window.initializeFilters = async function() {
                 await originalInitializeFilters.apply(this, arguments);
-
-                // Cập nhật cấu trúc báo cáo khi khởi tạo
-                // Thêm sự kiện cho nút generate report để kích hoạt việc tạo toggle
                 const generateReportBtn = document.getElementById('generate-report');
                 if (generateReportBtn) {
                     const originalClickHandler = generateReportBtn.onclick;
                     generateReportBtn.onclick = null;
                     generateReportBtn.addEventListener('click', async function(e) {
                         if (originalClickHandler) {
-                            // Gọi hàm xử lý sự kiện click ban đầu
                             await originalClickHandler.call(this, e);
                         }
-                        // Cập nhật cấu trúc báo cáo
                         setTimeout(updateReportStructure, 500);
                     });
                 }
             };
         }
         updateReportStructure();
-    });
-
-    document.addEventListener('DOMContentLoaded', async function () {
-        checkToken();
-        await initializeFilters();
     });
 </script>
 </body>
