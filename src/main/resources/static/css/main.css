@@ -9,6 +9,10 @@ html, body, .container, .main-content, .content-box, .aside, .articles {
     overflow-y: auto;
 }
 
+select {
+    cursor: pointer;
+}
+
 body {
     background-color: #e2e8f0;
     font-family: 'Inter', sans-serif;
@@ -206,6 +210,10 @@ tbody tr:nth-child(odd) {
     align-items: center;
     gap: 12px;
     font-size: 14px;
+}
+
+.table-controls select, .table-controls #search-input {
+    min-width: 230px !important;
 }
 
 /* INPUTS & SELECTS */
@@ -898,4 +906,29 @@ textarea.description-area {
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
 }
