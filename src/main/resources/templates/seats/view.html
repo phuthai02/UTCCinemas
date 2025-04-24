@@ -68,7 +68,7 @@
                             <option value="-1">Tất cả rạp chiếu</option>
                         </select>
                         <select id="room-select" disabled>
-                            <option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>
+                            <option value="-1">Tất cả phòng chiếu</option>
                         </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
@@ -109,9 +109,9 @@
                 <div class="records-per-page">
                     <label for="records-select">Số bản ghi mỗi trang:</label>
                     <select id="records-select">
-                        <option value="20">20&emsp;</option>
-                        <option value="50">50&emsp;</option>
-                        <option value="100">100&emsp;</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
             </div>
@@ -177,7 +177,7 @@
 
     function updateRoomDropdown(cinemaId) {
         const roomSelect = document.getElementById('room-select');
-        roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>';
+        roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu</option>';
 
         if (!cinemaId) {
             roomSelect.disabled = true;

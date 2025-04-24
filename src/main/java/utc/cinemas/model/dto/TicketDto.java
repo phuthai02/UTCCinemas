@@ -14,8 +14,11 @@ public class TicketDto {
     private String cinema;
     private String room;
     private String seat;
+    private Long price;
+    private Timestamp saleDate;
     private String username;
     private Timestamp createdDate;
     private Long createdUser;
     private Integer status;
+    private Timestamp startTime;
 }

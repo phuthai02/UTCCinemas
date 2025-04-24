@@ -564,16 +564,16 @@
 
     function updateReportDisplay(data, reportType) {
         // Cập nhật thông tin tổng quan
-        document.getElementById('total-tickets').textContent = data.summary.totalTickets.toLocaleString();
-        document.getElementById('total-revenue').textContent = data.summary.totalRevenue.toLocaleString() + ' VND';
-        document.getElementById('total-views').textContent = data.summary.totalViews.toLocaleString();
-        document.getElementById('total-showtimes').textContent = data.summary.totalShowtimes.toLocaleString();
+        document.getElementById('total-tickets').textContent = data.totalTickets.toLocaleString();
+        document.getElementById('total-revenue').textContent = data.totalRevenue.toLocaleString() + ' VND';
+        document.getElementById('total-views').textContent = data.totalViews.toLocaleString();
+        document.getElementById('total-showtimes').textContent = data.totalShowtimes.toLocaleString();
 
-        // Cập nhật biểu đồ
-        updateChart(data.chartData);
-
-        // Cập nhật bảng dữ liệu
-        updateTable(data.tableData, reportType);
+        // // Cập nhật biểu đồ
+        // updateChart(data.chartData);
+        //
+        // // Cập nhật bảng dữ liệu
+        // updateTable(data.tableData, reportType);
     }
 
     function updateChart(chartData) {

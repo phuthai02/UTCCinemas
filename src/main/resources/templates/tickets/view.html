@@ -68,10 +68,10 @@
                             <option value="-1">Tất cả rạp chiếu</option>
                         </select>
                         <select id="room-select" disabled>
-                            <option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>
+                            <option value="-1">Tất cả phòng chiếu</option>
                         </select>
                         <select id="movie-select">
-                            <option value="-1">Tất cả phim&emsp;&emsp;</option>
+                            <option value="-1">Tất cả phim</option>
                         </select>
                         <button id="search">Tìm kiếm</button>
                     </div>
@@ -91,9 +91,10 @@
                         <th>Rạp chiếu</th>
                         <th>Phòng chiếu</th>
                         <th>Số ghế</th>
+                        <th>Giá vé</th>
+                        <th>Giờ chiếu</th>
                         <th>Người mua</th>
-                        <th>Ngày tạo</th>
-                        <th>Người tạo</th>
+                        <th>Mua lúc</th>
                         <th>Trạng thái</th>
                     </tr>
                     </thead>
@@ -114,9 +115,9 @@
                 <div class="records-per-page">
                     <label for="records-select">Số bản ghi mỗi trang:</label>
                     <select id="records-select">
-                        <option value="20">20&emsp;</option>
-                        <option value="50">50&emsp;</option>
-                        <option value="100">100&emsp;</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
             </div>
@@ -184,7 +185,7 @@
 
     function updateRoomDropdown(cinemaId) {
         const roomSelect = document.getElementById('room-select');
-        roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu&emsp;&emsp;</option>';
+        roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu</option>';
 
         if (cinemaId === '-1') {
             roomSelect.disabled = true;
@@ -215,7 +216,7 @@
 
             if (response.code === 1 && response.data) {
                 const movieSelect = document.getElementById('movie-select');
-                movieSelect.innerHTML = '<option value="-1">Tất cả phim&emsp;&emsp;</option>';
+                movieSelect.innerHTML = '<option value="-1">Tất cả phim</option>';
 
                 response.data.forEach(movie => {
                     movieMap[movie.id] = movie.title;
@@ -271,8 +272,6 @@
             tableBody.innerHTML = "";
 
             datas.forEach((item, index) => {
-                const createdUser = userMap[item.createdUser] || '-';
-
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
@@ -281,11 +280,12 @@
                 <td>${item.cinema}</td>
                 <td>${item.room}</td>
                 <td>${item.seat}</td>
+                <td>${new Intl.NumberFormat('vi-VN').format(item.price)}</td>
+                <td>${new Date(item.startTime).toLocaleString('vi-VN')}</td>
                 <td>${item.username || '-'}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
-                <td>${createdUser}</td>
+                 <td>${item.saleDate ? new Date(item.saleDate).toLocaleString('vi-VN') : '-'}</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-secondary' : 'bg-success'}">
+                  <span class="badge ${item.status === 1 ? 'bg-danger' : 'bg-success'}">
                     ${item.status === 1 ? 'Chưa bán' : 'Đã bán' }
                   </span>
                 </td>

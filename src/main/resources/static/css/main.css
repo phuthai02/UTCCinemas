@@ -277,10 +277,12 @@ tbody tr:nth-child(odd) {
 
 .badge {
     font-size: 12px;
+    width: 100px;
+    display: inline-block;
+    text-align: center;
 }
-
     /* STATUS BADGES */
-.bg-success, .bg-secondary, .bg-danger {
+.bg-success, .bg-secondary, .bg-danger, .bg-warning {
     color: white;
     padding: 5px 10px;
     border-radius: 5px;
@@ -298,7 +300,9 @@ tbody tr:nth-child(odd) {
     background-color: #dc3545;
 }
 
-
+.bg-warning {
+    background-color: #e4d300;
+}
 
 /* ARTICLES */
 .articles {

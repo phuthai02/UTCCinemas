@@ -65,7 +65,7 @@
                     <div class="search-filter">
                         <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
                         <select id="status-select">
-                            <option value="-1">Tất cả trạng thái&emsp;&emsp;</option>
+                            <option value="-1">Tất cả trạng thái</option>
                             <option value="0">Đang chiếu</option>
                             <option value="1">Sắp chiếu</option>
                             <option value="2">Dừng chiếu</option>
@@ -111,9 +111,9 @@
                 <div class="records-per-page">
                     <label for="records-select">Số bản ghi mỗi trang:</label>
                     <select id="records-select">
-                        <option value="20">20&emsp;</option>
-                        <option value="50">50&emsp;</option>
-                        <option value="100">100&emsp;</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
             </div>
@@ -134,7 +134,7 @@
     const statusClasses = {
         2: 'bg-danger',
         0: 'bg-success',
-        1: 'bg-secondary'
+        1: 'bg-warning'
     };
 
     async function loadData() {
