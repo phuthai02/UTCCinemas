@@ -132,7 +132,6 @@ body {
 table {
     width: 100%;
     font-size: 14px;
-    table-layout: fixed;
     border: none;
 }
 
@@ -148,8 +147,6 @@ th, td {
     text-align: left;
     color: #2d3748;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 th {
@@ -765,6 +762,14 @@ button:focus-visible {
 .modal-button-primary {
     color: white;
     font-weight: bold;
+}
+
+.modal-button-primary.confirm {
+    background-color: #e1d001;
+}
+
+.modal-button-primary.confirm:hover {
+    background-color: #cdbd02;
 }
 
 .modal-button-primary.success {

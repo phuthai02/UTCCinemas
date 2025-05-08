@@ -360,24 +360,30 @@
     }
 
     async function submitFormData() {
-        try {
-            const formData = getFormData();
-            const endpoint = isEditMode
-                ? `/api/admin/cinemas/update`
-                : '/api/admin/cinemas/create';
+        const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
+        const itemType = 'rạp chiếu';
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const formData = getFormData();
+                    const endpoint = isEditMode
+                        ? `/api/admin/cinemas/update`
+                        : '/api/admin/cinemas/create';
 
-            const method = isEditMode ? 'PUT' : 'POST';
+                    const method = isEditMode ? 'PUT' : 'POST';
 
-            const response = await httpRequest(endpoint, {
-                method: method,
-                body: JSON.stringify(formData)
-            });
+                    const response = await httpRequest(endpoint, {
+                        method: method,
+                        body: JSON.stringify(formData)
+                    });
 
-            handleApiResponse(response);
-        } catch (error) {
-            console.error('Lỗi khi gửi yêu cầu:', error);
-            showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
-        }
+                    handleApiResponse(response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
     }
 
     function getFormData() {

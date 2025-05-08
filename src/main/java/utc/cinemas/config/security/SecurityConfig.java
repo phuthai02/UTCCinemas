@@ -12,11 +12,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import utc.cinemas.config.jwt.JwtAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    private static final List<String> PUBLIC_URLS = List.of(
+            "/css/**",
+            "/image/**",
+            "/javascript/**",
+            "/utc-cinemas/login",
+            "/api/auth/**"
+    );
+
+    private static final List<String> ADMIN_PROTECTED_URLS = List.of(
+            "/utc-cinemas/home",
+            "/utc-cinemas/cinemas/**",
+            "/utc-cinemas/rooms/**",
+            "/utc-cinemas/seats/**",
+            "/utc-cinemas/users/**",
+            "/utc-cinemas/movies/**",
+            "/utc-cinemas/showtimes/**",
+            "/utc-cinemas/tickets",
+            "/utc-cinemas/reports",
+            "/api/admin/**"
+    );
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, AuthenticationProvider authenticationProvider) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -27,12 +50,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/image/**", "/javascript/**").permitAll()
-                        .requestMatchers("/utc-cinemas/login", "/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> {
+                    PUBLIC_URLS.forEach(url -> auth.requestMatchers(url).permitAll());
+                    ADMIN_PROTECTED_URLS.forEach(url -> auth.requestMatchers(url).hasAuthority("ROLE_ADMIN"));
+                    auth.anyRequest().authenticated();
+                })
                 .formLogin(form -> form
                         .loginPage("/utc-cinemas/login")
                         .defaultSuccessUrl("/utc-cinemas/home", true)

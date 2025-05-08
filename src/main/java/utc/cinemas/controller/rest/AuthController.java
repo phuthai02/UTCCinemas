@@ -1,4 +1,4 @@
-package utc.cinemas.controller.all;
+package utc.cinemas.controller.rest;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

@@ -12,14 +12,18 @@ import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.dto.TicketDto;
 import utc.cinemas.model.entity.Seat;
 import utc.cinemas.model.entity.Ticket;
+import utc.cinemas.model.entity.User;
 import utc.cinemas.repository.TicketRepository;
+import utc.cinemas.repository.UserRepository;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -50,6 +54,40 @@ public class TicketSerivceImpl implements TicketSerivce {
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }
+
+    @Autowired
+    private UserRepository userRepository;
+//
+//    @Override
+//    public void createTicketBatch(Long showtimeId, List<Seat> seats) throws Exception {
+//        Random random = new Random();
+//        List<User> users = userRepository.findAll();
+//        for (Seat seat : seats) {
+//            Ticket ticket = new Ticket();
+//            ticket.setShowtimeId(showtimeId);
+//            ticket.setSeatId(seat.getId());
+//            int status = random.nextInt(2);
+//            ticket.setStatus(status);
+//            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+//            ticket.setCreatedDate(createdDate);
+//            if (status == 1) {
+//                ticket.setModifiedDate(createdDate);
+//            } else {
+//                int randomMinutes = random.nextInt(60) + 1;
+//                long createdTimeMillis = createdDate.getTime();
+//                long modifiedTimeMillis = createdTimeMillis + (randomMinutes * 60 * 1000);
+//                Timestamp modifiedDate = new Timestamp(modifiedTimeMillis);
+//                ticket.setUserId(users.get(random.nextInt(users.size())).getId());
+//                ticket.setModifiedDate(modifiedDate);
+//            }
+//            if (!users.isEmpty()) {
+//                User randomUser = users.get(random.nextInt(users.size()));
+//                ticket.setCreatedUser(randomUser.getId());
+//                ticket.setModifiedUser(randomUser.getId());
+//            }
+//            ticketRepository.save(ticket);
+//        }
+//    }
 
     @Override
     public void createTicketBatch(Long showtimeId, List<Seat> seats) throws Exception {

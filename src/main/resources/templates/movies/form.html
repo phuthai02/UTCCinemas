@@ -324,40 +324,46 @@
     }
 
     async function submitFormData() {
-        try {
-            const formData = new FormData(document.getElementById('movieForm'));
+        const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
+        const itemType = 'phim';
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const formData = new FormData(document.getElementById('movieForm'));
 
-            if (formData.get('releaseDate')) {
-                const date = new Date(formData.get('releaseDate'));
-                formData.set('releaseDate', date.toISOString());
-            }
+                    if (formData.get('releaseDate')) {
+                        const date = new Date(formData.get('releaseDate'));
+                        formData.set('releaseDate', date.toISOString());
+                    }
 
-            if (isEditMode) {
-                if (imageChanged) {
-                    formData.set('image', originalImageUrl);
-                } else {
-                    formData.delete('image');
-                    formData.delete('imageFile');
+                    if (isEditMode) {
+                        if (imageChanged) {
+                            formData.set('image', originalImageUrl);
+                        } else {
+                            formData.delete('image');
+                            formData.delete('imageFile');
+                        }
+                    }
+
+                    const endpoint = isEditMode
+                        ? `/api/admin/movies/update`
+                        : '/api/admin/movies/create';
+
+                    console.log(`Gửi yêu cầu ${isEditMode ? 'cập nhật' : 'tạo mới'} phim đến ${endpoint}`);
+
+                    const response = await httpRequest(endpoint, {
+                        method: isEditMode ? 'PUT' : 'POST',
+                        body: formData,
+                        headers: {}
+                    });
+
+                    handleApiResponse(response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
                 }
             }
-
-            const endpoint = isEditMode
-                ? `/api/admin/movies/update`
-                : '/api/admin/movies/create';
-
-            console.log(`Gửi yêu cầu ${isEditMode ? 'cập nhật' : 'tạo mới'} phim đến ${endpoint}`);
-
-            const response = await httpRequest(endpoint, {
-                method: isEditMode ? 'PUT' : 'POST',
-                body: formData,
-                headers: {}
-            });
-
-            handleApiResponse(response);
-        } catch (error) {
-            console.error('Lỗi khi gửi yêu cầu:', error);
-            showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
-        }
+        });
     }
 
     function handleApiResponse(response) {
