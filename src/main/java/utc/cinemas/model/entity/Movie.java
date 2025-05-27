@@ -51,4 +51,7 @@ public class Movie {
 
     @Column(name = "IMAGE")
     private String image; // Đường dẫn URL hình ảnh
+
+    @Column(name = "DISPLAY")
+    private Integer display; // Hiển thị (1: hiển thị, 0: ẩn)
 }

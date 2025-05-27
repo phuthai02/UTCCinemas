@@ -87,4 +87,13 @@ public class SeatServiceImpl implements SeatService {
     public List<Seat> getSeatsByRoomId(Long roomId) {
         return seatRepository.findAllByRoomId(roomId);
     }
+
+    @Override
+    public void applyRoomStatusToSeats(Long roomId, Integer roomStatus) {
+        List<Seat> seats = getSeatsByRoomId(roomId);
+        seats.stream().forEach(seat -> {
+            seat.setStatus(roomStatus);
+        });
+        seatRepository.saveAll(seats);
+    }
 }

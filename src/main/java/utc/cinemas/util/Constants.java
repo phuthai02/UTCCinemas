@@ -6,4 +6,7 @@ public class Constants {
 
     public static Integer STATUS_ACTIVE = 1;
     public static Integer STATUS_INACTIVE = 0;
+
+    public static Integer DISPLAY_HIDDEN = 0;
+    public static Integer DISPLAY_VISIBLE = 1;
 }

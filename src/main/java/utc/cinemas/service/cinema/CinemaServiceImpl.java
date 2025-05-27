@@ -1,6 +1,7 @@
 package utc.cinemas.service.cinema;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utc.cinemas.model.dto.CinemaDto;
@@ -8,6 +9,7 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
 import utc.cinemas.repository.CinemaRepository;
+import utc.cinemas.service.room.RoomService;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
@@ -21,6 +23,9 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Autowired
     private CinemaRepository cinemaRepository;
+
+    @Autowired
+    private RoomService roomService;
 
     @Override
     public Response getListOfCinemas(Map<String, String> filters) {
@@ -62,6 +67,7 @@ public class CinemaServiceImpl implements CinemaService {
     public Response update(CinemaDto cinemaDto) {
         try {
             Cinema cinema = cinemaDto.getEntity();
+            roomService.applyCinemaStatusToRooms(cinema.getId(), cinema.getStatus());
             DatabaseUtils.updateEntity(cinema, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật rạp chiếu thành công");
         } catch (Exception e) {

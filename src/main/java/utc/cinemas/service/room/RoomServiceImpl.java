@@ -8,6 +8,7 @@ import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.dto.RoomDto;
 import utc.cinemas.model.entity.Room;
 import utc.cinemas.repository.RoomRepository;
+import utc.cinemas.service.seat.SeatService;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
@@ -21,6 +22,9 @@ public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private SeatService seatService;
 
     @Override
     public Response getListOfRooms(Map<String, String> filters) {
@@ -79,5 +83,15 @@ public class RoomServiceImpl implements RoomService {
             log.error("Error fetching rooms all: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
+    }
+
+    @Override
+    public void applyCinemaStatusToRooms(Long cinemaId, Integer cinemaStatus) {
+        List<Room> rooms = roomRepository.findAllByCinemaId(cinemaId);
+        rooms.stream().forEach(room -> {
+            room.setStatus(cinemaStatus);
+            seatService.applyRoomStatusToSeats(room.getId(), room.getStatus());
+        });
+        roomRepository.saveAll(rooms);
     }
 }

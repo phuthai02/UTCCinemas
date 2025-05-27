@@ -38,4 +38,7 @@ public class Payment {
 
     @Column(name = "MODIFIED_DATE") // Ngày chỉnh sửa cuối
     private Timestamp modifiedDate;
+
+    @Column(name = "DISPLAY")
+    private Integer display; // Hiển thị (1: hiển thị, 0: ẩn)
 }

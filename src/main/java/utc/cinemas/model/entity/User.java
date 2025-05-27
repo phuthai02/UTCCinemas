@@ -45,4 +45,7 @@ public class User {
 
     @Column(name = "STATUS")
     private Integer status; // Trạng thái
+
+    @Column(name = "DISPLAY")
+    private Integer display; // Hiển thị (1: hiển thị, 0: ẩn)
 }

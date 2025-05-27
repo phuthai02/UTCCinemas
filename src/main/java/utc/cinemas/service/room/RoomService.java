@@ -11,4 +11,5 @@ public interface RoomService {
     Response getRoomById(Long id);
     Response update(RoomDto roomDto);
     Response getAll();
+    void applyCinemaStatusToRooms(Long cinemaId, Integer cinemaStatus);
 }

@@ -14,4 +14,5 @@ public interface SeatService {
     Response update(SeatDto seatDto);
     Response getSeatCountByRoomId(Long roomId);
     List<Seat> getSeatsByRoomId(Long roomId);
+    void applyRoomStatusToSeats(Long roomId, Integer roomStatus);
 }
