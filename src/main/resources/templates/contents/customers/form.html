@@ -1,0 +1,283 @@
+<div class="content-box">
+    <div class="edit-header">
+        <h2 id="pageTitle">Thêm người dùng mới</h2>
+        <div class="edit-actions">
+            <button onclick="navigateTo('/utc-cinemas/users')">
+                Quay lại
+            </button>
+        </div>
+    </div>
+
+    <div class="edit-container">
+        <form id="userForm" autocomplete="off">
+            <input type="hidden" id="userId" name="userId">
+            <input type="text" style="display:none">
+            <input type="password" style="display:none">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Tên hiển thị <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" maxlength="255" autocomplete="new-name">
+                    <div class="error-message" id="name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" maxlength="255" autocomplete="new-username">
+                    <div class="error-message" id="username-error"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group password-group">
+                    <label for="password">Mật khẩu <span class="required" id="passwordRequired">*</span></label>
+                    <input type="password" id="password" name="password" autocomplete="new-password">
+                    <div class="error-message" id="password-error"></div>
+                </div>
+                <div class="form-group password-group">
+                    <label for="confirmPassword">Xác nhận mật khẩu <span class="required"
+                                                                         id="confirmPasswordRequired">*</span></label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password">
+                    <div class="error-message" id="confirmPassword-error"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" maxlength="255" autocomplete="new-email">
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Số điện thoại <span class="required">*</span></label>
+                    <input type="text" id="phoneNumber" name="phoneNumber" maxlength="15" autocomplete="new-tel">
+                    <div class="error-message" id="phoneNumber-error"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="role">Vai trò <span class="required">*</span></label>
+                    <select id="role" name="role" autocomplete="new-role">
+                        <option value="">Chọn vai trò</option>
+                        <option value="1">Quản trị viên</option>
+                        <option value="0" selected>Nguời dùng</option>
+                    </select>
+                    <div class="error-message" id="role-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="status">Trạng thái <span class="required">*</span></label>
+                    <select id="status" name="status" autocomplete="new-status">
+                        <option value="">Chọn trạng thái</option>
+                        <option value="0">Dừng hoạt động</option>
+                        <option value="1" selected>Đang hoạt động</option>
+                    </select>
+                    <div class="error-message" id="status-error"></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/users')">Hủy bỏ</button>
+                <button type="submit" id="saveBtn">Lưu người dùng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let isEditMode = false;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePage();
+        document.getElementById('userForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    function initializePage() {
+        checkForEditMode();
+    }
+
+    function checkForEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+
+        if (userId) {
+            isEditMode = true;
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa người dùng';
+            document.getElementById('saveBtn').textContent = 'Cập nhật người dùng';
+
+            const usernameInput = document.getElementById('username');
+            usernameInput.readOnly = true;
+            usernameInput.classList.add('disabled-input');
+
+            document.getElementById('passwordRequired').style.display = 'none';
+            document.getElementById('confirmPasswordRequired').style.display = 'none';
+
+            document.getElementById('password').placeholder = "Để trống nếu không thay đổi mật khẩu";
+            document.getElementById('confirmPassword').placeholder = "Để trống nếu không thay đổi mật khẩu";
+
+            loadUserDetails(userId);
+        }
+    }
+
+    async function loadUserDetails(userId) {
+        try {
+            const response = await httpRequest(`/api/admin/users/${userId}`, {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                populateForm(response.data);
+            } else {
+                showModal('error', 'Ôi xong!', 'Không thể tải thông tin người dùng.');
+                setTimeout(() => navigateTo('/utc-cinemas/users'), 2000);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải thông tin người dùng:', error);
+            showModal('error', 'Ôi xong!', 'Không thể tải thông tin người dùng.');
+        }
+    }
+
+    function populateForm(user) {
+        document.getElementById('userId').value = user.id;
+        document.getElementById('name').value = user.name;
+        document.getElementById('username').value = user.username;
+        document.getElementById('email').value = user.email;
+        document.getElementById('phoneNumber').value = user.phoneNumber || '';
+        document.getElementById('role').value = user.role;
+        document.getElementById('status').value = user.status;
+        document.getElementById('password').value = '';
+        document.getElementById('confirmPassword').value = '';
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        clearErrorMessages();
+
+        if (!validateForm()) return;
+        await submitFormData();
+    }
+
+    function clearErrorMessages() {
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        const requiredFields = [
+            {id: 'name', message: 'Vui lòng nhập tên hiển thị'},
+            {id: 'username', message: 'Vui lòng nhập tên đăng nhập'},
+            {id: 'email', message: 'Vui lòng nhập email'},
+            {id: 'phoneNumber', message: 'Vui lòng nhập số điện thoại'},
+            {id: 'role', message: 'Vui lòng chọn vai trò'},
+            {id: 'status', message: 'Vui lòng chọn trạng thái'}
+        ];
+
+        if (!isEditMode) {
+            requiredFields.push(
+                {id: 'password', message: 'Vui lòng nhập mật khẩu'},
+                {id: 'confirmPassword', message: 'Vui lòng xác nhận mật khẩu'}
+            );
+        }
+
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errorElement = document.getElementById(`${field.id}-error`);
+
+            if (!input.value.trim()) {
+                errorElement.textContent = field.message;
+                isValid = false;
+            }
+        });
+
+        const email = document.getElementById('email').value.trim();
+        if (email && !validateEmail(email)) {
+            document.getElementById('email-error').textContent = 'Vui lòng nhập email hợp lệ';
+            isValid = false;
+        }
+
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+        if (phoneNumber && !validatePhoneNumber(phoneNumber)) {
+            document.getElementById('phoneNumber-error').textContent = 'Vui lòng nhập số điện thoại hợp lệ';
+            isValid = false;
+        }
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if ((password || confirmPassword) && password !== confirmPassword) {
+            document.getElementById('confirmPassword-error').textContent = 'Xác nhận mật khẩu không khớp';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validatePhoneNumber(phoneNumber) {
+        const re = /^[0-9+\-\s]{10,15}$/;
+        return re.test(phoneNumber);
+    }
+
+    async function submitFormData() {
+        const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
+        const itemType = 'người dùng';
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const formData = getFormData();
+                    const endpoint = isEditMode
+                        ? '/api/admin/users/update'
+                        : '/api/admin/users/create';
+
+                    const method = isEditMode ? 'PUT' : 'POST';
+
+                    const response = await httpRequest(endpoint, {
+                        method: method,
+                        body: JSON.stringify(formData)
+                    });
+
+                    handleApiResponse(response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    function getFormData() {
+        const data = {
+            name: document.getElementById('name').value.trim(),
+            username: document.getElementById('username').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phoneNumber: document.getElementById('phoneNumber').value.trim(),
+            role: document.getElementById('role').value,
+            status: document.getElementById('status').value
+        };
+
+        const password = document.getElementById('password').value;
+        if (password) {
+            data.password = password;
+        }
+
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (confirmPassword) {
+            data.confirmPassword = confirmPassword;
+        }
+
+        const userId = document.getElementById('userId').value;
+        if (userId) {
+            data.id = userId;
+        }
+
+        return data;
+    }
+
+    function handleApiResponse(response) {
+        if (response.code === 1) {
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/users');
+        } else {
+            showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
+        }
+    }
+</script>

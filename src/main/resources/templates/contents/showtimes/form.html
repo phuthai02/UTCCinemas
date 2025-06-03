@@ -1,0 +1,579 @@
+<div class="content-box">
+    <div class="edit-header">
+        <h2 id="pageTitle">Thêm suất chiếu mới</h2>
+        <div class="edit-actions">
+            <button onclick="navigateTo('/utc-cinemas/showtimes')">
+                Quay lại
+            </button>
+        </div>
+    </div>
+
+    <div class="edit-container">
+        <form id="showtimeForm">
+            <input type="hidden" id="showtimeId" name="showtimeId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cinemaSearch">Rạp chiếu <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="cinemaSearch" placeholder="Nhập tên rạp chiếu để tìm kiếm..." autocomplete="off">
+                        <div class="autocomplete-dropdown" id="cinemaDropdown"></div>
+                        <div class="selected-cinema" id="selectedCinema"></div>
+                        <input type="hidden" id="cinemaId" name="cinemaId">
+                        <div class="error-message" id="cinemaId-error"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="roomSearch">Phòng chiếu <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="roomSearch" placeholder="Nhập tên phòng chiếu để tìm kiếm..." autocomplete="off" disabled>
+                        <div class="autocomplete-dropdown" id="roomDropdown"></div>
+                        <div class="selected-room" id="selectedRoom"></div>
+                        <input type="hidden" id="roomId" name="roomId">
+                        <div class="error-message" id="roomId-error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="movieSearch">Phim <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="movieSearch" placeholder="Nhập tên phim để tìm kiếm..." autocomplete="off">
+                        <div class="autocomplete-dropdown" id="movieDropdown"></div>
+                        <div class="selected-movie" id="selectedMovie"></div>
+                        <input type="hidden" id="movieId" name="movieId">
+                        <div class="error-message" id="movieId-error"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="status">Trạng thái <span class="required">*</span></label>
+                    <select id="status" name="status">
+                        <option value="">Chọn trạng thái</option>
+                        <option value="0">Dừng hoạt động</option>
+                        <option value="1" selected>Đang hoạt động</option>
+                    </select>
+                    <div class="error-message" id="status-error"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startTime">Giờ bắt đầu chiếu <span class="required">*</span></label>
+                    <input type="datetime-local" id="startTime" name="startTime">
+                    <div class="error-message" id="startTime-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="price">Giá vé (VND) <span class="required">*</span></label>
+                    <input type="number" id="price" name="price" min="0" step="1000">
+                    <div class="error-message" id="price-error"></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/showtimes')">Hủy bỏ</button>
+                <button type="submit" id="saveBtn">Lưu suất chiếu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let cinemasData = [];
+    let roomsData = [];
+    let allRoomsData = [];
+    let moviesData = [];
+    let isEditMode = false;
+    let seatCount = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePage();
+        loadCinemas();
+        loadRooms();
+        loadMovies();
+        setupCinemaAutocomplete();
+        setupRoomAutocomplete();
+        setupMovieAutocomplete();
+        document.getElementById('showtimeForm').addEventListener('submit', handleFormSubmit);
+    });
+
+
+
+    function checkForEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const showtimeId = urlParams.get('id');
+
+        if (showtimeId) {
+            isEditMode = true;
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa suất chiếu';
+            document.getElementById('saveBtn').textContent = 'Cập nhật suất chiếu';
+            loadShowtimeDetails(showtimeId);
+        }
+    }
+
+    async function loadShowtimeDetails(showtimeId) {
+        try {
+            const response = await httpRequest(`/api/admin/showtimes/${showtimeId}`, {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                await populateForm(response.data);
+            } else {
+                showModal('error', 'Ôi xong!', 'Không thể tải thông tin suất chiếu.');
+                setTimeout(() => navigateTo('/utc-cinemas/showtimes'), 2000);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải thông tin suất chiếu:', error);
+            showModal('error', 'Ôi xong!', 'Không thể tải thông tin suất chiếu.');
+        }
+    }
+
+    async function loadSeatCount(roomId) {
+        try {
+            const response = await httpRequest('/api/admin/seats/count-by-room-id?roomId=' + roomId, {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data !== undefined) {
+                seatCount = response.data;
+                return seatCount;
+            } else {
+                console.error('Không thể tải số lượng ghế:', response.message);
+                return 0;
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải số lượng ghế:', error);
+            return 0;
+        }
+    }
+
+    async function loadMovies() {
+        try {
+            const response = await httpRequest('/api/admin/movies/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                moviesData = response.data;
+            } else {
+                console.error('Không thể tải danh sách phim:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phim:', error);
+        }
+    }
+
+    async function loadRooms() {
+        try {
+            const response = await httpRequest('/api/admin/rooms/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                roomsData = response.data;
+                allRoomsData = [...response.data];
+                checkForEditMode();
+            } else {
+                console.error('Không thể tải danh sách phòng chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phòng chiếu:', error);
+        }
+    }
+
+    async function populateForm(showtime) {
+        document.getElementById('showtimeId').value = showtime.id;
+        document.getElementById('status').value = showtime.status;
+        document.getElementById('roomId').value = showtime.roomId;
+        document.getElementById('movieId').value = showtime.movieId;
+        document.getElementById('price').value = showtime.price;
+
+        if (showtime.startTime) {
+            const date = new Date(showtime.startTime);
+            const formattedDate = date.toISOString().slice(0, 16);
+            document.getElementById('startTime').value = formattedDate;
+        }
+
+        if (showtime.roomId) {
+            const room = roomsData.find(r => r.id === showtime.roomId);
+            if (room) {
+                await loadSeatCount(showtime.roomId);
+
+                document.getElementById('cinemaId').value = room.cinemaId;
+                const selectedRoomDisplay = document.getElementById('selectedRoom');
+                selectedRoomDisplay.textContent = `Đã chọn: ${room.name} (${seatCount} ghế)`;
+                selectedRoomDisplay.classList.add('show');
+
+                const cinema = cinemasData.find(c => c.id === room.cinemaId);
+                if (cinema) {
+                    const selectedCinemaDisplay = document.getElementById('selectedCinema');
+                    selectedCinemaDisplay.textContent = `Đã chọn: ${cinema.name}`;
+                    selectedCinemaDisplay.classList.add('show');
+
+                    document.getElementById('roomSearch').disabled = false;
+                }
+            }
+        }
+
+        if (showtime.movieId) {
+            const movie = moviesData.find(m => m.id === showtime.movieId);
+            if (movie) {
+                const selectedMovieDisplay = document.getElementById('selectedMovie');
+                selectedMovieDisplay.textContent = `Đã chọn: ${movie.title}`;
+                selectedMovieDisplay.classList.add('show');
+            }
+        }
+    }
+
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                cinemasData = response.data;
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    function setupCinemaAutocomplete() {
+        const searchInput = document.getElementById('cinemaSearch');
+        const dropdown = document.getElementById('cinemaDropdown');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterCinemas(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (cinemasData.length > 0) {
+                filterCinemas(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('cinemaId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+
+            document.getElementById('roomId').value = '';
+            document.getElementById('selectedRoom').textContent = '';
+            document.getElementById('selectedRoom').classList.remove('show');
+            document.getElementById('roomSearch').disabled = true;
+
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterCinemas(searchTerm) {
+        const dropdown = document.getElementById('cinemaDropdown');
+        dropdown.innerHTML = '';
+
+        if (!cinemasData.length) return;
+
+        const filteredCinemas = cinemasData.filter(cinema => {
+            const cinemaName = (cinema.name || '').toLowerCase();
+            return cinemaName.includes(searchTerm);
+        });
+
+        if (filteredCinemas.length > 0) {
+            filteredCinemas.forEach(cinema => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = cinema.name;
+                item.setAttribute('data-id', cinema.id);
+
+                item.addEventListener('click', function () {
+                    selectCinema(cinema);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    function selectCinema(cinema) {
+        const searchInput = document.getElementById('cinemaSearch');
+        const hiddenInput = document.getElementById('cinemaId');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        hiddenInput.value = cinema.id;
+        searchInput.value = '';
+        const cinemaName = cinema.name;
+        selectedDisplay.textContent = `Đã chọn: ${cinemaName}`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('cinemaId-error').textContent = '';
+
+        document.getElementById('roomId').value = '';
+        document.getElementById('selectedRoom').textContent = '';
+        document.getElementById('selectedRoom').classList.remove('show');
+
+        document.getElementById('roomSearch').disabled = false;
+
+        roomsData = allRoomsData.filter(room => room.cinemaId === parseInt(cinema.id));
+    }
+
+    function setupRoomAutocomplete() {
+        const searchInput = document.getElementById('roomSearch');
+        const dropdown = document.getElementById('roomDropdown');
+        const selectedDisplay = document.getElementById('selectedRoom');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterRooms(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (roomsData.length > 0) {
+                filterRooms(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('roomId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterRooms(searchTerm) {
+        const dropdown = document.getElementById('roomDropdown');
+        dropdown.innerHTML = '';
+
+        if (!roomsData.length) return;
+
+        const filteredRooms = roomsData.filter(room => {
+            const roomName = (room.name || '').toLowerCase();
+            return roomName.includes(searchTerm);
+        });
+
+        if (filteredRooms.length > 0) {
+            filteredRooms.forEach(room => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = room.name;
+                item.setAttribute('data-id', room.id);
+
+                item.addEventListener('click', function () {
+                    selectRoom(room);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    async function selectRoom(room) {
+        const searchInput = document.getElementById('roomSearch');
+        const hiddenInput = document.getElementById('roomId');
+        const selectedDisplay = document.getElementById('selectedRoom');
+
+        hiddenInput.value = room.id;
+        searchInput.value = '';
+
+        // Lấy số lượng ghế
+        await loadSeatCount(room.id);
+
+        const roomName = room.name;
+        selectedDisplay.textContent = `Đã chọn: ${roomName} (${seatCount} ghế)`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('roomId-error').textContent = '';
+    }
+
+    function setupMovieAutocomplete() {
+        const searchInput = document.getElementById('movieSearch');
+        const dropdown = document.getElementById('movieDropdown');
+        const selectedDisplay = document.getElementById('selectedMovie');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterMovies(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (moviesData.length > 0) {
+                filterMovies(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('movieId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterMovies(searchTerm) {
+        const dropdown = document.getElementById('movieDropdown');
+        dropdown.innerHTML = '';
+
+        if (!moviesData.length) return;
+
+        const filteredMovies = moviesData.filter(movie => {
+            const movieTitle = (movie.title || '').toLowerCase();
+            return movieTitle.includes(searchTerm);
+        });
+
+        if (filteredMovies.length > 0) {
+            filteredMovies.forEach(movie => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = movie.title;
+                item.setAttribute('data-id', movie.id);
+
+                item.addEventListener('click', function () {
+                    selectMovie(movie);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    function selectMovie(movie) {
+        const searchInput = document.getElementById('movieSearch');
+        const hiddenInput = document.getElementById('movieId');
+        const selectedDisplay = document.getElementById('selectedMovie');
+
+        hiddenInput.value = movie.id;
+        searchInput.value = '';
+        const movieTitle = movie.title;
+        selectedDisplay.textContent = `Đã chọn: ${movieTitle}`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('movieId-error').textContent = '';
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        clearErrorMessages();
+
+        if (!validateForm()) return;
+        await submitFormData();
+    }
+
+    function clearErrorMessages() {
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    }
+
+    function validateForm() {
+        const validationRules = [
+            {id: 'movieId', validation: value => value !== '', message: 'Vui lòng chọn phim'},
+            {id: 'roomId', validation: value => value !== '', message: 'Vui lòng chọn phòng chiếu'},
+            {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn rạp chiếu'},
+            {id: 'startTime', validation: value => value !== '', message: 'Vui lòng chọn giờ bắt đầu chiếu'},
+            {id: 'price', validation: value => value !== '' && parseInt(value) >= 0, message: 'Vui lòng nhập giá vé hợp lệ'},
+            {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}
+        ];
+
+        let isValid = true;
+
+        validationRules.forEach(rule => {
+            const field = document.getElementById(rule.id);
+            const errorElement = document.getElementById(`${rule.id}-error`);
+
+            if (!rule.validation(field.value)) {
+                errorElement.textContent = rule.message;
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    async function submitFormData() {
+        const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
+        const itemType = 'suất chiếu';
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const formData = getFormData();
+                    const endpoint = isEditMode
+                        ? '/api/admin/showtimes/update'
+                        : '/api/admin/showtimes/create';
+
+                    const method = isEditMode ? 'PUT' : 'POST';
+
+                    const response = await httpRequest(endpoint, {
+                        method: method,
+                        body: JSON.stringify(formData)
+                    });
+
+                    handleApiResponse(response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    function getFormData() {
+        const data = {
+            movieId: document.getElementById('movieId').value,
+            roomId: document.getElementById('roomId').value,
+            startTime: new Date(document.getElementById('startTime').value).toISOString(),
+            price: document.getElementById('price').value,
+            status: document.getElementById('status').value
+        };
+
+        const showtimeId = document.getElementById('showtimeId').value;
+        if (showtimeId) {
+            data.id = showtimeId;
+        }
+
+        return data;
+    }
+
+    function handleApiResponse(response) {
+        if (response.code === 1) {
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/showtimes');
+        } else {
+            showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
+        }
+    }
+</script>

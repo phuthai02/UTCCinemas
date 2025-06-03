@@ -1,0 +1,248 @@
+<div class="content-box">
+    <div class="table-controls">
+        <div class="top-left">
+            <div class="search-filter">
+                <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
+                <select id="cinema-select">
+                    <option value="-1">Tất cả rạp chiếu</option>
+                </select>
+                <select id="room-select" disabled>
+                    <option value="-1">Tất cả phòng chiếu</option>
+                </select>
+                <button id="search">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="top-right">
+            <button class="add-btn">Thêm mới</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="tableData" class="display">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Số ghế</th>
+                <th>Phòng chiếu</th>
+                <th>Rạp chiếu</th>
+                <th>Ngày tạo</th>
+                <th>Người tạo</th>
+                <th>Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination">
+            <button id="prevPageBtn">
+                <span>Trước</span>
+            </button>
+            <input id="pageInfo" type="text" placeholder="1 / 1" disabled/>
+            <button id="nextPageBtn">
+                <span>Sau</span>
+            </button>
+        </div>
+        <div class="records-per-page">
+            <label for="records-select">Số bản ghi mỗi trang:</label>
+            <select id="records-select">
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+</div>
+<script>
+    let page = 0;
+    let totalPages = 0;
+    let cinemaMap = {};
+    let roomMap = {};
+    let userMap = {};
+    let selectedCinemaId = '-1';
+    let selectedRoomId = '-1';
+    let allRooms = [];
+
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const cinemaSelect = document.getElementById('cinema-select');
+                cinemaSelect.innerHTML = '<option value="-1">Tất cả rạp chiếu</option>';
+
+                response.data.forEach(cinema => {
+                    cinemaMap[cinema.id] = cinema.name;
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    cinemaSelect.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    async function loadRooms() {
+        try {
+            const response = await httpRequest('/api/admin/rooms/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                allRooms = response.data;
+                allRooms.forEach(room => {
+                    roomMap[room.id] = room.name;
+                });
+            } else {
+                console.error('Không thể tải danh sách phòng chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phòng chiếu:', error);
+        }
+    }
+
+    function updateRoomDropdown(cinemaId) {
+        const roomSelect = document.getElementById('room-select');
+        roomSelect.innerHTML = '<option value="-1">Tất cả phòng chiếu</option>';
+
+        if (!cinemaId) {
+            roomSelect.disabled = true;
+            return;
+        }
+
+        const filteredRooms = allRooms.filter(room => room.cinemaId === parseInt(cinemaId));
+
+        if (filteredRooms.length > 0) {
+            roomSelect.disabled = false;
+
+            filteredRooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room.id;
+                option.textContent = room.name;
+                roomSelect.appendChild(option);
+            });
+        } else {
+            roomSelect.disabled = true;
+        }
+    }
+
+    async function loadUsers() {
+        try {
+            const response = await httpRequest('/api/admin/users/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                response.data.forEach(user => {
+                    userMap[user.id] = user.name;
+                });
+            } else {
+                console.error('Không thể tải danh sách người dùng:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách người dùng:', error);
+        }
+    }
+
+    async function loadData() {
+        try {
+            const pageSize = document.getElementById("records-select").value;
+            const search = document.getElementById("search-input").value;
+            let url = `/api/admin/seats/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
+            url += `&cinemaId=${selectedCinemaId}`;
+            url += `&roomId=${selectedRoomId}`;
+
+            const result = await httpRequest(url);
+
+            if (result.message !== 'SUCCESS') {
+                console.error('Lỗi khi lấy dữ liệu:', result.message);
+                return;
+            }
+
+            const datas = result.data.data;
+            const tableBody = document.querySelector("#tableData tbody");
+            tableBody.innerHTML = "";
+
+            datas.forEach((item, index) => {
+                const roomId = item.roomId;
+                const room = allRooms.find(room => room.id === roomId);
+
+                const roomName = room.name || 'Không xác định';
+                const cinemaName = cinemaMap[room.cinemaId] || 'Không xác định';
+                const createdUser = userMap[item.createdUser] || 'Không xác định';
+
+                const row = document.createElement("tr");
+                row.onclick = () => {
+                    navigateTo(`/utc-cinemas/seats/edit?id=${item.id}`);
+                };
+
+                row.innerHTML = `
+                <td>${page * pageSize + index + 1}</td>
+                <td>${item.seatNumber}</td>
+                <td>${roomName}</td>
+                <td>${cinemaName}</td>
+                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
+                <td>${createdUser}</td>
+                <td>
+                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
+                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
+                  </span>
+                </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            totalPages = result.data.totalPages;
+            if (totalPages > 0 && page > totalPages - 1) {
+                page = 0;
+                await loadData();
+            }
+            document.getElementById("pageInfo").placeholder = (totalPages == 0 ? 0 : (page + 1)) + " / " + totalPages;
+        } catch (error) {
+            console.error("Lỗi khi gọi API:", error);
+        }
+    }
+
+    function prevPage() {
+        if (page === 0) return;
+        page--;
+        loadData();
+    }
+
+    function nextPage() {
+        if (page === (totalPages - 1)) return;
+        page++;
+        loadData();
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        document.getElementById('nextPageBtn').addEventListener('click', nextPage);
+        document.getElementById('prevPageBtn').addEventListener('click', prevPage);
+        document.getElementById("search").addEventListener("click", loadData);
+        document.getElementById("records-select").addEventListener("change", loadData);
+        document.querySelector(".add-btn").addEventListener("click", function () {
+            navigateTo("/utc-cinemas/seats/create")
+        });
+
+        document.getElementById('cinema-select').addEventListener('change', function () {
+            selectedCinemaId = this.value;
+            selectedRoomId = '-1';
+            updateRoomDropdown(selectedCinemaId);
+        });
+
+        document.getElementById('room-select').addEventListener('change', function () {
+            selectedRoomId = this.value;
+        });
+
+        await Promise.all([loadCinemas(), loadUsers(), loadRooms()]);
+        await loadData();
+    });
+</script>
