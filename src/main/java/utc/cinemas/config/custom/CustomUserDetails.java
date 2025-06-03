@@ -1,5 +1,7 @@
 package utc.cinemas.config.custom;
 
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,18 +12,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+    private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(User user) {
+    public CustomUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
         this.user = user;
+        this.authorities = authorities;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String roleName = (user.getRole() != null && Objects.equals(user.getRole(), (Constants.ROLE_ADMIN))) ? "ROLE_ADMIN" : "ROLE_USER";
-        return List.of(new SimpleGrantedAuthority(roleName));
+        return authorities;
     }
 
     @Override
@@ -52,9 +56,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public User getUser() {
-        return user;
     }
 }

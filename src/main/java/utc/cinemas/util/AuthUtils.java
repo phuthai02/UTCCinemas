@@ -31,17 +31,4 @@ public class AuthUtils {
         return authentication != null && authentication.isAuthenticated()
                 && !Objects.equals(authentication.getPrincipal(), "anonymousUser");
     }
-
-    public static boolean hasRole(Integer requiredRole) {
-        Authentication authentication = getAuthentication();
-        if (authentication == null) {
-            return false;
-        }
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        return authorities.stream().anyMatch(grantedAuthority -> {
-            String authority = grantedAuthority.getAuthority();
-            String roleName = Objects.equals(requiredRole, Constants.ROLE_ADMIN) ? "ADMIN" : "USER";
-            return authority.equals("ROLE_" + roleName);
-        });
-    }
 }
