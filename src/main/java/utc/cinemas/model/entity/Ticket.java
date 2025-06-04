@@ -24,6 +24,9 @@ public class Ticket {
     @Column(name = "SEAT_ID") // Mã ghế
     private Long seatId;
 
+    @Column(name = "PRICE") // Giá vé
+    private Long price;
+
     @Column(name = "STATUS") // Trạng thái vé (0: Đã đặt, 1: Đã thanh toán)
     private Integer status;
 

@@ -19,31 +19,33 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Response generateReport(ReportRequest request) {
-        try {
-            ReportResponse response = ticketRepository.getReportTotalByCinemaId(request.getEntityId());
-            response.setChartData(getCinemasRevenueChart());
-            return Utils.createResponse(ResponseCode.SUCCESS, response);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, e.getMessage());
-        }
+//        try {
+//            ReportResponse response = ticketRepository.getReportTotalByCinemaId(request.getEntityId());
+//            response.setChartData(getCinemasRevenueChart());
+//            return Utils.createResponse(ResponseCode.SUCCESS, response);
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return Utils.createResponse(ResponseCode.ERROR, e.getMessage());
+//        }
+        return null;
     }
 
     private ChartData getCinemasRevenueChart() {
-        List<Object[]> results = ticketRepository.getAllCinemasWithRevenue();
-
-        ChartData chartData = new ChartData();
-        List<String> labels = new ArrayList<>();
-        List<Long> values = new ArrayList<>();
-
-        for (Object[] row : results) {
-            labels.add((String) row[0]);
-            values.add(((Number) row[1]).longValue());
-        }
-
-        chartData.setLabels(labels);
-        chartData.setValues(values);
-
-        return chartData;
+//        List<Object[]> results = ticketRepository.getAllCinemasWithRevenue();
+//
+//        ChartData chartData = new ChartData();
+//        List<String> labels = new ArrayList<>();
+//        List<Long> values = new ArrayList<>();
+//
+//        for (Object[] row : results) {
+//            labels.add((String) row[0]);
+//            values.add(((Number) row[1]).longValue());
+//        }
+//
+//        chartData.setLabels(labels);
+//        chartData.setValues(values);
+//
+//        return chartData;
+        return null;
     }
 }

@@ -42,13 +42,14 @@ public class TicketSerivceImpl implements TicketSerivce {
 
             Pageable pageable = Utils.getPageable(filters);
 
-            Page<TicketDto> resultPage = ticketRepository.findAll(search, cinemaId, roomId, movieId, pageable);
+//            Page<TicketDto> resultPage = ticketRepository.findAll(search, cinemaId, roomId, movieId, pageable);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", resultPage.getContent());
-            response.put("totalPages", resultPage.getTotalPages());
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("data", resultPage.getContent());
+//            response.put("totalPages", resultPage.getTotalPages());
 
-            return Utils.createResponse(ResponseCode.SUCCESS, response);
+//            return Utils.createResponse(ResponseCode.SUCCESS, response);
+            return Utils.createResponse(ResponseCode.SUCCESS);
         } catch (Exception e) {
             log.error("Error fetching tickets: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);

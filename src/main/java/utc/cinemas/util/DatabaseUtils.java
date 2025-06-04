@@ -39,6 +39,7 @@ public class DatabaseUtils {
         setField(entity, "modifiedDate", now);
         setField(entity, "modifiedUser", userId);
         setField(entity, "status", Constants.STATUS_ACTIVE);
+        setField(entity, "display", Constants.DISPLAY_VISIBLE);
         repository.save(entity);
     }
 
@@ -86,6 +87,41 @@ public class DatabaseUtils {
         setField(existingEntity, "modifiedUser", userId);
 
         repository.save(existingEntity);
+    }
+
+    public static <T, R extends JpaRepository<T, Long>> void deleteEntity(Long id, R repository) throws Exception {
+        if (id == null) {
+            throw new IllegalArgumentException("Entity ID cannot be null for delete operation");
+        }
+
+        Optional<T> existingEntityOpt = repository.findById(id);
+        if (existingEntityOpt.isEmpty()) {
+            throw new EntityNotFoundException("Entity with ID " + id + " not found");
+        }
+
+        T existingEntity = existingEntityOpt.get();
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Long userId = AuthUtils.getUserId();
+
+        setField(existingEntity, "status", Constants.STATUS_INACTIVE);
+        setField(existingEntity, "display", Constants.DISPLAY_HIDDEN);
+        setField(existingEntity, "modifiedDate", now);
+        setField(existingEntity, "modifiedUser", userId);
+
+        repository.save(existingEntity);
+    }
+
+    public static <T, R extends JpaRepository<T, Long>> void hardDeleteEntity(Long id, R repository) throws Exception {
+        if (id == null) {
+            throw new IllegalArgumentException("Entity ID cannot be null for delete operation");
+        }
+
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Entity with ID " + id + " not found");
+        }
+
+        repository.deleteById(id);
     }
 
     private static Field findIdField(Class<?> clazz) {

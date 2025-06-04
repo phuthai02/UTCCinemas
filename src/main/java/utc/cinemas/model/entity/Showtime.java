@@ -24,9 +24,6 @@ public class Showtime {
     @Column(name = "START_TIME") // Giờ bắt đầu chiếu
     private Timestamp startTime;
 
-    @Column(name = "PRICE") // Giá vé
-    private Long price;
-
     @Column(name = "CREATED_USER") // Người tạo
     private Long createdUser;
 

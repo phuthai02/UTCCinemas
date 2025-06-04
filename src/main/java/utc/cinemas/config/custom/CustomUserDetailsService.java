@@ -12,8 +12,10 @@ import utc.cinemas.repository.UserRepository;
 import utc.cinemas.service.userpermisstion.UserPermissionService;
 import utc.cinemas.util.Constants;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -32,26 +34,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user với username: " + username));
 
-        // Kiểm tra role hợp lệ
-        if (user.getRole() == null || (!Objects.equals(Constants.ROLE_ADMIN, user.getRole()) && !Objects.equals(Constants.ROLE_DEVELOPER, user.getRole()))) {
-            throw new UsernameNotFoundException("Chỉ admin mới được phép đăng nhập vào hệ thống");
+        if (user.getRole() == null || Objects.equals(Constants.ROLE_USER, user.getRole())) {
+            throw new UsernameNotFoundException("Người dùng không được phép đăng nhập vào hệ thống");
         }
 
         Collection<GrantedAuthority> authorities = new HashSet<>();
 
-        // Nếu là DEVELOPER thì cấp tất cả quyền
-        if (Objects.equals(Constants.ROLE_DEVELOPER, user.getRole())) {
-            List<String> allPermissions = userPermissionService.getAllPermissionCodes();
-            authorities.addAll(allPermissions.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
-        } else {
-            // Nếu là ADMIN thường thì lấy quyền từ database
-            List<String> permissions = userPermissionService.getUserPermissions(user.getId());
-            authorities.addAll(permissions.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
+        List<String> permissions = userPermissionService.getUserPermissions(user.getId());
+        if (permissions.isEmpty()) {
+            permissions = Constants.getDefaultPermissionsForRole(user.getRole());
         }
+
+        authorities.addAll(permissions.stream().map(SimpleGrantedAuthority::new).toList());
 
         return new CustomUserDetails(user, authorities);
     }

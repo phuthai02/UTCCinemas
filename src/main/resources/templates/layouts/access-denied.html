@@ -31,7 +31,7 @@
         .back-button {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #3498db;
+            background-color: #f43f5e;
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -40,7 +40,7 @@
         }
 
         .back-button:hover {
-            background-color: #2980b9;
+            background-color: #be123c;
         }
     </style>
 </head>
@@ -53,12 +53,12 @@
     <div class="access-denied-message">
         Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ với quản trị viên nếu bạn cho rằng đây là lỗi.
     </div>
-    <a id="backBtn" class="back-button">Quay lại trang đăng nhập</a>
+    <a id="backBtn" class="back-button">Quay lại trang chủ</a>
 </div>
 
 <script src="/javascript/main.js"></script>
 <script>
-    document.getElementById('backBtn').addEventListener('click', logout);
+    document.getElementById('backBtn').addEventListener('click', function () { navigateTo("/utc-cinemas/home") });
 </script>
 </body>
 </html>

@@ -3,11 +3,8 @@
         <div class="top-left">
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                <select id="room-select">
-                    <option value="-1">Tất cả phòng</option>
-                </select>
-                <select id="type-select">
-                    <option value="-1">Tất cả loại thiết bị</option>
+                <select id="search-select">
+                    <option value="-1">Tất cả loại sản phẩm</option>
                 </select>
                 <button id="search">Tìm kiếm</button>
             </div>
@@ -23,15 +20,12 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th>Tên thiết bị</th>
-                <th>Loại thiết bị</th>
-                <th>Phòng</th>
-                <th>Thương hiệu</th>
-                <th>Model</th>
+                <th>Tên sản phẩm</th>
+                <th>Loại sản phẩm</th>
+                <th>Giá</th>
                 <th>Số lượng</th>
-                <th>Tình trạng</th>
-                <th>Ngày mua</th>
-                <th>Bảo hành đến</th>
+                <th>Mô tả</th>
+                <th>Rạp chiếu</th>
                 <th>Người tạo</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
@@ -66,57 +60,28 @@
 <script>
     let page = 0;
     let totalPages = 0;
-    let roomMap = {};
+    let productTypeMap = {};
     let userMap = {};
+    let cinemaMap = {};
 
-    const conditionStatusMap = {
-        1: 'Tốt',
-        2: 'Khá',
-        3: 'Trung bình',
-        4: 'Kém',
-        5: 'Hỏng'
-    };
-
-    async function loadRooms() {
+    async function loadProductTypes() {
         try {
-            const response = await httpRequest('/api/admin/rooms/get-all', {
+            const response = await httpRequest('/api/admin/products/get-product-types', {
                 method: 'GET'
             });
-            const selectElement = document.getElementById('room-select');
+            const selectElement = document.getElementById('search-select');
             if (response.code === 1 && response.data) {
-                response.data.forEach(room => {
-                    roomMap[room.id] = room.name;
+                response.data.forEach(productType => {
                     const option = document.createElement('option');
-                    option.value = room.id;
-                    option.textContent = room.name;
+                    option.value = productType;
+                    option.textContent = productType;
                     selectElement.appendChild(option);
                 });
             } else {
-                console.error('Không thể tải danh sách phòng:', response.message);
+                console.error('Không thể tải danh sách loại sản phẩm:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách phòng:', error);
-        }
-    }
-
-    async function loadEquipmentTypes() {
-        try {
-            const response = await httpRequest('/api/admin/equipments/get-types', {
-                method: 'GET'
-            });
-            const selectElement = document.getElementById('type-select');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách loại thiết bị:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách loại thiết bị:', error);
+            console.error('Lỗi khi tải danh sách loại sản phẩm:', error);
         }
     }
 
@@ -137,69 +102,74 @@
         }
     }
 
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+            if (response.code === 1 && response.data) {
+                response.data.forEach(cinema => {
+                    cinemaMap[cinema.id] = cinema.name;
+                });
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    function formatPrice(price) {
+        if (!price) return '0 ₫';
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const roomId = document.getElementById("room-select").value;
-            const equipmentType = document.getElementById("type-select").value;
-
-            let queryParams = `page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
-            if (roomId !== '-1') queryParams += `&roomId=${roomId}`;
-            if (equipmentType !== '-1') queryParams += `&equipmentType=${equipmentType}`;
-
-            const result = await httpRequest(`/api/admin/equipments/get-list?${queryParams}`);
-
+            const productType = document.getElementById("search-select").value;
+            const result = await httpRequest('/api/admin/products/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&productType=' + productType);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
             }
-
             const datas = result.data.data;
             const tableBody = document.querySelector("#tableData tbody");
             tableBody.innerHTML = "";
-
             datas.forEach((item, index) => {
                 const createdUserName = userMap[item.createdUser] || 'Không xác định';
-                const roomName = roomMap[item.roomId] || 'Không xác định';
-                const conditionText = conditionStatusMap[item.conditionStatus] || 'Không xác định';
-
+                const cinemaName = cinemaMap[item.cinemaId] || 'Không xác định';
                 const row = document.createElement("tr");
                 row.onclick = () => {
-                    navigateTo(`/utc-cinemas/equipments/edit?id=${item.id}`);
+                    navigateTo(`/utc-cinemas/products/edit?id=${item.id}`);
                 };
-
                 row.innerHTML = `
-                <td>${page * parseInt(pageSize) + index + 1}</td>
-                <td>${item.equipmentName}</td>
-                <td>${item.equipmentType || '-'}</td>
-                <td>${roomName}</td>
-                <td>${item.brand || '-'}</td>
-                <td>${item.model || '-'}</td>
+                <td>${page * pageSize + index + 1}</td>
+                <td>${item.productName}</td>
+                <td>${item.productType || '-'}</td>
+                <td>${formatPrice(item.price)}</td>
                 <td>${item.quantity || 0}</td>
-                <td>
-                  <span class="badge ${getConditionBadgeClass(item.conditionStatus)}">
-                    ${conditionText}
-                  </span>
-                </td>
-                <td>${item.purchaseDate ? new Date(item.purchaseDate).toLocaleDateString('vi-VN') : '-'}</td>
-                <td>${item.warrantyExpiry ? new Date(item.warrantyExpiry).toLocaleDateString('vi-VN') : '-'}</td>
+                <td>${item.description || '-'}</td>
+                <td>${cinemaName}</td>
                 <td>${createdUserName}</td>
                 <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
                   <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động'}
+                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
                   </span>
                 </td>
                 <td>
                   <span class="badge ${item.display === 1 ? 'bg-success' : 'bg-warning'}">
-                    ${item.display === 1 ? 'Hiển thị' : 'Ẩn'}
+                    ${item.display === 1 ? 'Hiển thị' : 'Ẩn' }
                   </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
             });
-
             totalPages = result.data.totalPages;
             if (totalPages > 0 && page > totalPages - 1) {
                 page = 0;
@@ -208,17 +178,6 @@
             document.getElementById("pageInfo").placeholder = (totalPages == 0 ? 0 : (page + 1)) + " / " + totalPages;
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
-        }
-    }
-
-    function getConditionBadgeClass(condition) {
-        switch(condition) {
-            case 1: return 'bg-success';
-            case 2: return 'bg-info';
-            case 3: return 'bg-warning';
-            case 4: return 'bg-danger';
-            case 5: return 'bg-dark';
-            default: return 'bg-secondary';
         }
     }
 
@@ -240,12 +199,12 @@
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
         document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/equipments/create")
+            navigateTo("/utc-cinemas/products/create")
         });
 
-        await loadRooms();
-        await loadEquipmentTypes();
+        await loadProductTypes();
         await loadUsers();
+        await loadCinemas();
         await loadData();
     });
 </script>

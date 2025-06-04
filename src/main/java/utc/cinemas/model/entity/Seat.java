@@ -19,6 +19,9 @@ public class Seat {
     @Column(name = "SEAT_NUMBER")
     private String seatNumber; // Số ghế
 
+    @Column(name = "SEAT_TYPE") // Hạng ghế
+    private String seatType;
+
     @Column(name = "CREATED_USER")
     private Long createdUser; // Người tạo
 

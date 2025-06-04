@@ -13,41 +13,40 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
     void deleteAllByShowtimeId(Long showtimeId);
-
-    @Query("SELECT new utc.cinemas.model.dto.TicketDto(m.title, c.name, r.name, s.seatNumber, st.price, " +
-            "CASE WHEN t.modifiedDate != t.createdDate THEN t.modifiedDate ELSE NULL END, " +
-            "u.name, t.createdDate, t.createdUser, t.status, st.startTime) " +
-            "FROM Ticket t " +
-            "LEFT JOIN Showtime st ON t.showtimeId = st.id " +
-            "LEFT JOIN Room r ON st.roomId = r.id " +
-            "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
-            "LEFT JOIN Movie m ON st.movieId = m.id " +
-            "LEFT JOIN User u ON t.userId = u.id " +
-            "LEFT JOIN Seat s ON t.seatId = s.id " +
-            "WHERE (:cinemaId = -1 OR c.id = :cinemaId) " +
-            "AND (:roomId = -1 OR st.roomId = :roomId) " +
-            "AND (:movieId = -1 OR st.movieId = :movieId)")
-    Page<TicketDto> findAll(String search, Long cinemaId, Long roomId, Long movieId, Pageable pageable);
-
-    @Query("SELECT new utc.cinemas.model.dto.ReportResponse(" +
-            "COUNT(DISTINCT t.id), " +
-            "SUM(CASE WHEN t.id IS NOT NULL AND t.status = 0 THEN st.price ELSE 0 END), " +
-            "COUNT(DISTINCT CASE WHEN t.status = 0 THEN t.id ELSE NULL END), " +
-            "COUNT(DISTINCT st.id)) " +
-            "FROM Showtime st " +
-            "LEFT JOIN Ticket t ON st.id = t.showtimeId " +
-            "LEFT JOIN Room r ON st.roomId = r.id " +
-            "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
-            "WHERE (:cinemaId = -1 OR c.id = :cinemaId)")
-    ReportResponse getReportTotalByCinemaId(Long cinemaId);
-
-    @Query("SELECT c.name as name, " +
-            "COALESCE(SUM(CASE WHEN t.id IS NOT NULL AND t.status = 0 THEN st.price ELSE 0 END), 0) as revenue " +
-            "FROM Cinema c " +
-            "LEFT JOIN Room r ON r.cinemaId = c.id " +
-            "LEFT JOIN Showtime st ON st.roomId = r.id " +
-            "LEFT JOIN Ticket t ON t.showtimeId = st.id " +
-            "GROUP BY c.id, c.name " +
-            "ORDER BY c.id DESC")
-    List<Object[]> getAllCinemasWithRevenue();
+//    @Query("SELECT new utc.cinemas.model.dto.TicketDto(m.title, c.name, r.name, s.seatNumber, st.price, " +
+//            "CASE WHEN t.modifiedDate != t.createdDate THEN t.modifiedDate ELSE NULL END, " +
+//            "u.name, t.createdDate, t.createdUser, t.status, st.startTime) " +
+//            "FROM Ticket t " +
+//            "LEFT JOIN Showtime st ON t.showtimeId = st.id " +
+//            "LEFT JOIN Room r ON st.roomId = r.id " +
+//            "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
+//            "LEFT JOIN Movie m ON st.movieId = m.id " +
+//            "LEFT JOIN User u ON t.userId = u.id " +
+//            "LEFT JOIN Seat s ON t.seatId = s.id " +
+//            "WHERE (:cinemaId = -1 OR c.id = :cinemaId) " +
+//            "AND (:roomId = -1 OR st.roomId = :roomId) " +
+//            "AND (:movieId = -1 OR st.movieId = :movieId)")
+//    Page<TicketDto> findAll(String search, Long cinemaId, Long roomId, Long movieId, Pageable pageable);
+//
+//    @Query("SELECT new utc.cinemas.model.dto.ReportResponse(" +
+//            "COUNT(DISTINCT t.id), " +
+//            "SUM(CASE WHEN t.id IS NOT NULL AND t.status = 0 THEN t.price ELSE 0 END), " +
+//            "COUNT(DISTINCT CASE WHEN t.status = 0 THEN t.id ELSE NULL END), " +
+//            "COUNT(DISTINCT st.id)) " +
+//            "FROM Showtime st " +
+//            "LEFT JOIN Ticket t ON st.id = t.showtimeId " +
+//            "LEFT JOIN Room r ON st.roomId = r.id " +
+//            "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
+//            "WHERE (:cinemaId = -1 OR c.id = :cinemaId)")
+//    ReportResponse getReportTotalByCinemaId(Long cinemaId);
+//
+//    @Query("SELECT c.name as name, " +
+//            "COALESCE(SUM(CASE WHEN t.id IS NOT NULL AND t.status = 0 THEN t.price ELSE 0 END), 0) as revenue " +
+//            "FROM Cinema c " +
+//            "LEFT JOIN Room r ON r.cinemaId = c.id " +
+//            "LEFT JOIN Showtime st ON st.roomId = r.id " +
+//            "LEFT JOIN Ticket t ON t.showtimeId = st.id " +
+//            "GROUP BY c.id, c.name " +
+//            "ORDER BY c.id DESC")
+//    List<Object[]> getAllCinemasWithRevenue();
 }

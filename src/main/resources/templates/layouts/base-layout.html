@@ -30,86 +30,92 @@
                 <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
             </li>
 
-            <!-- Quản lý quyền -->
+            <!-- Danh sách quyền -->
             <li th:if="${@PermissionUtils.hasPermission('PERMISSION_VIEW')}"
                 th:class="${activeMenu == 'permissions' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/permissions')">
                 <span class="iconify" data-icon="mdi:shield-key" data-inline="true"></span>
-                Quản lý quyền
+                Danh sách quyền
             </li>
 
             <!-- Phân quyền người dùng -->
-            <li sec:authorize="hasAuthority('USER_PERMISSION_VIEW')"
+            <li th:if="${@PermissionUtils.hasPermission('USER_PERMISSION_VIEW')}"
                 th:class="${activeMenu == 'users-permissions' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/users-permissions')">
                 <span class="iconify" data-icon="mdi:account-lock" data-inline="true"></span> Phân quyền người dùng
             </li>
 
-            <!-- Quản lý rạp chiếu -->
-            <li sec:authorize="hasAuthority('CINEMA_VIEW')"
+            <!-- Danh sách rạp chiếu -->
+            <li th:if="${@PermissionUtils.hasPermission('CINEMA_VIEW')}"
                 th:class="${activeMenu == 'cinemas' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/cinemas')">
-                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Danh sách rạp chiếu
             </li>
 
-            <!-- Quản lý phòng chiếu -->
-            <li sec:authorize="hasAuthority('ROOM_VIEW')"
+            <li th:if="${@PermissionUtils.hasPermission('PRODUCT_VIEW')}"
+                th:class="${activeMenu == 'products' ? 'aside-active' : ''}"
+                onclick="navigateTo('/utc-cinemas/products')">
+                <span class="iconify" data-icon="mdi:food" data-inline="true"></span> Danh sách hàng hóa
+            </li>
+
+            <!-- Danh sách phòng chiếu -->
+            <li th:if="${@PermissionUtils.hasPermission('ROOM_VIEW')}"
                 th:class="${activeMenu == 'rooms' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/rooms')">
-                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
+                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Danh sách phòng chiếu
             </li>
 
-            <!-- Quản lý trang thiết bị -->
-            <li sec:authorize="hasAuthority('EQUIPMENT_VIEW')"
+            <!-- Danh sách thiết bị -->
+            <li th:if="${@PermissionUtils.hasPermission('EQUIPMENT_VIEW')}"
                 th:class="${activeMenu == 'equipments' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/equipments')">
-                <span class="iconify" data-icon="mdi:tools" data-inline="true"></span> Quản lý trang thiết bị
+                <span class="iconify" data-icon="mdi:tools" data-inline="true"></span> Danh sách thiết bị
             </li>
 
-            <!-- Quản lý ghế ngồi -->
-            <li sec:authorize="hasAuthority('SEAT_VIEW')"
+            <!-- Danh sách ghế ngồi -->
+            <li th:if="${@PermissionUtils.hasPermission('SEAT_VIEW')}"
                 th:class="${activeMenu == 'seats' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/seats')">
-                <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Quản lý ghế ngồi
+                <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Danh sách ghế ngồi
             </li>
 
-            <!-- Quản lý phim -->
-            <li sec:authorize="hasAuthority('MOVIE_VIEW')"
+            <!-- Danh sách phim -->
+            <li th:if="${@PermissionUtils.hasPermission('MOVIE_VIEW')}"
                 th:class="${activeMenu == 'movies' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/movies')">
-                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
+                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Danh sách phim
             </li>
 
-            <!-- Quản lý suất chiếu -->
-            <li sec:authorize="hasAuthority('SHOWTIME_VIEW')"
+            <!-- Danh sách suất chiếu -->
+            <li th:if="${@PermissionUtils.hasPermission('SHOWTIME_VIEW')}"
                 th:class="${activeMenu == 'showtimes' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/showtimes')">
-                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
+                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Danh sách suất chiếu
             </li>
 
-            <!-- Quản lý đặt vé -->
-            <li sec:authorize="hasAuthority('TICKET_VIEW')"
+            <!-- Danh sách đặt vé -->
+            <li th:if="${@PermissionUtils.hasPermission('TICKET_VIEW')}"
                 th:class="${activeMenu == 'tickets' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/tickets')">
-                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
+                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Danh sách đặt vé
             </li>
 
-            <!-- Quản lý nhân viên -->
-            <li sec:authorize="hasAuthority('STAFF_VIEW')"
+            <!-- Danh sách nhân viên -->
+            <li th:if="${@PermissionUtils.hasPermission('STAFF_VIEW')}"
                 th:class="${activeMenu == 'staffs' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/staffs')">
-                <span class="iconify" data-icon="mdi:account-tie-outline" data-inline="true"></span> Quản lý nhân viên
+                <span class="iconify" data-icon="mdi:account-tie-outline" data-inline="true"></span> Danh sách nhân viên
             </li>
 
-            <!-- Quản lý khách hàng -->
-            <li sec:authorize="hasAuthority('CUSTOMER_VIEW')"
+            <!-- Danh sách khách hàng -->
+            <li th:if="${@PermissionUtils.hasPermission('CUSTOMER_VIEW')}"
                 th:class="${activeMenu == 'customers' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/customers')">
-                <span class="iconify" data-icon="mdi:account-outline" data-inline="true"></span> Quản lý khách hàng
+                <span class="iconify" data-icon="mdi:account-outline" data-inline="true"></span> Danh sách khách hàng
             </li>
 
             <!-- Thống kê báo cáo -->
-            <li sec:authorize="hasAuthority('REPORT_VIEW')"
+            <li th:if="${@PermissionUtils.hasPermission('REPORT_VIEW')}"
                 th:class="${activeMenu == 'reports' ? 'aside-active' : ''}"
                 onclick="navigateTo('/utc-cinemas/reports')">
                 <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo

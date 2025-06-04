@@ -29,6 +29,7 @@
                 <th>Giám đốc cơ sở</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
+                <th>Hiển thị</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -115,6 +116,11 @@
                 <td>
                   <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
                     ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
+                  </span>
+                </td>
+                <td>
+                  <span class="badge ${item.display === 1 ? 'bg-success' : 'bg-warning'}">
+                    ${item.display === 1 ? 'Hiển thị' : 'Ẩn' }
                   </span>
                 </td>
                 `;

@@ -11,4 +11,5 @@ public interface EquipmentService {
     Response getEquipmentById(Long id);
     Response update(EquipmentDto equipmentDto);
     Response getAll();
+    Response getAllTypes();
 }

@@ -1,4 +1,4 @@
-package utc.Equipments.controller.rest;
+package utc.cinemas.controller.rest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,13 @@ public class EquipmentController {
     public ResponseEntity<Response> getEquipments() {
         log.info("Get all equipments");
         Response response = equipmentService.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("get-equipment-types")
+    public ResponseEntity<Response> getEquipmentTypes() {
+        log.info("Get all equipment types");
+        Response response = equipmentService.getAllTypes();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

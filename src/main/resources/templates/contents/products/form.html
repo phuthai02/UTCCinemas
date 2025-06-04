@@ -1,0 +1,294 @@
+<div class="content-box">
+    <div class="edit-header">
+        <h2 id="pageTitle">Thêm hàng hóa mới</h2>
+        <div class="edit-actions">
+            <button onclick="navigateTo('/utc-cinemas/products')">
+                Quay lại
+            </button>
+        </div>
+    </div>
+
+    <div class="edit-container">
+        <form id="productForm">
+            <input type="hidden" id="productId" name="productId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="productName">Tên sản phẩm <span class="required">*</span></label>
+                    <input type="text" id="productName" name="productName" maxlength="255">
+                    <div class="error-message" id="productName-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="productType">Loại sản phẩm <span class="required">*</span></label>
+                    <select id="productType" name="productType">
+                        <option value="">Chọn loại sản phẩm</option>
+                        <option value="FOOD">Thức ăn</option>
+                        <option value="DRINK">Nước uống</option>
+                        <option value="COMBO">Combo</option>
+                        <option value="SNACK">Snack</option>
+                        <option value="OTHER">Khác</option>
+                    </select>
+                    <div class="error-message" id="productType-error"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Giá (VNĐ) <span class="required">*</span></label>
+                    <input type="number" id="price" name="price" min="0">
+                    <div class="error-message" id="price-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Số lượng <span class="required">*</span></label>
+                    <input type="number" id="quantity" name="quantity" min="0">
+                    <div class="error-message" id="quantity-error"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cinemaId">Rạp chiếu <span class="required">*</span></label>
+                    <select id="cinemaId" name="cinemaId">
+                        <option value="">Chọn rạp chiếu</option>
+                    </select>
+                    <div class="error-message" id="cinemaId-error"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="description">Mô tả</label>
+                    <textarea id="description" name="description" maxlength="500" placeholder="Nhập mô tả cho sản phẩm này..."></textarea>
+                    <div class="error-message" id="description-error"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">Trạng thái <span class="required">*</span></label>
+                    <select id="status" name="status">
+                        <option value="">Chọn trạng thái</option>
+                        <option value="0">Dừng hoạt động</option>
+                        <option value="1" selected>Đang hoạt động</option>
+                    </select>
+                    <div class="error-message" id="status-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="display">Hiển thị <span class="required">*</span></label>
+                    <select id="display" name="display">
+                        <option value="">Chọn hiển thị</option>
+                        <option value="0">Ẩn</option>
+                        <option value="1" selected>Hiển thị</option>
+                    </select>
+                    <div class="error-message" id="display-error"></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/products')">Hủy bỏ</button>
+                <button type="submit" id="saveBtn">Lưu sản phẩm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let isEditMode = false;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializePage();
+        loadCinemas();
+        loadProductTypes();
+        document.getElementById('productForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    function initializePage() {
+        checkForEditMode();
+    }
+
+    function checkForEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (productId) {
+            isEditMode = true;
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa hàng hóa';
+            document.getElementById('saveBtn').textContent = 'Cập nhật sản phẩm';
+            loadProductDetails(productId);
+        }
+    }
+
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            const selectElement = document.getElementById('cinemaId');
+            if (response.code === 1 && response.data) {
+                response.data.forEach(cinema => {
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    selectElement.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+        }
+    }
+
+    async function loadProductDetails(productId) {
+        try {
+            const response = await httpRequest(`/api/admin/products/${productId}`, {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                populateForm(response.data);
+            } else {
+                showModal('error', 'Ôi xong!', 'Không thể tải thông tin sản phẩm.');
+                setTimeout(() => navigateTo('/utc-cinemas/products'), 2000);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải thông tin sản phẩm:', error);
+            showModal('error', 'Ôi xong!', 'Không thể tải thông tin sản phẩm.');
+        }
+    }
+
+    function populateForm(product) {
+        document.getElementById('productId').value = product.id;
+        document.getElementById('productName').value = product.productName;
+        document.getElementById('productType').value = product.productType || '';
+        document.getElementById('price').value = product.price || '';
+        document.getElementById('quantity').value = product.quantity || '';
+        document.getElementById('cinemaId').value = product.cinemaId || '';
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('status').value = product.status;
+        document.getElementById('display').value = product.display;
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        clearErrorMessages();
+
+        if (!validateForm()) return;
+        await submitFormData();
+    }
+
+    function clearErrorMessages() {
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    }
+
+    function validateForm() {
+        const validationRules = [
+            {
+                id: 'productName',
+                validation: value => value.trim() !== '',
+                message: 'Vui lòng nhập tên sản phẩm'
+            },
+            {
+                id: 'productType',
+                validation: value => value !== '',
+                message: 'Vui lòng chọn loại sản phẩm'
+            },
+            {
+                id: 'price',
+                validation: value => value !== '' && parseFloat(value) >= 0,
+                message: 'Vui lòng nhập giá hợp lệ (>= 0)'
+            },
+            {
+                id: 'quantity',
+                validation: value => value !== '' && parseInt(value) >= 0,
+                message: 'Vui lòng nhập số lượng hợp lệ (>= 0)'
+            },
+            {
+                id: 'cinemaId',
+                validation: value => value !== '',
+                message: 'Vui lòng chọn rạp chiếu'
+            },
+            {
+                id: 'status',
+                validation: value => value !== '',
+                message: 'Vui lòng chọn trạng thái'
+            },
+            {
+                id: 'display',
+                validation: value => value !== '',
+                message: 'Vui lòng chọn hiển thị'
+            }
+        ];
+
+        let isValid = true;
+
+        validationRules.forEach(rule => {
+            const field = document.getElementById(rule.id);
+            const errorElement = document.getElementById(`${rule.id}-error`);
+
+            if (!rule.validation(field.value)) {
+                errorElement.textContent = rule.message;
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    async function submitFormData() {
+        const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
+        const itemType = 'sản phẩm';
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const formData = getFormData();
+                    const endpoint = isEditMode
+                        ? `/api/admin/products/update`
+                        : '/api/admin/products/create';
+
+                    const method = isEditMode ? 'PUT' : 'POST';
+
+                    const response = await httpRequest(endpoint, {
+                        method: method,
+                        body: JSON.stringify(formData)
+                    });
+
+                    handleApiResponse(response);
+                } catch (error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    function getFormData() {
+        const data = {
+            productName: document.getElementById('productName').value.trim(),
+            productType: document.getElementById('productType').value,
+            price: parseInt(document.getElementById('price').value),
+            quantity: parseInt(document.getElementById('quantity').value),
+            cinemaId: parseInt(document.getElementById('cinemaId').value),
+            description: document.getElementById('description').value.trim(),
+            status: parseInt(document.getElementById('status').value),
+            display: parseInt(document.getElementById('display').value)
+        };
+
+        const productId = document.getElementById('productId').value;
+        if (productId) {
+            data.id = parseInt(productId);
+        }
+
+        return data;
+    }
+
+    function handleApiResponse(response) {
+        if (response.code === 1) {
+            const actionText = isEditMode ? 'cập nhật' : 'thêm mới';
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/products');
+        } else {
+            showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
+        }
+    }
+</script>
