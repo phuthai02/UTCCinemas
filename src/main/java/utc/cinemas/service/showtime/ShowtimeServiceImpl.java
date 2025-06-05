@@ -1,5 +1,6 @@
 package utc.cinemas.service.showtime;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,6 +98,34 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         } catch (Exception e) {
             log.error("Error editing showtime: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật suất chiếu thất bại");
+        }
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, showtimeRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Showtime not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin suất chiếu");
+        } catch (Exception e) {
+            log.error("Error toggling status showtime: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response delete(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, showtimeRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Showtime not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin suất chiếu");
+        } catch (Exception e) {
+            log.error("Error deleting showtime: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 }

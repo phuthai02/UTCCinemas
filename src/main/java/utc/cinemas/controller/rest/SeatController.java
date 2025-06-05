@@ -54,4 +54,18 @@ public class SeatController {
         Response response = seatService.getSeatCountByRoomId(roomId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("toggle-status/{id}")
+    public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
+        log.info("Toggle status id={}", id);
+        Response response = seatService.toggleStatus(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Response> delete(@PathVariable Long id) {
+        log.info("Delete id={}", id);
+        Response response = seatService.delete(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

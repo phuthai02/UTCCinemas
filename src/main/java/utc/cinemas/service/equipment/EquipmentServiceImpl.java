@@ -112,7 +112,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Response deletePermission(Long id) {
+    public Response delete(Long id) {
         try {
             DatabaseUtils.deleteEntity(id, equipmentRepository);
             return Utils.createResponse(ResponseCode.SUCCESS);

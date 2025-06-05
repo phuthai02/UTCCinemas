@@ -29,7 +29,7 @@
                 <th>Giám đốc cơ sở</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
-                <th>Hiển thị</th>
+                <th>Xoá</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -114,14 +114,20 @@
                 <td>${directorName}</td>
                 <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
-                  </span>
+                      <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
+                            data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"
+                            data-inline="false"
+                            title="Đổi trạng thái"
+                            onclick="toggleStatus(${item.id})">
+                      </span>
                 </td>
                 <td>
-                  <span class="badge ${item.display === 1 ? 'bg-success' : 'bg-warning'}">
-                    ${item.display === 1 ? 'Hiển thị' : 'Ẩn' }
-                  </span>
+                    <span class="iconify delete-icon"
+                          data-icon="mdi:trash-can-outline"
+                          data-inline="false"
+                          title="Xóa"
+                          onclick="del(${item.id})">
+                    </span>
                 </td>
                 `;
                 tableBody.appendChild(row);

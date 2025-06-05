@@ -11,4 +11,6 @@ public interface ShowtimeService {
     Response getShowtimeById(Long id);
     Response create(ShowtimeDto showtimeDto);
     Response update(ShowtimeDto showtimeDto);
+    Response toggleStatus(Long id);
+    Response delete(Long id);
 }

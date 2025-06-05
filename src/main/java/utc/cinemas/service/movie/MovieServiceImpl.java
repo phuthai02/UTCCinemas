@@ -115,24 +115,24 @@ public class MovieServiceImpl implements MovieService {
             DatabaseUtils.toggleStatus(id, movieRepository);
             return Utils.createResponse(ResponseCode.SUCCESS);
         } catch (EntityNotFoundException e) {
-            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+            log.error("Movie not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin phim");
         } catch (Exception e) {
-            log.error("Error toggling status cinema: {}", e.getMessage());
+            log.error("Error toggling status movie: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 
     @Override
-    public Response deletePermission(Long id) {
+    public Response delete(Long id) {
         try {
             DatabaseUtils.deleteEntity(id, movieRepository);
             return Utils.createResponse(ResponseCode.SUCCESS);
         } catch (EntityNotFoundException e) {
-            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+            log.error("Movie not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin phim");
         } catch (Exception e) {
-            log.error("Error deleting cinema: {}", e.getMessage());
+            log.error("Error deleting movie: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

@@ -1,5 +1,6 @@
 package utc.cinemas.service.seat;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,5 +96,33 @@ public class SeatServiceImpl implements SeatService {
             seat.setStatus(roomStatus);
         });
         seatRepository.saveAll(seats);
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, seatRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Seat not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin ghế ngồi");
+        } catch (Exception e) {
+            log.error("Error toggling status seat: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response delete(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, seatRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Seat not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin ghế ngồi");
+        } catch (Exception e) {
+            log.error("Error deleting seat: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
     }
 }

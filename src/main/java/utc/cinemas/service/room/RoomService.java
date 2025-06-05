@@ -12,4 +12,6 @@ public interface RoomService {
     Response update(RoomDto roomDto);
     Response getAll();
     void applyCinemaStatusToRooms(Long cinemaId, Integer cinemaStatus);
+    Response toggleStatus(Long id);
+    Response delete(Long id);
 }

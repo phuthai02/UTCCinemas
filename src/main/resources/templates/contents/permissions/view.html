@@ -100,11 +100,11 @@
         });
     }
 
-    async function deletePermission(id) {
+    async function del(id) {
         showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá quyền này không?`, null, async (result) => {
             if (result) {
                 try {
-                    const result = await httpRequest('/api/admin/permissions/delete/' + id, {
+                    const result = await httpRequest('/api/admin/cinemas/delete/' + id, {
                         method: 'DELETE'
                     });
 
@@ -162,7 +162,7 @@
                           data-icon="mdi:trash-can-outline"
                           data-inline="false"
                           title="Xóa"
-                          onclick="deletePermission(${item.id})">
+                          onclick="del(${item.id})">
                     </span>
                 </td>
                 `;

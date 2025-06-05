@@ -15,4 +15,6 @@ public interface SeatService {
     Response getSeatCountByRoomId(Long roomId);
     List<Seat> getSeatsByRoomId(Long roomId);
     void applyRoomStatusToSeats(Long roomId, Integer roomStatus);
+    Response toggleStatus(Long id);
+    Response delete(Long id);
 }

@@ -12,5 +12,6 @@ public interface ProductService {
     Response update(ProductDto productDto);
     Response getAll();
     Response getAllProductTypes();
+    Response toggleStatus(Long id);
     Response delete(Long id);
 }

@@ -53,7 +53,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Response deletePermission(Long id) {
+    public Response delete(Long id) {
         try {
             DatabaseUtils.deleteEntity(id, permissionRepository);
             return Utils.createResponse(ResponseCode.SUCCESS);

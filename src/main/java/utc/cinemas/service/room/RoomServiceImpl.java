@@ -1,5 +1,6 @@
 package utc.cinemas.service.room;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,5 +94,33 @@ public class RoomServiceImpl implements RoomService {
             seatService.applyRoomStatusToSeats(room.getId(), room.getStatus());
         });
         roomRepository.saveAll(rooms);
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, roomRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Room not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin phòng chiếu");
+        } catch (Exception e) {
+            log.error("Error toggling status room: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response delete(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, roomRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Room not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin phòng chiếu");
+        } catch (Exception e) {
+            log.error("Error deleting room: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
     }
 }

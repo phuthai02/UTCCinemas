@@ -63,9 +63,9 @@ public class CinemaController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Response> deletePermission(@PathVariable Long id) {
-        log.info("Delete permission id={}", id);
-        Response response = cinemaService.deletePermission(id);
+    public ResponseEntity<Response> delete(@PathVariable Long id) {
+        log.info("Delete cinema id={}", id);
+        Response response = cinemaService.delete(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

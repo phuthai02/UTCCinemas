@@ -104,7 +104,7 @@ public class CinemaServiceImpl implements CinemaService {
     }
 
     @Override
-    public Response deletePermission(Long id) {
+    public Response delete(Long id) {
         try {
             DatabaseUtils.deleteEntity(id, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS);

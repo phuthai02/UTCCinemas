@@ -1,5 +1,6 @@
 package utc.cinemas.service.product;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,7 +98,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, productRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Product not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin hàng hoá");
+        } catch (Exception e) {
+            log.error("Error toggling status product: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
     public Response delete(Long id) {
-        return null;
+        try {
+            DatabaseUtils.deleteEntity(id, productRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Product not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin hàng hoá");
+        } catch (Exception e) {
+            log.error("Error deleting product: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
     }
 }

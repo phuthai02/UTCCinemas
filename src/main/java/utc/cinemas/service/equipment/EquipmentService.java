@@ -13,5 +13,5 @@ public interface EquipmentService {
     Response getAll();
     Response getAllTypes();
     Response toggleStatus(Long id);
-    Response deletePermission(Long id);
+    Response delete(Long id);
 }
