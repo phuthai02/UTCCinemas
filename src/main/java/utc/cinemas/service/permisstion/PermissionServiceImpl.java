@@ -80,21 +80,6 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Response getAllModules() {
-        try {
-            List<Permission> permissions = permissionRepository.findAll();
-            Set<String> modules = permissions.stream()
-                    .map(Permission::getModule)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-            return Utils.createResponse(ResponseCode.SUCCESS, modules);
-        } catch (Exception e) {
-            log.error("Error fetching modules all: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR);
-        }
-    }
-
-    @Override
     public Response getAll() {
         try {
             List<Permission> permissions = permissionRepository.findAll();

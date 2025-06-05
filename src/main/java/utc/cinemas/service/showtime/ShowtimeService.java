@@ -7,10 +7,10 @@ import java.util.Map;
 
 public interface ShowtimeService {
     Response getListOfShowtimes(Map<String, String> filters);
-    Response getAll();
     Response getShowtimeById(Long id);
+    Response getAll();
     Response create(ShowtimeDto showtimeDto);
     Response update(ShowtimeDto showtimeDto);
-    Response toggleStatus(Long id);
     Response delete(Long id);
+    Response toggleStatus(Long id);
 }

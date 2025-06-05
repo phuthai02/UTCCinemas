@@ -7,10 +7,10 @@ import java.util.Map;
 
 public interface MovieService {
     Response getListOfMovies(Map<String, String> filters);
-    Response create(MovieDto movieDto);
     Response getMovieById(Long id);
-    Response update(MovieDto movieDto);
     Response getAll();
-    Response toggleStatus(Long id);
+    Response create(MovieDto movieDto);
+    Response update(MovieDto movieDto);
     Response delete(Long id);
+    Response toggleStatus(Long id);
 }

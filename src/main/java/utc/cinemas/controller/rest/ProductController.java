@@ -55,13 +55,6 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("get-product-types")
-    public ResponseEntity<Response> getProductTypes() {
-        log.info("Get all product types");
-        Response response = productService.getAllProductTypes();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @DeleteMapping("{id}")
     public ResponseEntity<Response> deleteProduct(@PathVariable Long id) {
         log.info("Delete product with id: id={}", id);

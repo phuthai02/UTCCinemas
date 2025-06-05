@@ -9,15 +9,12 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
 import utc.cinemas.repository.CinemaRepository;
-import utc.cinemas.service.room.RoomService;
-import utc.cinemas.util.Constants;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -25,9 +22,6 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Autowired
     private CinemaRepository cinemaRepository;
-
-    @Autowired
-    private RoomService roomService;
 
     @Override
     public Response getListOfCinemas(Map<String, String> filters) {
@@ -69,7 +63,6 @@ public class CinemaServiceImpl implements CinemaService {
     public Response update(CinemaDto cinemaDto) {
         try {
             Cinema cinema = cinemaDto.getEntity();
-            roomService.applyCinemaStatusToRooms(cinema.getId(), cinema.getStatus());
             DatabaseUtils.updateEntity(cinema, cinemaRepository);
             return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật chi nhánh thành công");
         } catch (Exception e) {

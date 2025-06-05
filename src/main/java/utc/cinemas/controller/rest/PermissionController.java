@@ -56,13 +56,6 @@ public class PermissionController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("get-modules")
-    public ResponseEntity<Response> getModules() {
-        log.info("Get all modules");
-        Response response = permissionService.getAllModules();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PutMapping("toggle-status/{id}")
     public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
         log.info("Toggle status id={}", id);

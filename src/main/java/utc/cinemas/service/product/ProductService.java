@@ -8,10 +8,9 @@ import java.util.Map;
 public interface ProductService {
     Response getListOfProducts(Map<String, String> filters);
     Response getProductById(Long id);
+    Response getAll();
     Response create(ProductDto productDto);
     Response update(ProductDto productDto);
-    Response getAll();
-    Response getAllProductTypes();
-    Response toggleStatus(Long id);
     Response delete(Long id);
+    Response toggleStatus(Long id);
 }

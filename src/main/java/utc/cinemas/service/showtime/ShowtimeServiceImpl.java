@@ -27,12 +27,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Autowired
     private ShowtimeRepository showtimeRepository;
 
-    @Autowired
-    private SeatService seatService;
-
-    @Autowired
-    private TicketSerivce ticketSerivce;
-
     @Override
     public Response getListOfShowtimes(@RequestParam Map<String, String> filters) {
         try {
@@ -65,12 +59,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         try {
             Showtime showtime = showtimeDto.getEntity();
             DatabaseUtils.createEntity(showtime, showtimeRepository);
-
-            List<Seat> seats = seatService.getSeatsByRoomId(showtime.getRoomId());
-            if (seats.isEmpty()) return Utils.createResponse(ResponseCode.ERROR, "Phòng chiếu này chưa có ghế ngồi");
-
-            ticketSerivce.createTicketBatch(showtime.getId(), seats);
-
             return Utils.createResponse(ResponseCode.SUCCESS, "Thêm suất chiếu mới thành công");
         } catch (Exception e) {
             log.error("Error adding showtime: {}", e.getMessage());

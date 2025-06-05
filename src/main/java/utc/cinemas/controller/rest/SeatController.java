@@ -48,13 +48,6 @@ public class SeatController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("count-by-room-id")
-    public ResponseEntity<Response> getSeatCountByRoomId(@RequestParam Long roomId) {
-        log.info("Get seat count by room id: id={}", roomId);
-        Response response = seatService.getSeatCountByRoomId(roomId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PutMapping("toggle-status/{id}")
     public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
         log.info("Toggle status id={}", id);

@@ -62,6 +62,17 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    public Response getAll(Long id) {
+        try {
+            List<Seat> seats = seatRepository.findAll();
+            return Utils.createResponse(ResponseCode.SUCCESS, seats);
+        } catch (Exception e) {
+            log.error("Error fetching seats all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
     public Response update(SeatDto seatDto) {
         try {
             Seat seat = seatDto.getEntity();
@@ -71,31 +82,6 @@ public class SeatServiceImpl implements SeatService {
             log.error("Error editing seat: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Cập nhật ghế ngồi thất bại");
         }
-    }
-
-    @Override
-    public Response getSeatCountByRoomId(Long roomId) {
-        try {
-            Long count = seatRepository.countAllByRoomId(roomId);
-            return Utils.createResponse(ResponseCode.SUCCESS, count);
-        } catch (Exception e) {
-            log.error("Error counting seat: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin ghế ngồi");
-        }
-    }
-
-    @Override
-    public List<Seat> getSeatsByRoomId(Long roomId) {
-        return seatRepository.findAllByRoomId(roomId);
-    }
-
-    @Override
-    public void applyRoomStatusToSeats(Long roomId, Integer roomStatus) {
-        List<Seat> seats = getSeatsByRoomId(roomId);
-        seats.stream().forEach(seat -> {
-            seat.setStatus(roomStatus);
-        });
-        seatRepository.saveAll(seats);
     }
 
     @Override

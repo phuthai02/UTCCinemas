@@ -15,9 +15,6 @@ import utc.cinemas.util.Utils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -81,18 +78,6 @@ public class ProductServiceImpl implements ProductService {
             return Utils.createResponse(ResponseCode.SUCCESS, products);
         } catch (Exception e) {
             log.error("Error fetching products all: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR);
-        }
-    }
-
-    @Override
-    public Response getAllProductTypes() {
-        try {
-            List<Product> products = productRepository.findAll();
-            Set<String> types = products.stream().map(Product::getProductType).filter(Objects::nonNull).collect(Collectors.toSet());
-            return Utils.createResponse(ResponseCode.SUCCESS, types);
-        } catch (Exception e) {
-            log.error("Error fetching types all: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

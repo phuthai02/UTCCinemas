@@ -7,11 +7,10 @@ import java.util.Map;
 
 public interface RoomService {
     Response getListOfRooms(Map<String, String> filters);
-    Response create(RoomDto roomDto);
     Response getRoomById(Long id);
-    Response update(RoomDto roomDto);
     Response getAll();
-    void applyCinemaStatusToRooms(Long cinemaId, Integer cinemaStatus);
-    Response toggleStatus(Long id);
+    Response create(RoomDto roomDto);
+    Response update(RoomDto roomDto);
     Response delete(Long id);
+    Response toggleStatus(Long id);
 }

@@ -27,7 +27,6 @@
                 <th>Giờ mở cửa</th>
                 <th>Giờ đóng cửa</th>
                 <th>Giám đốc cơ sở</th>
-                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
                 <th>Xoá</th>
             </tr>
@@ -61,6 +60,48 @@
     let page = 0;
     let totalPages = 0;
     let directorMap = {};
+
+    async function toggleStatus(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn đổi trạng thái chi nhánh này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/cinemas/toggle-status/' + id, {
+                        method: 'PUT'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi đổi trạng thái:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    async function del(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá chi nhánh này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/cinemas/delete/' + id, {
+                        method: 'DELETE'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xóa quyền:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
 
     async function loadDirectors() {
         try {
@@ -100,19 +141,15 @@
             datas.forEach((item, index) => {
                 const directorName = directorMap[item.cinemaDirector] || 'Chưa phân công';
                 const row = document.createElement("tr");
-                row.onclick = () => {
-                    navigateTo(`/utc-cinemas/cinemas/edit?id=${item.id}`);
-                };
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.name}</td>
+                <td><a href="/utc-cinemas/cinemas/edit?id=${item.id}">${item.name}</a></td>
                 <td>${item.location}</td>
                 <td>${item.phoneNumber || '-'}</td>
                 <td>${item.email || '-'}</td>
                 <td>${item.openingTime || '-'}</td>
                 <td>${item.closingTime || '-'}</td>
                 <td>${directorName}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
                       <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
                             data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"

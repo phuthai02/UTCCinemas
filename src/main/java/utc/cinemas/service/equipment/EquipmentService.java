@@ -7,11 +7,10 @@ import java.util.Map;
 
 public interface EquipmentService {
     Response getListOfEquipments(Map<String, String> filters);
-    Response create(EquipmentDto equipmentDto);
     Response getEquipmentById(Long id);
-    Response update(EquipmentDto equipmentDto);
     Response getAll();
-    Response getAllTypes();
-    Response toggleStatus(Long id);
+    Response create(EquipmentDto equipmentDto);
+    Response update(EquipmentDto equipmentDto);
     Response delete(Long id);
+    Response toggleStatus(Long id);
 }

@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
-    @Query("SELECT u FROM User u WHERE (u.name LIKE :search OR u.username LIKE :search) AND (:role = -1 OR u.role = :role)")
+    @Query("SELECT u FROM User u WHERE (u.name LIKE :search OR u.username LIKE :search) AND (:role = -1 OR u.role = :role) AND u.display = 1")
     Page<User> findAll(String search, Integer role, Pageable pageable);
 }

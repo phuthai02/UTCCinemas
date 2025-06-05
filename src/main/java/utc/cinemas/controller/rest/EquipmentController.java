@@ -55,13 +55,6 @@ public class EquipmentController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("get-equipment-types")
-    public ResponseEntity<Response> getEquipmentTypes() {
-        log.info("Get all equipment types");
-        Response response = equipmentService.getAllTypes();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PutMapping("toggle-status/{id}")
     public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
         log.info("Toggle status id={}", id);

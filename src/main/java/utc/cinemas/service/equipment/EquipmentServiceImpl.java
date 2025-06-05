@@ -15,9 +15,6 @@ import utc.cinemas.util.Utils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -81,18 +78,6 @@ public class EquipmentServiceImpl implements EquipmentService {
             return Utils.createResponse(ResponseCode.SUCCESS, equipments);
         } catch (Exception e) {
             log.error("Error fetching equipments all: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR);
-        }
-    }
-
-    @Override
-    public Response getAllTypes() {
-        try {
-            List<Equipment> equipments = equipmentRepository.findAll();
-            Set<String> modules = equipments.stream().map(Equipment::getEquipmentType).filter(Objects::nonNull).collect(Collectors.toSet());
-            return Utils.createResponse(ResponseCode.SUCCESS, modules);
-        } catch (Exception e) {
-            log.error("Error fetching types all: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

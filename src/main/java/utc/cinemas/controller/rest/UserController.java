@@ -19,10 +19,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("get-list")
-    public ResponseEntity<Response> getUsers(@RequestParam Map<String, String> filters) {
-        log.info("Get list users with params: filters={}", filters);
-        Response response = userService.getListOfUsers(filters);
+    @GetMapping("get-list-staff")
+    public ResponseEntity<Response> getStaffs(@RequestParam Map<String, String> filters) {
+        log.info("Get list staffs with params: filters={}", filters);
+        Response response = userService.getListOfStaffs(filters);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("get-list-consumer")
+    public ResponseEntity<Response> getConsumers(@RequestParam Map<String, String> filters) {
+        log.info("Get list consumers with params: filters={}", filters);
+        Response response = userService.getListOfConsumers(filters);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -33,10 +40,17 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("create")
-    public ResponseEntity<Response> createUser(@RequestBody UserDto userDto) {
-        log.info("Create user with params: dto={}", JsonUtils.toString(userDto));
-        Response response = userService.create(userDto);
+    @PostMapping("create-staff")
+    public ResponseEntity<Response> createStaff(@RequestBody UserDto userDto) {
+        log.info("Create staff with params: dto={}", JsonUtils.toString(userDto));
+        Response response = userService.createStaffs(userDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("create-consumer")
+    public ResponseEntity<Response> createConsumer(@RequestBody UserDto userDto) {
+        log.info("Create consumer with params: dto={}", JsonUtils.toString(userDto));
+        Response response = userService.createConsumers(userDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -51,6 +65,20 @@ public class UserController {
     public ResponseEntity<Response> getUsers() {
         log.info("Get all users");
         Response response = userService.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("toggle-status/{id}")
+    public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
+        log.info("Toggle status id={}", id);
+        Response response = userService.toggleStatus(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Response> delete(@PathVariable Long id) {
+        log.info("Delete id={}", id);
+        Response response = userService.delete(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

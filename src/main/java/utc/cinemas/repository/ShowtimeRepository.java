@@ -13,6 +13,6 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
             "LEFT JOIN Movie m ON s.movieId = m.id " +
             "WHERE (:cinemaId = -1 OR c.id = :cinemaId) " +
             "AND (:roomId = -1 OR s.roomId = :roomId) " +
-            "AND (:movieId = -1 OR s.movieId = :movieId)")
+            "AND (:movieId = -1 OR s.movieId = :movieId) AND s.display = 1")
     Page<Showtime> findAll(String search, Long cinemaId, Long roomId, Long movieId, Pageable pageable);
 }

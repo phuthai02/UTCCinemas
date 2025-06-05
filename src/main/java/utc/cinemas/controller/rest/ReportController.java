@@ -21,10 +21,17 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @PostMapping("generate")
-    public ResponseEntity<Response> generateReport(@RequestBody ReportRequest request) {
-        log.info("Generating report: params={}", JsonUtils.toString(request));
-        Response response = reportService.generateReport(request);
+    @PostMapping("view")
+    public ResponseEntity<Response> viewReport(@RequestBody ReportRequest request) {
+        log.info("View report: params={}", JsonUtils.toString(request));
+        Response response = reportService.viewReport(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("export")
+    public ResponseEntity<Response> exportReport(@RequestBody ReportRequest request) {
+        log.info("Export report: params={}", JsonUtils.toString(request));
+        Response response = reportService.exportReport(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

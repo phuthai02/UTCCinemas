@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import utc.cinemas.model.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query("SELECT p FROM Product p WHERE (p.productName LIKE :search OR p.description LIKE :search) AND (:productType = '-1' OR p.productType = :productType)")
+    @Query("SELECT p FROM Product p WHERE (p.productName LIKE :search OR p.description LIKE :search) AND (:productType = '-1' OR p.productType = :productType) AND p.display = 1")
     Page<Product> findAll(String search, String productType, Pageable pageable);
 }

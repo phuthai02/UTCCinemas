@@ -104,7 +104,7 @@
         showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá quyền này không?`, null, async (result) => {
             if (result) {
                 try {
-                    const result = await httpRequest('/api/admin/cinemas/delete/' + id, {
+                    const result = await httpRequest('/api/admin/permissions/delete/' + id, {
                         method: 'DELETE'
                     });
 
