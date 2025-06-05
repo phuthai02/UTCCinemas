@@ -291,7 +291,7 @@
             </li>
 
             <li onclick="navigateTo('/utc-cinemas/cinemas')">
-                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý rạp chiếu
+                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý chi nhánh
             </li>
 
             <li onclick="navigateTo('/utc-cinemas/rooms')">
@@ -338,15 +338,15 @@
                 <div class="filter-group">
                     <label for="report-type">Loại báo cáo:</label>
                     <select id="report-type">
-                        <option value="cinema">Theo rạp chiếu</option>
+                        <option value="cinema">Theo chi nhánh</option>
                         <option value="room">Theo phòng chiếu</option>
                         <option value="movie">Theo phim</option>
                     </select>
 
                     <div id="cinema-filter" class="sub-filter">
-                        <label for="cinema-select">Rạp chiếu:</label>
+                        <label for="cinema-select">Chi nhánh:</label>
                         <select id="cinema-select">
-                            <option value="-1">Tất cả rạp chiếu</option>
+                            <option value="-1">Tất cả chi nhánh</option>
                         </select>
                     </div>
 
@@ -472,10 +472,10 @@
                     selectElement.appendChild(option);
                 });
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 
@@ -611,7 +611,7 @@
         let tableTitle = '';
         switch(reportType) {
             case 'cinema':
-                tableTitle = 'Chi tiết theo rạp chiếu';
+                tableTitle = 'Chi tiết theo chi nhánh';
                 break;
             case 'room':
                 tableTitle = 'Chi tiết theo phòng chiếu';

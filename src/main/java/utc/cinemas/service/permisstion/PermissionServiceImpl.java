@@ -1,5 +1,6 @@
 package utc.cinemas.service.permisstion;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import utc.cinemas.model.dto.Response;
 import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Permission;
 import utc.cinemas.repository.PermissionRepository;
+import utc.cinemas.util.Constants;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
@@ -33,6 +35,34 @@ public class PermissionServiceImpl implements PermissionService {
         } catch (Exception e) {
             log.error("Error getting permission: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin quyền");
+        }
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, permissionRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Permission not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin quyền");
+        } catch (Exception e) {
+            log.error("Error toggling status permission: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response deletePermission(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, permissionRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Permission not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin quyền");
+        } catch (Exception e) {
+            log.error("Error deleting permission: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 

@@ -11,10 +11,10 @@ import java.sql.Timestamp;
 public class Cinema {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ID rạp chiếu
+    private Long id; // ID chi nhánh
 
     @Column(name = "NAME")
-    private String name; // Tên rạp
+    private String name; // Tên chi nhánh
 
     @Column(name = "LOCATION")
     private String location; // Địa chỉ rạp

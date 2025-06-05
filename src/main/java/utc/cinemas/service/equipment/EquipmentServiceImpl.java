@@ -1,5 +1,6 @@
 package utc.cinemas.service.equipment;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,6 +93,34 @@ public class EquipmentServiceImpl implements EquipmentService {
             return Utils.createResponse(ResponseCode.SUCCESS, modules);
         } catch (Exception e) {
             log.error("Error fetching types all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, equipmentRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Equipment not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin thiết bị");
+        } catch (Exception e) {
+            log.error("Error toggling status equipment: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response deletePermission(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, equipmentRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Equipment not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin thiết bị");
+        } catch (Exception e) {
+            log.error("Error deleting equipment: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

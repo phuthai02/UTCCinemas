@@ -12,4 +12,6 @@ public interface PermissionService {
     Response getAll();
     Response update(PermissionDto permissionDto);
     Response create(PermissionDto permissionDto);
+    Response toggleStatus(Long id);
+    Response deletePermission(Long id);
 }

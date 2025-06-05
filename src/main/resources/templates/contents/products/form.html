@@ -47,9 +47,9 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="cinemaId">Rạp chiếu <span class="required">*</span></label>
+                    <label for="cinemaId">Chi nhánh <span class="required">*</span></label>
                     <select id="cinemaId" name="cinemaId">
-                        <option value="">Chọn rạp chiếu</option>
+                        <option value="">Chọn chi nhánh</option>
                     </select>
                     <div class="error-message" id="cinemaId-error"></div>
                 </div>
@@ -133,10 +133,10 @@
                     selectElement.appendChild(option);
                 });
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 
@@ -207,7 +207,7 @@
             {
                 id: 'cinemaId',
                 validation: value => value !== '',
-                message: 'Vui lòng chọn rạp chiếu'
+                message: 'Vui lòng chọn chi nhánh'
             },
             {
                 id: 'status',

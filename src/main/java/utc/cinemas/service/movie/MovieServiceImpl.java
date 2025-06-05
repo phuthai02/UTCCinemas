@@ -1,5 +1,6 @@
 package utc.cinemas.service.movie;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -105,6 +106,34 @@ public class MovieServiceImpl implements MovieService {
             ImageUtils.deleteImage(imagePath);
         } catch (Exception ex) {
             log.warn("Không thể xóa ảnh khi rollback: {}", ex.getMessage());
+        }
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, movieRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+        } catch (Exception e) {
+            log.error("Error toggling status cinema: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response deletePermission(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, movieRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+        } catch (Exception e) {
+            log.error("Error deleting cinema: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
         }
     }
 }

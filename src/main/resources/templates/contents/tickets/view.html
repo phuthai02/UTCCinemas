@@ -4,7 +4,7 @@
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
                 <select id="cinema-select">
-                    <option value="-1">Tất cả rạp chiếu</option>
+                    <option value="-1">Tất cả chi nhánh</option>
                 </select>
                 <select id="room-select" disabled>
                     <option value="-1">Tất cả phòng chiếu</option>
@@ -27,7 +27,7 @@
             <tr>
                 <th>#</th>
                 <th>Phim</th>
-                <th>Rạp chiếu</th>
+                <th>Chi nhánh</th>
                 <th>Phòng chiếu</th>
                 <th>Số ghế</th>
                 <th>Giá vé</th>
@@ -82,7 +82,7 @@
 
             if (response.code === 1 && response.data) {
                 const cinemaSelect = document.getElementById('cinema-select');
-                cinemaSelect.innerHTML = '<option value="-1">Tất cả rạp chiếu</option>';
+                cinemaSelect.innerHTML = '<option value="-1">Tất cả chi nhánh</option>';
 
                 response.data.forEach(cinema => {
                     cinemaMap[cinema.id] = cinema.name;
@@ -92,10 +92,10 @@
                     cinemaSelect.appendChild(option);
                 });
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 

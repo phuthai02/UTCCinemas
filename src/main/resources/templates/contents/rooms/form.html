@@ -25,9 +25,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="cinemaSearch">Rạp chiếu <span class="required">*</span></label>
+                    <label for="cinemaSearch">Chi nhánh <span class="required">*</span></label>
                     <div class="autocomplete-container">
-                        <input type="text" id="cinemaSearch" placeholder="Nhập tên rạp chiếu để tìm kiếm..." autocomplete="off">
+                        <input type="text" id="cinemaSearch" placeholder="Nhập tên chi nhánh để tìm kiếm..." autocomplete="off">
                         <div class="autocomplete-dropdown" id="cinemaDropdown"></div>
                         <div class="selected-cinema" id="selectedCinema"></div>
                         <input type="hidden" id="cinemaId" name="cinemaId">
@@ -122,10 +122,10 @@
                 cinemasData = response.data;
                 checkForEditMode();
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 
@@ -221,7 +221,7 @@
         const validationRules = [
             {id: 'name', validation: value => value.trim() !== '', message: 'Vui lòng nhập tên phòng chiếu'},
             {id: 'seatCapacity', validation: value => value > 0, message: 'Vui lòng nhập số ghế tối đa hợp lệ'},
-            {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn rạp chiếu'},
+            {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn chi nhánh'},
             {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}
         ];
 

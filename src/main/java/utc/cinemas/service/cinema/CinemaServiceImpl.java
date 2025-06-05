@@ -1,7 +1,7 @@
 package utc.cinemas.service.cinema;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utc.cinemas.model.dto.CinemaDto;
@@ -10,12 +10,14 @@ import utc.cinemas.model.dto.ResponseCode;
 import utc.cinemas.model.entity.Cinema;
 import utc.cinemas.repository.CinemaRepository;
 import utc.cinemas.service.room.RoomService;
+import utc.cinemas.util.Constants;
 import utc.cinemas.util.DatabaseUtils;
 import utc.cinemas.util.JsonUtils;
 import utc.cinemas.util.Utils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -45,10 +47,10 @@ public class CinemaServiceImpl implements CinemaService {
         try {
             Cinema cinema = cinemaDto.getEntity();
             DatabaseUtils.createEntity(cinema, cinemaRepository);
-            return Utils.createResponse(ResponseCode.SUCCESS, "Thêm rạp chiếu mới thành công");
+            return Utils.createResponse(ResponseCode.SUCCESS, "Thêm chi nhánh mới thành công");
         } catch (Exception e) {
             log.error("Error adding cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Thêm rạp chiếu mới thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Thêm chi nhánh mới thất bại");
         }
     }
 
@@ -59,7 +61,7 @@ public class CinemaServiceImpl implements CinemaService {
             return Utils.createResponse(ResponseCode.SUCCESS, cinema);
         } catch (Exception e) {
             log.error("Error getting cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin rạp chiếu");
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
         }
     }
 
@@ -69,10 +71,10 @@ public class CinemaServiceImpl implements CinemaService {
             Cinema cinema = cinemaDto.getEntity();
             roomService.applyCinemaStatusToRooms(cinema.getId(), cinema.getStatus());
             DatabaseUtils.updateEntity(cinema, cinemaRepository);
-            return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật rạp chiếu thành công");
+            return Utils.createResponse(ResponseCode.SUCCESS, "Cập nhật chi nhánh thành công");
         } catch (Exception e) {
             log.error("Error editing cinema: {}", e.getMessage());
-            return Utils.createResponse(ResponseCode.ERROR, "Cập nhật rạp chiếu thất bại");
+            return Utils.createResponse(ResponseCode.ERROR, "Cập nhật chi nhánh thất bại");
         }
     }
 
@@ -83,6 +85,34 @@ public class CinemaServiceImpl implements CinemaService {
             return Utils.createResponse(ResponseCode.SUCCESS, cinemas);
         } catch (Exception e) {
             log.error("Error fetching cinemas all: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response toggleStatus(Long id) {
+        try {
+            DatabaseUtils.toggleStatus(id, cinemaRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+        } catch (Exception e) {
+            log.error("Error toggling status cinema: {}", e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR);
+        }
+    }
+
+    @Override
+    public Response deletePermission(Long id) {
+        try {
+            DatabaseUtils.deleteEntity(id, cinemaRepository);
+            return Utils.createResponse(ResponseCode.SUCCESS);
+        } catch (EntityNotFoundException e) {
+            log.error("Cinema not found for ID {}: {}", id, e.getMessage());
+            return Utils.createResponse(ResponseCode.ERROR, "Không thể tải thông tin chi nhánh");
+        } catch (Exception e) {
+            log.error("Error deleting cinema: {}", e.getMessage());
             return Utils.createResponse(ResponseCode.ERROR);
         }
     }

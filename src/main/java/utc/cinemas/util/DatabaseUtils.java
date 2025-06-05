@@ -3,15 +3,14 @@ package utc.cinemas.util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Id;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -89,6 +88,36 @@ public class DatabaseUtils {
         repository.save(existingEntity);
     }
 
+    public static <T, R extends JpaRepository<T, Long>> void toggleStatus(Long id, R repository) throws Exception {
+        if (id == null) {
+            throw new IllegalArgumentException("Entity ID cannot be null for toggle status operation");
+        }
+
+        Optional<T> existingEntityOpt = repository.findById(id);
+        if (existingEntityOpt.isEmpty()) {
+            throw new EntityNotFoundException("Entity with ID " + id + " not found");
+        }
+
+        T existingEntity = existingEntityOpt.get();
+
+        Field statusField = existingEntity.getClass().getDeclaredField("status");
+        statusField.setAccessible(true);
+        Object currentStatus = statusField.get(existingEntity);
+
+        Object newStatus = Objects.equals(currentStatus, Constants.STATUS_ACTIVE)
+                ? Constants.STATUS_INACTIVE
+                : Constants.STATUS_ACTIVE;
+
+        statusField.set(existingEntity, newStatus);
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Long userId = AuthUtils.getUserId();
+        setField(existingEntity, "modifiedDate", now);
+        setField(existingEntity, "modifiedUser", userId);
+
+        repository.save(existingEntity);
+    }
+
     public static <T, R extends JpaRepository<T, Long>> void deleteEntity(Long id, R repository) throws Exception {
         if (id == null) {
             throw new IllegalArgumentException("Entity ID cannot be null for delete operation");
@@ -104,7 +133,6 @@ public class DatabaseUtils {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         Long userId = AuthUtils.getUserId();
 
-        setField(existingEntity, "status", Constants.STATUS_INACTIVE);
         setField(existingEntity, "display", Constants.DISPLAY_HIDDEN);
         setField(existingEntity, "modifiedDate", now);
         setField(existingEntity, "modifiedUser", userId);

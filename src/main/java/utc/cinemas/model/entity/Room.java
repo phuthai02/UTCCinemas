@@ -14,7 +14,7 @@ public class Room {
     private Long id; // ID phòng chiếu
 
     @Column(name = "CINEMA_ID")
-    private Long cinemaId; // ID rạp chiếu
+    private Long cinemaId; // ID chi nhánh
 
     @Column(name = "NAME")
     private String name; // Tên phòng chiếu

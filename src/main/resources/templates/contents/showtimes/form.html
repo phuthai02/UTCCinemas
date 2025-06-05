@@ -14,9 +14,9 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="cinemaSearch">Rạp chiếu <span class="required">*</span></label>
+                    <label for="cinemaSearch">Chi nhánh <span class="required">*</span></label>
                     <div class="autocomplete-container">
-                        <input type="text" id="cinemaSearch" placeholder="Nhập tên rạp chiếu để tìm kiếm..." autocomplete="off">
+                        <input type="text" id="cinemaSearch" placeholder="Nhập tên chi nhánh để tìm kiếm..." autocomplete="off">
                         <div class="autocomplete-dropdown" id="cinemaDropdown"></div>
                         <div class="selected-cinema" id="selectedCinema"></div>
                         <input type="hidden" id="cinemaId" name="cinemaId">
@@ -235,10 +235,10 @@
             if (response.code === 1 && response.data) {
                 cinemasData = response.data;
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 
@@ -504,7 +504,7 @@
         const validationRules = [
             {id: 'movieId', validation: value => value !== '', message: 'Vui lòng chọn phim'},
             {id: 'roomId', validation: value => value !== '', message: 'Vui lòng chọn phòng chiếu'},
-            {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn rạp chiếu'},
+            {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn chi nhánh'},
             {id: 'startTime', validation: value => value !== '', message: 'Vui lòng chọn giờ bắt đầu chiếu'},
             {id: 'price', validation: value => value !== '' && parseInt(value) >= 0, message: 'Vui lòng nhập giá vé hợp lệ'},
             {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}

@@ -54,4 +54,18 @@ public class CinemaController {
         Response response = cinemaService.getAll();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("toggle-status/{id}")
+    public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
+        log.info("Toggle status id={}", id);
+        Response response = cinemaService.toggleStatus(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Response> deletePermission(@PathVariable Long id) {
+        log.info("Delete permission id={}", id);
+        Response response = cinemaService.deletePermission(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

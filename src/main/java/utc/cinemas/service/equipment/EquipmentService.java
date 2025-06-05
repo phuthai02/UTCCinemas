@@ -12,4 +12,6 @@ public interface EquipmentService {
     Response update(EquipmentDto equipmentDto);
     Response getAll();
     Response getAllTypes();
+    Response toggleStatus(Long id);
+    Response deletePermission(Long id);
 }

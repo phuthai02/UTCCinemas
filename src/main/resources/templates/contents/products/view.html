@@ -25,7 +25,7 @@
                 <th>Giá</th>
                 <th>Số lượng</th>
                 <th>Mô tả</th>
-                <th>Rạp chiếu</th>
+                <th>Chi nhánh</th>
                 <th>Người tạo</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
@@ -112,10 +112,10 @@
                     cinemaMap[cinema.id] = cinema.name;
                 });
             } else {
-                console.error('Không thể tải danh sách rạp chiếu:', response.message);
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách rạp chiếu:', error);
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
     }
 

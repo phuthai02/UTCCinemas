@@ -62,4 +62,18 @@ public class PermissionController {
         Response response = permissionService.getAllModules();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("toggle-status/{id}")
+    public ResponseEntity<Response> toggleStatus(@PathVariable Long id) {
+        log.info("Toggle status id={}", id);
+        Response response = permissionService.toggleStatus(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Response> deletePermission(@PathVariable Long id) {
+        log.info("Delete permission id={}", id);
+        Response response = permissionService.deletePermission(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -155,11 +155,16 @@ table {
 }
 
 table td:first-child,
-table th:first-child {
+table th:first-child,
+table td:last-child,
+table th:last-child,
+table td:nth-last-child(2),
+table th:nth-last-child(2) {
     width: 40px;
     text-align: center;
     white-space: nowrap;
 }
+
 
 th, td {
     padding: 12px 16px;
@@ -292,16 +297,41 @@ tbody tr:nth-child(odd) {
 }
 
 .badge {
-    font-size: 12px;
-    width: 100px;
+    font-size: 11px;
+    min-width: 100px;
     display: inline-block;
     text-align: center;
+    padding: 7px 15px;
 }
     /* STATUS BADGES */
 .bg-success, .bg-secondary, .bg-danger, .bg-warning {
     color: white;
-    padding: 5px 10px;
     border-radius: 5px;
+}
+
+.delete-icon {
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.toggle-status-icon {
+    font-size: 34px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.status-on {
+    color: #28a745;
+}
+
+.status-off, .delete-icon{
+    color: #dc3545;
+}
+
+.iconify:hover {
+    transform: scale(1.2);
+    opacity: 0.9;
 }
 
 .bg-success {

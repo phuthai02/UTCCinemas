@@ -11,4 +11,6 @@ public interface MovieService {
     Response getMovieById(Long id);
     Response update(MovieDto movieDto);
     Response getAll();
+    Response toggleStatus(Long id);
+    Response deletePermission(Long id);
 }

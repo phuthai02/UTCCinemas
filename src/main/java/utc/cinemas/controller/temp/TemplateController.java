@@ -43,27 +43,27 @@ public class TemplateController {
     @GetMapping("/cinemas")
     @PreAuthorize("hasAuthority('CINEMA_VIEW')")
     public String cinemas(Model model) {
-        return renderPage(model, "cinemas", "contents/cinemas/view", "Danh sách rạp chiếu - UTC Cinemas");
+        return renderPage(model, "cinemas", "contents/cinemas/view", "Quản lý chi nhánh - UTC Cinemas");
     }
 
     @GetMapping("/cinemas/create")
     @PreAuthorize("hasAuthority('CINEMA_CREATE')")
     public String createCinema(Model model) {
-        return renderPage(model, "cinemas", "contents/cinemas/form", "Thêm rạp chiếu - UTC Cinemas");
+        return renderPage(model, "cinemas", "contents/cinemas/form", "Thêm chi nhánh - UTC Cinemas");
     }
 
     @GetMapping("/cinemas/edit")
     @PreAuthorize("hasAuthority('CINEMA_EDIT')")
     public String editCinema(@RequestParam String id, Model model) {
         model.addAttribute("id", id);
-        return renderPage(model, "cinemas", "contents/cinemas/form", "Sửa rạp chiếu - UTC Cinemas");
+        return renderPage(model, "cinemas", "contents/cinemas/form", "Sửa chi nhánh - UTC Cinemas");
     }
 
     // ROOM MANAGEMENT
     @GetMapping("/rooms")
     @PreAuthorize("hasAuthority('ROOM_VIEW')")
     public String rooms(Model model) {
-        return renderPage(model, "rooms", "contents/rooms/view", "Danh sách phòng chiếu - UTC Cinemas");
+        return renderPage(model, "rooms", "contents/rooms/view", "Quản lý phòng chiếu - UTC Cinemas");
     }
 
     @GetMapping("/rooms/create")
@@ -83,7 +83,7 @@ public class TemplateController {
     @GetMapping("/seats")
     @PreAuthorize("hasAuthority('SEAT_VIEW')")
     public String seats(Model model) {
-        return renderPage(model, "seats", "contents/seats/view", "Danh sách ghế ngồi - UTC Cinemas");
+        return renderPage(model, "seats", "contents/seats/view", "Quản lý ghế ngồi - UTC Cinemas");
     }
 
     @GetMapping("/seats/create")
@@ -103,7 +103,7 @@ public class TemplateController {
     @GetMapping("/movies")
     @PreAuthorize("hasAuthority('MOVIE_VIEW')")
     public String movies(Model model) {
-        return renderPage(model, "movies", "contents/movies/view", "Danh sách phim - UTC Cinemas");
+        return renderPage(model, "movies", "contents/movies/view", "Quản lý phim - UTC Cinemas");
     }
 
     @GetMapping("/movies/create")
@@ -123,7 +123,7 @@ public class TemplateController {
     @GetMapping("/showtimes")
     @PreAuthorize("hasAuthority('SHOWTIME_VIEW')")
     public String showtimes(Model model) {
-        return renderPage(model, "showtimes", "contents/showtimes/view", "Danh sách suất chiếu - UTC Cinemas");
+        return renderPage(model, "showtimes", "contents/showtimes/view", "Quản lý suất chiếu - UTC Cinemas");
     }
 
     @GetMapping("/showtimes/create")
@@ -143,7 +143,7 @@ public class TemplateController {
     @GetMapping("/tickets")
     @PreAuthorize("hasAuthority('TICKET_VIEW')")
     public String tickets(Model model) {
-        return renderPage(model, "tickets", "contents/tickets/view", "Danh sách đặt vé - UTC Cinemas");
+        return renderPage(model, "tickets", "contents/tickets/view", "Quản lý vé - UTC Cinemas");
     }
 
     // REPORTS
@@ -157,7 +157,7 @@ public class TemplateController {
     @GetMapping("/equipments")
     @PreAuthorize("hasAuthority('EQUIPMENT_VIEW')")
     public String equipments(Model model) {
-        return renderPage(model, "equipments", "contents/equipments/view", "Danh sách thiết bị - UTC Cinemas");
+        return renderPage(model, "equipments", "contents/equipments/view", "Quản lý thiết bị - UTC Cinemas");
     }
 
     @GetMapping("/equipments/create")
@@ -177,7 +177,7 @@ public class TemplateController {
     @GetMapping("/permissions")
     @PreAuthorize("hasAuthority('PERMISSION_VIEW')")
     public String permissions(Model model) {
-        return renderPage(model, "permissions", "contents/permissions/view", "Danh sách quyền - UTC Cinemas");
+        return renderPage(model, "permissions", "contents/permissions/view", "Quản lý quyền - UTC Cinemas");
     }
 
     @GetMapping("/permissions/create")
@@ -197,7 +197,7 @@ public class TemplateController {
     @GetMapping("/staffs")
     @PreAuthorize("hasAuthority('STAFF_VIEW')")
     public String staff(Model model) {
-        return renderPage(model, "staffs", "contents/staffs/view", "Danh sách nhân viên - UTC Cinemas");
+        return renderPage(model, "staffs", "contents/staffs/view", "Quản lý nhân viên - UTC Cinemas");
     }
 
     @GetMapping("/staffs/create")
@@ -217,7 +217,7 @@ public class TemplateController {
     @GetMapping("/customers")
     @PreAuthorize("hasAuthority('CUSTOMER_VIEW')")
     public String customers(Model model) {
-        return renderPage(model, "customers", "contents/customers/view", "Danh sách khách hàng - UTC Cinemas");
+        return renderPage(model, "customers", "contents/customers/view", "Quản lý khách hàng - UTC Cinemas");
     }
 
     @GetMapping("/customers/create")
@@ -237,7 +237,7 @@ public class TemplateController {
     @GetMapping("/products")
     @PreAuthorize("hasAuthority('PRODUCT_VIEW')")
     public String products(Model model) {
-        return renderPage(model, "products", "contents/products/view", "Danh sách sản phẩm - UTC Cinemas");
+        return renderPage(model, "products", "contents/products/view", "Quản lý sản phẩm - UTC Cinemas");
     }
 
     @GetMapping("/products/create")

@@ -11,4 +11,6 @@ public interface CinemaService {
     Response getCinemaById(Long id);
     Response update(CinemaDto cinemaDto);
     Response getAll();
+    Response toggleStatus(Long id);
+    Response deletePermission(Long id);
 }
