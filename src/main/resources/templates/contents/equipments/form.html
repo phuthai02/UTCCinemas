@@ -22,6 +22,17 @@
                     <label for="equipmentType">Loại thiết bị <span class="required">*</span></label>
                     <select id="equipmentType" name="equipmentType">
                         <option value="">Chọn loại thiết bị</option>
+                        <option value="Máy chiếu">Máy chiếu</option>
+                        <option value="Màn chiếu">Màn chiếu</option>
+                        <option value="Hệ thống âm thanh">Hệ thống âm thanh</option>
+                        <option value="Loa">Loa</option>
+                        <option value="Âm ly">Âm ly</option>
+                        <option value="Đầu phát phim">Đầu phát phim</option>
+                        <option value="Hệ thống điều khiển">Hệ thống điều khiển</option>
+                        <option value="Hệ thống chiếu sáng">Hệ thống chiếu sáng</option>
+                        <option value="Máy điều hòa">Máy điều hòa</option>
+                        <option value="Camera giám sát">Camera giám sát</option>
+                        <option value="Khác">Khác</option>
                     </select>
                     <div class="error-message" id="equipmentType-error"></div>
                 </div>
@@ -29,33 +40,46 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="roomId">Phòng <span class="required">*</span></label>
-                    <select id="roomId" name="roomId">
-                        <option value="">Chọn phòng</option>
-                    </select>
-                    <div class="error-message" id="roomId-error"></div>
+                    <label for="cinemaSearch">Chi nhánh <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="cinemaSearch" placeholder="Nhập tên chi nhánh để tìm kiếm..." autocomplete="off">
+                        <div class="autocomplete-dropdown" id="cinemaDropdown"></div>
+                        <div class="selected-cinema" id="selectedCinema"></div>
+                        <input type="hidden" id="cinemaId" name="cinemaId">
+                        <div class="error-message" id="cinemaId-error"></div>
+                    </div>
                 </div>
+                <div class="form-group">
+                    <label for="roomSearch">Phòng <span class="required">*</span></label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="roomSearch" placeholder="Nhập tên phòng để tìm kiếm..." autocomplete="off" disabled>
+                        <div class="autocomplete-dropdown" id="roomDropdown"></div>
+                        <div class="selected-room" id="selectedRoom"></div>
+                        <input type="hidden" id="roomId" name="roomId">
+                        <div class="error-message" id="roomId-error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
                     <label for="brand">Thương hiệu</label>
                     <input type="text" id="brand" name="brand" maxlength="100">
                     <div class="error-message" id="brand-error"></div>
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
                     <label for="model">Model</label>
                     <input type="text" id="model" name="model" maxlength="100">
                     <div class="error-message" id="model-error"></div>
                 </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
                     <label for="quantity">Số lượng <span class="required">*</span></label>
                     <input type="number" id="quantity" name="quantity" min="1" value="1">
                     <div class="error-message" id="quantity-error"></div>
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
                     <label for="conditionStatus">Tình trạng <span class="required">*</span></label>
                     <select id="conditionStatus" name="conditionStatus">
@@ -68,42 +92,18 @@
                     </select>
                     <div class="error-message" id="conditionStatus-error"></div>
                 </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
                     <label for="purchaseDate">Ngày mua</label>
                     <input type="date" id="purchaseDate" name="purchaseDate">
                     <div class="error-message" id="purchaseDate-error"></div>
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
                     <label for="warrantyExpiry">Ngày hết bảo hành</label>
                     <input type="date" id="warrantyExpiry" name="warrantyExpiry">
                     <div class="error-message" id="warrantyExpiry-error"></div>
-                </div>
-                <div class="form-group">
-                    <label for="status">Trạng thái <span class="required">*</span></label>
-                    <select id="status" name="status">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Dừng hoạt động</option>
-                        <option value="1" selected>Đang hoạt động</option>
-                    </select>
-                    <div class="error-message" id="status-error"></div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="display">Hiển thị <span class="required">*</span></label>
-                    <select id="display" name="display">
-                        <option value="">Chọn hiển thị</option>
-                        <option value="0">Ẩn</option>
-                        <option value="1" selected>Hiển thị</option>
-                    </select>
-                    <div class="error-message" id="display-error"></div>
-                </div>
-                <div class="form-group">
-                    <!-- Empty div for layout balance -->
                 </div>
             </div>
 
@@ -124,12 +124,16 @@
 </div>
 
 <script>
+    let cinemasData = [];
+    let roomsData = [];
+    let allRoomsData = [];
     let isEditMode = false;
 
     document.addEventListener('DOMContentLoaded', function () {
-        initializePage();
+        loadCinemas();
         loadRooms();
-        loadEquipmentTypes();
+        setupCinemaAutocomplete();
+        setupRoomAutocomplete();
         document.getElementById('equipmentForm').addEventListener('submit', handleFormSubmit);
     });
 
@@ -149,20 +153,32 @@
         }
     }
 
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                cinemasData = response.data;
+            } else {
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
+        }
+    }
+
     async function loadRooms() {
         try {
             const response = await httpRequest('/api/admin/rooms/get-all', {
                 method: 'GET'
             });
 
-            const selectElement = document.getElementById('roomId');
             if (response.code === 1 && response.data) {
-                response.data.forEach(room => {
-                    const option = document.createElement('option');
-                    option.value = room.id;
-                    option.textContent = room.name;
-                    selectElement.appendChild(option);
-                });
+                roomsData = response.data;
+                allRoomsData = [...response.data];
+                initializePage();
             } else {
                 console.error('Không thể tải danh sách phòng:', response.message);
             }
@@ -171,26 +187,170 @@
         }
     }
 
-    async function loadEquipmentTypes() {
-        try {
-            const response = await httpRequest('/api/admin/equipments/get-types', {
-                method: 'GET'
+    function setupCinemaAutocomplete() {
+        const searchInput = document.getElementById('cinemaSearch');
+        const dropdown = document.getElementById('cinemaDropdown');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterCinemas(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (cinemasData.length > 0) {
+                filterCinemas(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('cinemaId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+
+            // Reset room selection
+            document.getElementById('roomId').value = '';
+            document.getElementById('selectedRoom').textContent = '';
+            document.getElementById('selectedRoom').classList.remove('show');
+            document.getElementById('roomSearch').disabled = true;
+
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterCinemas(searchTerm) {
+        const dropdown = document.getElementById('cinemaDropdown');
+        dropdown.innerHTML = '';
+
+        if (!cinemasData.length) return;
+
+        const filteredCinemas = cinemasData.filter(cinema => {
+            const cinemaName = (cinema.name || '').toLowerCase();
+            return cinemaName.includes(searchTerm);
+        });
+
+        if (filteredCinemas.length > 0) {
+            filteredCinemas.forEach(cinema => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = cinema.name;
+                item.setAttribute('data-id', cinema.id);
+
+                item.addEventListener('click', function () {
+                    selectCinema(cinema);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
             });
 
-            const selectElement = document.getElementById('equipmentType');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách loại thiết bị:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách loại thiết bị:', error);
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
         }
+    }
+
+    function selectCinema(cinema) {
+        const searchInput = document.getElementById('cinemaSearch');
+        const hiddenInput = document.getElementById('cinemaId');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        hiddenInput.value = cinema.id;
+        searchInput.value = '';
+        selectedDisplay.textContent = `Đã chọn: ${cinema.name}`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('cinemaId-error').textContent = '';
+
+        // Reset room selection
+        document.getElementById('roomId').value = '';
+        document.getElementById('selectedRoom').textContent = '';
+        document.getElementById('selectedRoom').classList.remove('show');
+
+        // Enable room search and filter rooms by selected cinema
+        document.getElementById('roomSearch').disabled = false;
+        roomsData = allRoomsData.filter(room => room.cinemaId === parseInt(cinema.id));
+    }
+
+    function setupRoomAutocomplete() {
+        const searchInput = document.getElementById('roomSearch');
+        const dropdown = document.getElementById('roomDropdown');
+        const selectedDisplay = document.getElementById('selectedRoom');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterRooms(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (roomsData.length > 0) {
+                filterRooms(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('roomId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterRooms(searchTerm) {
+        const dropdown = document.getElementById('roomDropdown');
+        dropdown.innerHTML = '';
+
+        if (!roomsData.length) return;
+
+        const filteredRooms = roomsData.filter(room => {
+            const roomName = (room.name || '').toLowerCase();
+            return roomName.includes(searchTerm);
+        });
+
+        if (filteredRooms.length > 0) {
+            filteredRooms.forEach(room => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = room.name;
+                item.setAttribute('data-id', room.id);
+
+                item.addEventListener('click', function () {
+                    selectRoom(room);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    function selectRoom(room) {
+        const searchInput = document.getElementById('roomSearch');
+        const hiddenInput = document.getElementById('roomId');
+        const selectedDisplay = document.getElementById('selectedRoom');
+
+        hiddenInput.value = room.id;
+        searchInput.value = '';
+        selectedDisplay.textContent = `Đã chọn: ${room.name}`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('roomId-error').textContent = '';
     }
 
     async function loadEquipmentDetails(equipmentId) {
@@ -215,14 +375,34 @@
         document.getElementById('equipmentId').value = equipment.id;
         document.getElementById('equipmentName').value = equipment.equipmentName;
         document.getElementById('equipmentType').value = equipment.equipmentType || '';
-        document.getElementById('roomId').value = equipment.roomId || '';
         document.getElementById('brand').value = equipment.brand || '';
         document.getElementById('model').value = equipment.model || '';
         document.getElementById('quantity').value = equipment.quantity || 1;
         document.getElementById('conditionStatus').value = equipment.conditionStatus || 1;
         document.getElementById('description').value = equipment.description || '';
-        document.getElementById('status').value = equipment.status;
-        document.getElementById('display').value = equipment.display;
+
+        // Set room and cinema selection for edit mode
+        if (equipment.roomId) {
+            document.getElementById('roomId').value = equipment.roomId;
+            const room = allRoomsData.find(r => r.id === equipment.roomId);
+
+            if (room) {
+                document.getElementById('cinemaId').value = room.cinemaId;
+                const selectedRoomDisplay = document.getElementById('selectedRoom');
+                selectedRoomDisplay.textContent = `Đã chọn: ${room.name}`;
+                selectedRoomDisplay.classList.add('show');
+
+                const cinema = cinemasData.find(c => c.id === room.cinemaId);
+                if (cinema) {
+                    const selectedCinemaDisplay = document.getElementById('selectedCinema');
+                    selectedCinemaDisplay.textContent = `Đã chọn: ${cinema.name}`;
+                    selectedCinemaDisplay.classList.add('show');
+
+                    document.getElementById('roomSearch').disabled = false;
+                    roomsData = allRoomsData.filter(r => r.cinemaId === cinema.id);
+                }
+            }
+        }
 
         // Format dates
         if (equipment.purchaseDate) {
@@ -261,6 +441,11 @@
                 message: 'Vui lòng chọn loại thiết bị'
             },
             {
+                id: 'cinemaId',
+                validation: value => value !== '',
+                message: 'Vui lòng chọn chi nhánh'
+            },
+            {
                 id: 'roomId',
                 validation: value => value !== '',
                 message: 'Vui lòng chọn phòng'
@@ -277,16 +462,6 @@
                 id: 'conditionStatus',
                 validation: value => value !== '',
                 message: 'Vui lòng chọn tình trạng'
-            },
-            {
-                id: 'status',
-                validation: value => value !== '',
-                message: 'Vui lòng chọn trạng thái'
-            },
-            {
-                id: 'display',
-                validation: value => value !== '',
-                message: 'Vui lòng chọn hiển thị'
             }
         ];
 
@@ -350,9 +525,7 @@
             model: document.getElementById('model').value.trim(),
             quantity: parseInt(document.getElementById('quantity').value),
             conditionStatus: parseInt(document.getElementById('conditionStatus').value),
-            description: document.getElementById('description').value.trim(),
-            status: parseInt(document.getElementById('status').value),
-            display: parseInt(document.getElementById('display').value)
+            description: document.getElementById('description').value.trim()
         };
 
         // Handle dates
@@ -382,12 +555,4 @@
             showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
         }
     }
-
-    const style = document.createElement('style');
-    style.textContent = `
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-    `;
-    document.head.appendChild(style);
 </script>

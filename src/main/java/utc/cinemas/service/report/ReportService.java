@@ -1,9 +1,9 @@
 package utc.cinemas.service.report;
 
-import utc.cinemas.model.dto.ReportRequest;
 import utc.cinemas.model.dto.Response;
+import utc.cinemas.model.dto.report.ReportRequest;
+import utc.cinemas.model.dto.report.ReportResponse;
 
 public interface ReportService {
-    Response viewReport(ReportRequest request);
-    Response exportReport(ReportRequest request);
+    ReportResponse generateReport(ReportRequest request);
 }

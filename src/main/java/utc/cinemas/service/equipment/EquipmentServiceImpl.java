@@ -27,8 +27,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Response getListOfEquipments(Map<String, String> filters) {
         try {
             String search = Utils.getSearch(filters);
-            String equipmentType = JsonUtils.convert(filters.get("equipmentType"), String.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> equipmentRepository.findAll(search, equipmentType, pageable));
+            Long cinemaId = JsonUtils.convert(filters.get("cinemaId"), Long.class);
+            Long roomId = JsonUtils.convert(filters.get("roomId"), Long.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> equipmentRepository.findAll(search, cinemaId, roomId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching equipments: {}", e.getMessage());

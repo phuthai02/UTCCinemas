@@ -30,6 +30,19 @@
                     <label for="module">Module <span class="required">*</span></label>
                     <select id="module" name="module">
                         <option value="">Chọn module</option>
+                        <option value="PERMISSION">Quyền</option>
+                        <option value="USER_PERMISSION">Phân quyền người dùng</option>
+                        <option value="CINEMA">Chi nhánh</option>
+                        <option value="PRODUCT">Hàng hoá</option>
+                        <option value="ROOM">Phòng chiếu</option>
+                        <option value="EQUIPMENT">Thiết bị</option>
+                        <option value="SEAT">Ghế ngồi</option>
+                        <option value="MOVIE">Phim</option>
+                        <option value="SHOWTIME">Suất chiếu</option>
+                        <option value="TICKET">Vé</option>
+                        <option value="STAFF">Nhân viên</option>
+                        <option value="CUSTOMER">Khách hàng</option>
+                        <option value="REPORT">Báo cáo, thống kê</option>
                     </select>
                     <div class="error-message" id="module-error"></div>
                 </div>
@@ -60,7 +73,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         initializePage();
-        loadModules();
         document.getElementById('permissionForm').addEventListener('submit', handleFormSubmit);
     });
 
@@ -71,34 +83,11 @@
     function checkForEditMode() {
         const urlParams = new URLSearchParams(window.location.search);
         const permissionId = urlParams.get('id');
-
         if (permissionId) {
             isEditMode = true;
             document.getElementById('pageTitle').textContent = 'Chỉnh sửa quyền';
             document.getElementById('saveBtn').textContent = 'Cập nhật quyền';
             loadPermissionDetails(permissionId);
-        }
-    }
-
-    async function loadModules() {
-        try {
-            const response = await httpRequest('/api/admin/permissions/get-modules', {
-                method: 'GET'
-            });
-
-            const selectElement = document.getElementById('module');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(module => {
-                    const option = document.createElement('option');
-                    option.value = module;
-                    option.textContent = module;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách module:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách module:', error);
         }
     }
 

@@ -4,7 +4,7 @@
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
                 <select id="search-select">
-                    <option value="-1">Tất cả loại sản phẩm</option>
+                    <option value="-1">Tất cả chi nhánh</option>
                 </select>
                 <button id="search">Tìm kiếm</button>
             </div>
@@ -26,8 +26,6 @@
                 <th>Số lượng</th>
                 <th>Mô tả</th>
                 <th>Chi nhánh</th>
-                <th>Người tạo</th>
-                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
                 <th>Xoá</th>
             </tr>
@@ -60,47 +58,7 @@
 <script>
     let page = 0;
     let totalPages = 0;
-    let productTypeMap = {};
-    let userMap = {};
     let cinemaMap = {};
-
-    async function loadProductTypes() {
-        try {
-            const response = await httpRequest('/api/admin/products/get-product-types', {
-                method: 'GET'
-            });
-            const selectElement = document.getElementById('search-select');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(productType => {
-                    const option = document.createElement('option');
-                    option.value = productType;
-                    option.textContent = productType;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách loại sản phẩm:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách loại sản phẩm:', error);
-        }
-    }
-
-    async function loadUsers() {
-        try {
-            const response = await httpRequest('/api/admin/users/get-all', {
-                method: 'GET'
-            });
-            if (response.code === 1 && response.data) {
-                response.data.forEach(user => {
-                    userMap[user.id] = user.name;
-                });
-            } else {
-                console.error('Không thể tải danh sách người dùng:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách người dùng:', error);
-        }
-    }
 
     async function loadCinemas() {
         try {
@@ -108,8 +66,13 @@
                 method: 'GET'
             });
             if (response.code === 1 && response.data) {
+                const selectElement = document.getElementById('search-select');
                 response.data.forEach(cinema => {
                     cinemaMap[cinema.id] = cinema.name;
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    selectElement.appendChild(option);
                 });
             } else {
                 console.error('Không thể tải danh sách chi nhánh:', response.message);
@@ -131,8 +94,8 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const productType = document.getElementById("search-select").value;
-            const result = await httpRequest('/api/admin/products/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&productType=' + productType);
+            const cinemaId = document.getElementById("search-select").value;
+            const result = await httpRequest('/api/admin/products/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&cinemaId=' + cinemaId);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -141,7 +104,6 @@
             const tableBody = document.querySelector("#tableData tbody");
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
-                const createdUserName = userMap[item.createdUser] || 'Không xác định';
                 const cinemaName = cinemaMap[item.cinemaId] || 'Không xác định';
                 const row = document.createElement("tr");
                 row.innerHTML = `
@@ -152,8 +114,6 @@
                 <td>${item.quantity || 0}</td>
                 <td>${item.description || '-'}</td>
                 <td>${cinemaName}</td>
-                <td>${createdUserName}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
                       <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
                             data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"
@@ -219,7 +179,7 @@
                         showModal('error', 'Ôi xong!', result.message);
                     }
                 } catch (error) {
-                    console.error('Lỗi khi xóa quyền:', error);
+                    console.error('Lỗi khi xoá:', error);
                     showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
                 }
             }
@@ -247,8 +207,6 @@
             navigateTo("/utc-cinemas/products/create")
         });
 
-        await loadProductTypes();
-        await loadUsers();
         await loadCinemas();
         await loadData();
     });

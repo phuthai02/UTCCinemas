@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TicketDto {
+    private long id;
     private String movie;
     private String cinema;
     private String room;
@@ -21,4 +22,5 @@ public class TicketDto {
     private Long createdUser;
     private Integer status;
     private Timestamp startTime;
+    private Integer isDuplicate;
 }

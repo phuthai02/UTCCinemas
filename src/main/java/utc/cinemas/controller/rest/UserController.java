@@ -26,10 +26,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("get-list-consumer")
+    @GetMapping("get-list-customer")
     public ResponseEntity<Response> getConsumers(@RequestParam Map<String, String> filters) {
-        log.info("Get list consumers with params: filters={}", filters);
-        Response response = userService.getListOfConsumers(filters);
+        log.info("Get list customer with params: filters={}", filters);
+        Response response = userService.getListOfCustomers(filters);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -47,10 +47,10 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("create-consumer")
+    @PostMapping("create-customer")
     public ResponseEntity<Response> createConsumer(@RequestBody UserDto userDto) {
-        log.info("Create consumer with params: dto={}", JsonUtils.toString(userDto));
-        Response response = userService.createConsumers(userDto);
+        log.info("Create customer with params: dto={}", JsonUtils.toString(userDto));
+        Response response = userService.createCustomers(userDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

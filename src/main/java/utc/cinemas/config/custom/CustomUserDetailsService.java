@@ -34,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user với username: " + username));
 
-        if (user.getRole() == null || Objects.equals(Constants.ROLE_USER, user.getRole())) {
+        if (user.getRole() == null || Objects.equals(Constants.ROLE_CUSTOMER, user.getRole())) {
             throw new UsernameNotFoundException("Người dùng không được phép đăng nhập vào hệ thống");
         }
 

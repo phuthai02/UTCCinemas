@@ -18,13 +18,14 @@
                     <div class="error-message" id="seatNumber-error"></div>
                 </div>
                 <div class="form-group">
-                    <label for="status">Trạng thái <span class="required">*</span></label>
-                    <select id="status" name="status">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Dừng hoạt động</option>
-                        <option value="1" selected>Đang hoạt động</option>
+                    <label for="seatType">Loại ghế <span class="required">*</span></label>
+                    <select id="seatType" name="seatType">
+                        <option value="0">Ghế Thường</option>
+                        <option value="1">Ghế Vip</option>
+                        <option value="2">Ghế Đôi</option>
+                        <option value="3">Ghế Ưu Tiên</option>
                     </select>
-                    <div class="error-message" id="status-error"></div>
+                    <div class="error-message" id="seatType-error"></div>
                 </div>
             </div>
             <div class="form-row">
@@ -60,19 +61,16 @@
 <script>
     let cinemasData = [];
     let roomsData = [];
-    let allRoomsData = [];
     let isEditMode = false;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        initializePage();
-        loadCinemas();
-        loadRooms();
+    document.addEventListener('DOMContentLoaded', async function () {
+        await loadCinemas();
+        await loadRooms();
         setupCinemaAutocomplete();
         setupRoomAutocomplete();
+        checkForEditMode();
         document.getElementById('seatForm').addEventListener('submit', handleFormSubmit);
     });
-
-
 
     function checkForEditMode() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -112,7 +110,6 @@
 
             if (response.code === 1 && response.data) {
                 roomsData = response.data;
-                allRoomsData = [...response.data];
             } else {
                 console.error('Không thể tải danh sách phòng chiếu:', response.message);
             }
@@ -124,26 +121,29 @@
     function populateForm(seat) {
         document.getElementById('seatId').value = seat.id;
         document.getElementById('seatNumber').value = seat.seatNumber;
-        document.getElementById('status').value = seat.status;
+
+        if (seat.seatType !== undefined && seat.seatType !== null) {
+            document.getElementById('seatType').value = seat.seatType;
+        }
 
         if (seat.roomId) {
             document.getElementById('roomId').value = seat.roomId;
+
             const room = roomsData.find(r => r.id === seat.roomId);
 
             if (room) {
                 document.getElementById('cinemaId').value = room.cinemaId;
-                const selectedRoomDisplay = document.getElementById('selectedRoom');
-                selectedRoomDisplay.textContent = `Đã chọn: ${room.name}`;
-                selectedRoomDisplay.classList.add('show');
-
                 const cinema = cinemasData.find(c => c.id === room.cinemaId);
                 if (cinema) {
                     const selectedCinemaDisplay = document.getElementById('selectedCinema');
                     selectedCinemaDisplay.textContent = `Đã chọn: ${cinema.name}`;
                     selectedCinemaDisplay.classList.add('show');
-
                     document.getElementById('roomSearch').disabled = false;
                 }
+
+                const selectedRoomDisplay = document.getElementById('selectedRoom');
+                selectedRoomDisplay.textContent = `Đã chọn: ${room.name}`;
+                selectedRoomDisplay.classList.add('show');
             }
         }
     }
@@ -156,7 +156,6 @@
 
             if (response.code === 1 && response.data) {
                 cinemasData = response.data;
-                checkForEditMode();
             } else {
                 console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
@@ -245,14 +244,14 @@
         selectedDisplay.classList.add('show');
 
         document.getElementById('cinemaId-error').textContent = '';
-
         document.getElementById('roomId').value = '';
         document.getElementById('selectedRoom').textContent = '';
         document.getElementById('selectedRoom').classList.remove('show');
-
         document.getElementById('roomSearch').disabled = false;
+    }
 
-        roomsData = allRoomsData.filter(room => room.cinemaId === parseInt(cinema.id));
+    function getRoomsByCinema(cinemaId) {
+        return roomsData.filter(room => room.cinemaId === parseInt(cinemaId));
     }
 
     function setupRoomAutocomplete() {
@@ -266,7 +265,8 @@
         });
 
         searchInput.addEventListener('focus', function () {
-            if (roomsData.length > 0) {
+            const cinemaId = document.getElementById('cinemaId').value;
+            if (cinemaId) {
                 filterRooms(this.value.toLowerCase());
             }
         });
@@ -289,9 +289,14 @@
         const dropdown = document.getElementById('roomDropdown');
         dropdown.innerHTML = '';
 
-        if (!roomsData.length) return;
+        const cinemaId = document.getElementById('cinemaId').value;
+        if (!cinemaId) return;
 
-        const filteredRooms = roomsData.filter(room => {
+        const currentRooms = getRoomsByCinema(cinemaId);
+
+        if (!currentRooms.length) return;
+
+        const filteredRooms = currentRooms.filter(room => {
             const roomName = (room.name || '').toLowerCase();
             return roomName.includes(searchTerm);
         });
@@ -346,9 +351,9 @@
     function validateForm() {
         const validationRules = [
             {id: 'seatNumber', validation: value => value.trim() !== '', message: 'Vui lòng nhập số ghế'},
+            {id: 'seatType', validation: value => value !== '', message: 'Vui lòng chọn loại ghế'},
             {id: 'roomId', validation: value => value !== '', message: 'Vui lòng chọn phòng chiếu'},
             {id: 'cinemaId', validation: value => value !== '', message: 'Vui lòng chọn chi nhánh'},
-            {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}
         ];
 
         let isValid = true;
@@ -396,8 +401,8 @@
     function getFormData() {
         const data = {
             seatNumber: document.getElementById('seatNumber').value.trim(),
+            seatType: parseInt(document.getElementById('seatType').value),
             roomId: document.getElementById('roomId').value,
-            status: document.getElementById('status').value
         };
 
         const seatId = document.getElementById('seatId').value;

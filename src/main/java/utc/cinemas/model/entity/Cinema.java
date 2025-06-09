@@ -35,7 +35,7 @@ public class Cinema {
     private Integer status; // Trạng thái
 
     @Column(name = "CINEMA_DIRECTOR")
-    private Long cinemaDirector; // Giám đốc cơ sở
+    private Long cinemaDirector; // Giám đốc chi nhánh
 
     @Column(name = "EMAIL")
     private String email; // Email

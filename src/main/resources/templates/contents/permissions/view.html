@@ -5,6 +5,19 @@
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
                 <select id="search-select">
                     <option value="-1">Tất cả module</option>
+                    <option value="PERMISSION">Quyền</option>
+                    <option value="USER_PERMISSION">Phân quyền người dùng</option>
+                    <option value="CINEMA">Chi nhánh</option>
+                    <option value="PRODUCT">Hàng hoá</option>
+                    <option value="ROOM">Phòng chiếu</option>
+                    <option value="EQUIPMENT">Thiết bị</option>
+                    <option value="SEAT">Ghế ngồi</option>
+                    <option value="MOVIE">Phim</option>
+                    <option value="SHOWTIME">Suất chiếu</option>
+                    <option value="TICKET">Vé</option>
+                    <option value="STAFF">Nhân viên</option>
+                    <option value="CUSTOMER">Khách hàng</option>
+                    <option value="REPORT">Báo cáo, thống kê</option>
                 </select>
                 <button id="search">Tìm kiếm</button>
             </div>
@@ -21,10 +34,10 @@
             <tr>
                 <th>#</th>
                 <th>Tên quyền</th>
-                <th>Mã quyền</th>
                 <th>Mô tả</th>
-                <th>Module</th>
+                <th>Mã quyền</th>
                 <th>Hành động</th>
+                <th>Module</th>
                 <th>Trạng thái</th>
                 <th>Xoá bỏ</th>
             </tr>
@@ -58,25 +71,40 @@
     let page = 0;
     let totalPages = 0;
 
-    async function loadModules() {
-        try {
-            const response = await httpRequest('/api/admin/permissions/get-modules', {
-                method: 'GET'
-            });
-            const selectElement = document.getElementById('search-select');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(module => {
-                    const option = document.createElement('option');
-                    option.value = module;
-                    option.textContent = module;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách module:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách module:', error);
-        }
+    // Mapping màu sắc cho modules
+    const moduleColorMap = {
+        'PERMISSION': 'bg-primary',
+        'USER_PERMISSION': 'bg-info',
+        'CINEMA': 'bg-success',
+        'PRODUCT': 'bg-warning',
+        'ROOM': 'bg-danger',
+        'EQUIPMENT': 'bg-secondary',
+        'SEAT': 'bg-dark',
+        'MOVIE': 'bg-primary',
+        'SHOWTIME': 'bg-info',
+        'TICKET': 'bg-success',
+        'STAFF': 'bg-warning',
+        'CUSTOMER': 'bg-danger',
+        'REPORT': 'bg-secondary'
+    };
+
+    // Mapping màu sắc cho actions
+    const actionColorMap = {
+        'CREATE': 'bg-success',
+        'EDIT': 'bg-warning',
+        'VIEW': 'bg-info',
+        'DELETE': 'bg-danger',
+        'REVOKE': 'bg-dark',
+        'ASSIGN': 'bg-primary',
+        'EXPORT': 'bg-secondary'
+    };
+
+    function getModuleBadgeClass(module) {
+        return moduleColorMap[module] || 'bg-secondary';
+    }
+
+    function getActionBadgeClass(action) {
+        return actionColorMap[action] || 'bg-secondary';
     }
 
     async function toggleStatus(id) {
@@ -114,7 +142,7 @@
                         showModal('error', 'Ôi xong!', result.message);
                     }
                 } catch (error) {
-                    console.error('Lỗi khi xóa quyền:', error);
+                    console.error('Lỗi khi xoá:', error);
                     showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
                 }
             }
@@ -141,13 +169,13 @@
                 <td><a href="/utc-cinemas/permissions/edit?id=${item.id}">${item.permissionName}</a></td>
                 <td>${item.description || '-'}</td>
                 <td>
-                  <span class="badge bg-secondary">${item.permissionCode}</span>
+                  <span class="badge ${getActionBadgeClass(item.action)}">${item.permissionCode}</span>
                 </td>
                 <td>
-                  <span class="badge bg-secondary">${item.module || '-'}</span>
+                  <span class="badge ${getActionBadgeClass(item.action)}">${item.action || '-'}</span>
                 </td>
-                <td>
-                  <span class="badge bg-secondary">${item.action || '-'}</span>
+                 <td>
+                    <span class="badge ${getModuleBadgeClass(item.module)}">${item.module || '-'}</span>
                 </td>
                 <td>
                       <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
@@ -200,7 +228,6 @@
             navigateTo("/utc-cinemas/permissions/create")
         });
 
-        await loadModules();
         await loadData();
     });
 </script>

@@ -303,11 +303,7 @@ tbody tr:nth-child(odd) {
     text-align: center;
     padding: 7px 15px;
 }
-    /* STATUS BADGES */
-.bg-success, .bg-secondary, .bg-danger, .bg-warning {
-    color: white;
-    border-radius: 5px;
-}
+
 
 .delete-icon {
     font-size: 20px;
@@ -334,21 +330,65 @@ tbody tr:nth-child(odd) {
     opacity: 0.9;
 }
 
-.bg-success {
-    background-color: #28a745;
+/* STATUS BADGES - Full Set */
+.bg-primary,
+.bg-secondary,
+.bg-success,
+.bg-danger,
+.bg-warning,
+.bg-info,
+.bg-light,
+.bg-dark,
+.bg-white,
+.bg-transparent {
+    color: white;
+    border-radius: 5px;
+}
+
+/* Individual Background Colors */
+.bg-primary {
+    background-color: #0166d3;
 }
 
 .bg-secondary {
     background-color: #6c757d;
 }
 
+.bg-success {
+    background-color: #28a745;
+}
+
 .bg-danger {
-    background-color: #dc3545;
+    background-color: #b82d3b;
 }
 
 .bg-warning {
-    background-color: #e4d300;
+    background-color: #d4b200; /* hoặc #e4d300 nếu bạn thích đậm hơn */
 }
+
+.bg-info {
+    background-color: #17a2b8;
+}
+
+.bg-light {
+    background-color: #f8f9fa;
+    color: #212529; /* chữ đậm hơn để dễ đọc trên nền sáng */
+}
+
+.bg-dark {
+    background-color: #343a40;
+}
+
+.bg-white {
+    background-color: #ffffff;
+    color: #212529; /* chữ tối để nổi trên nền trắng */
+}
+
+.bg-transparent {
+    background-color: transparent;
+    color: #212529; /* mặc định chữ tối trên nền trong suốt */
+}
+
 
 /* ARTICLES */
 .articles {
@@ -734,7 +774,7 @@ button:focus-visible {
     }
 
     .search-filter input, .search-filter select, .search-filter button,
-    .pagination button, .records-per-page select {
+    .pagination button {
         width: 100%;
     }
 

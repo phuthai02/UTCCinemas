@@ -23,9 +23,8 @@
                 <th>Tên phòng chiếu</th>
                 <th>Số ghế tối đa</th>
                 <th>Chi nhánh</th>
-                <th>Người tạo</th>
-                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
+                <th>Xoá</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -57,7 +56,6 @@
     let page = 0;
     let totalPages = 0;
     let cinemaMap = {};
-    let userMap = {};
 
     async function loadCinemas() {
         try {
@@ -81,24 +79,6 @@
         }
     }
 
-    async function loadUsers() {
-        try {
-            const response = await httpRequest('/api/admin/users/get-all', {
-                method: 'GET'
-            });
-
-            if (response.code === 1 && response.data) {
-                response.data.forEach(user => {
-                    userMap[user.id] = user.name;
-                });
-            } else {
-                console.error('Không thể tải danh sách người dùng:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách người dùng:', error);
-        }
-    }
-
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
@@ -114,22 +94,27 @@
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
                 const cinemaName = cinemaMap[item.cinemaId] || 'Không xác định';
-                const createdUser = userMap[item.createdUser] || 'Không xác định';
                 const row = document.createElement("tr");
-                row.onclick = () => {
-                    navigateTo(`/utc-cinemas/rooms/edit?id=${item.id}`);
-                };
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.name}</td>
+                <td><a href="/utc-cinemas/rooms/edit?id=${item.id}">${item.name}</a></td>
                 <td>${item.seatCapacity}</td>
                 <td>${cinemaName}</td>
-                <td>${createdUser}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
+                 <td>
+                      <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
+                            data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"
+                            data-inline="false"
+                            title="Đổi trạng thái"
+                            onclick="toggleStatus(${item.id})">
+                      </span>
+                </td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
-                  </span>
+                    <span class="iconify delete-icon"
+                          data-icon="mdi:trash-can-outline"
+                          data-inline="false"
+                          title="Xóa"
+                          onclick="del(${item.id})">
+                    </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
@@ -157,6 +142,48 @@
         loadData();
     }
 
+    async function toggleStatus(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn đổi trạng thái phòng chiếu này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/rooms/toggle-status/' + id, {
+                        method: 'PUT'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi đổi trạng thái:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    async function del(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá phòng chiếu này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/rooms/delete/' + id, {
+                        method: 'DELETE'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xoá:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('nextPageBtn').addEventListener('click', nextPage);
         document.getElementById('prevPageBtn').addEventListener('click', prevPage);
@@ -166,7 +193,7 @@
             navigateTo("/utc-cinemas/rooms/create")
         });
 
-        await Promise.all([loadCinemas(), loadUsers()]);
+        await Promise.all([loadCinemas()]);
         await loadData();
     });
 </script>

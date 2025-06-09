@@ -3,11 +3,6 @@
         <div class="top-left">
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                <select id="search-select">
-                    <option value="-1">Tất cả vai trò</option>
-                    <option value="1">Quản trị viên</option>
-                    <option value="0">Người dùng</option>
-                </select>
                 <button id="search">Tìm kiếm</button>
             </div>
         </div>
@@ -27,8 +22,8 @@
                 <th>Email</th>
                 <th>Số điện thoại</th>
                 <th>Vai trò</th>
-                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
+                <th>Xoá</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -60,12 +55,23 @@
     let page = 0;
     let totalPages = 0;
 
+    const roleMap = {
+        0: 'Khách hàng'
+    };
+
+    const roleColorMap = {
+        0: 'bg-primary'
+    };
+
+    function getRoleBadgeClass(role) {
+        return roleColorMap[role] || 'bg-dark';
+    }
+
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const role = document.getElementById("search-select").value;
-            const result = await httpRequest('/api/admin/users/get-list?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search + '&role=' + role);
+            const result = await httpRequest('/api/admin/users/get-list-customer?page=' + page + '&pageSize=' + pageSize + '&sortBy=id&sortOrder=desc&search=' + search);
             if (result.message !== 'SUCCESS') {
                 console.error('Lỗi khi lấy dữ liệu:', result.message);
                 return;
@@ -75,21 +81,32 @@
             tableBody.innerHTML = "";
             datas.forEach((item, index) => {
                 const row = document.createElement("tr");
-                row.onclick = () => {
-                    navigateTo(`/utc-cinemas/users/edit?id=${item.id}`);
-                };
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
-                <td>${item.name}</td>
+                <td><a href="/utc-cinemas/customers/edit?id=${item.id}">${item.name}</a></td>
                 <td>${item.username}</td>
                 <td>${item.email}</td>
                 <td>${item.phoneNumber || 'Chưa cập nhật'}</td>
-                <td>${item.role === 1 ? 'Quản trị viên' : 'Người dùng'}</td>
-                <td>${new Date(item.createdDate).toLocaleString('vi-VN')}</td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}">
-                    ${item.status === 1 ? 'Đang hoạt động' : 'Dừng hoạt động' }
-                  </span>
+                 <span class="badge ${getRoleBadgeClass(item.role)}">
+                     ${roleMap[item.role] || 'Không xác định'}
+                 </span>
+                </td>
+                 <td>
+                      <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
+                            data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"
+                            data-inline="false"
+                            title="Đổi trạng thái"
+                            onclick="toggleStatus(${item.id})">
+                      </span>
+                </td>
+                <td>
+                    <span class="iconify delete-icon"
+                          data-icon="mdi:trash-can-outline"
+                          data-inline="false"
+                          title="Xóa"
+                          onclick="del(${item.id})">
+                    </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
@@ -117,15 +134,56 @@
         loadData();
     }
 
+    async function toggleStatus(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn đổi trạng thái khách hàng này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/users/toggle-status/' + id, {
+                        method: 'PUT'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi đổi trạng thái:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    async function del(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá khách hàng này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/users/delete/' + id, {
+                        method: 'DELETE'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xoá:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('nextPageBtn').addEventListener('click', nextPage);
         document.getElementById('prevPageBtn').addEventListener('click', prevPage);
         document.getElementById("search").addEventListener("click", loadData);
         document.getElementById("records-select").addEventListener("change", loadData);
         document.querySelector(".add-btn").addEventListener("click", function () {
-            navigateTo("/utc-cinemas/users/create")
+            navigateTo("/utc-cinemas/customers/create")
         });
-
         await loadData();
     });
 </script>

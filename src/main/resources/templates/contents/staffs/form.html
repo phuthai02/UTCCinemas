@@ -1,8 +1,8 @@
 <div class="content-box">
     <div class="edit-header">
-        <h2 id="pageTitle">Thêm người dùng mới</h2>
+        <h2 id="pageTitle">Thêm nhân viên mới</h2>
         <div class="edit-actions">
-            <button onclick="navigateTo('/utc-cinemas/users')">
+            <button onclick="navigateTo('/utc-cinemas/staffs')">
                 Quay lại
             </button>
         </div>
@@ -55,24 +55,18 @@
                     <label for="role">Vai trò <span class="required">*</span></label>
                     <select id="role" name="role" autocomplete="new-role">
                         <option value="">Chọn vai trò</option>
-                        <option value="1">Quản trị viên</option>
-                        <option value="0" selected>Nguời dùng</option>
+                        <option value="1">Tổng giám đốc</option>
+                        <option value="2">Giám đốc chi nhánh</option>
+                        <option value="3">Nhân viên kỹ thuật</option>
+                        <option value="4">Nhân viên bán vé</option>
+                        <option value="2002">Nhà phát triển</option>
                     </select>
                     <div class="error-message" id="role-error"></div>
                 </div>
-                <div class="form-group">
-                    <label for="status">Trạng thái <span class="required">*</span></label>
-                    <select id="status" name="status" autocomplete="new-status">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Dừng hoạt động</option>
-                        <option value="1" selected>Đang hoạt động</option>
-                    </select>
-                    <div class="error-message" id="status-error"></div>
-                </div>
             </div>
             <div class="form-actions">
-                <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/users')">Hủy bỏ</button>
-                <button type="submit" id="saveBtn">Lưu người dùng</button>
+                <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/staffs')">Hủy bỏ</button>
+                <button type="submit" id="saveBtn">Lưu nhân viên</button>
             </div>
         </form>
     </div>
@@ -96,8 +90,8 @@
 
         if (userId) {
             isEditMode = true;
-            document.getElementById('pageTitle').textContent = 'Chỉnh sửa người dùng';
-            document.getElementById('saveBtn').textContent = 'Cập nhật người dùng';
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa nhân viên';
+            document.getElementById('saveBtn').textContent = 'Cập nhật nhân viên';
 
             const usernameInput = document.getElementById('username');
             usernameInput.readOnly = true;
@@ -122,12 +116,12 @@
             if (response.code === 1 && response.data) {
                 populateForm(response.data);
             } else {
-                showModal('error', 'Ôi xong!', 'Không thể tải thông tin người dùng.');
+                showModal('error', 'Ôi xong!', 'Không thể tải thông tin nhân viên.');
                 setTimeout(() => navigateTo('/utc-cinemas/users'), 2000);
             }
         } catch (error) {
-            console.error('Lỗi khi tải thông tin người dùng:', error);
-            showModal('error', 'Ôi xong!', 'Không thể tải thông tin người dùng.');
+            console.error('Lỗi khi tải thông tin nhân viên:', error);
+            showModal('error', 'Ôi xong!', 'Không thể tải thông tin nhân viên.');
         }
     }
 
@@ -138,7 +132,6 @@
         document.getElementById('email').value = user.email;
         document.getElementById('phoneNumber').value = user.phoneNumber || '';
         document.getElementById('role').value = user.role;
-        document.getElementById('status').value = user.status;
         document.getElementById('password').value = '';
         document.getElementById('confirmPassword').value = '';
     }
@@ -163,8 +156,7 @@
             {id: 'username', message: 'Vui lòng nhập tên đăng nhập'},
             {id: 'email', message: 'Vui lòng nhập email'},
             {id: 'phoneNumber', message: 'Vui lòng nhập số điện thoại'},
-            {id: 'role', message: 'Vui lòng chọn vai trò'},
-            {id: 'status', message: 'Vui lòng chọn trạng thái'}
+            {id: 'role', message: 'Vui lòng chọn vai trò'}
         ];
 
         if (!isEditMode) {
@@ -219,14 +211,14 @@
 
     async function submitFormData() {
         const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
-        const itemType = 'người dùng';
+        const itemType = 'nhân viên';
         showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
             if (result) {
                 try {
                     const formData = getFormData();
                     const endpoint = isEditMode
                         ? '/api/admin/users/update'
-                        : '/api/admin/users/create';
+                        : '/api/admin/users/create-staff';
 
                     const method = isEditMode ? 'PUT' : 'POST';
 
@@ -250,8 +242,7 @@
             username: document.getElementById('username').value.trim(),
             email: document.getElementById('email').value.trim(),
             phoneNumber: document.getElementById('phoneNumber').value.trim(),
-            role: document.getElementById('role').value,
-            status: document.getElementById('status').value
+            role: document.getElementById('role').value
         };
 
         const password = document.getElementById('password').value;
@@ -274,7 +265,7 @@
 
     function handleApiResponse(response) {
         if (response.code === 1) {
-            showModal('success', 'Thành công!', response.message, '/utc-cinemas/users');
+            showModal('success', 'Thành công!', response.message, '/utc-cinemas/staffs');
         } else {
             showModal('error', 'Ôi xong!', response.message || 'Có lỗi xảy ra.');
         }

@@ -13,7 +13,7 @@ import utc.cinemas.util.JsonUtils;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/ticket")
+@RequestMapping("/api/admin/tickets")
 @Slf4j
 public class TicketController {
 
@@ -24,34 +24,6 @@ public class TicketController {
     public ResponseEntity<Response> getTickets(@RequestParam Map<String, String> filters) {
         log.info("Get list tickets with params: filters={}", filters);
         Response response = ticketSerivce.getListOfTickets(filters);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping("get-all")
-    public ResponseEntity<Response> getAll() {
-        log.info("Get all tickets");
-        Response response = ticketSerivce.getAll();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping("{id}")
-    public ResponseEntity<Response> getTicketById(@PathVariable Long id) {
-        log.info("Get ticket by id: id={}", id);
-        Response response = ticketSerivce.getTicketById(id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping("create")
-    public ResponseEntity<Response> createTicket(@RequestBody TicketDto ticketDto) {
-        log.info("Create ticket with params: dto={}", JsonUtils.toString(ticketDto));
-        Response response = ticketSerivce.create(ticketDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PutMapping("update")
-    public ResponseEntity<Response> updateTicket(@RequestBody TicketDto ticketDto) {
-        log.info("Update ticket with params: dto={}", JsonUtils.toString(ticketDto));
-        Response response = ticketSerivce.update(ticketDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

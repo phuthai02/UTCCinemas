@@ -20,7 +20,7 @@ public class Seat {
     private String seatNumber; // Số ghế
 
     @Column(name = "SEAT_TYPE") // Hạng ghế
-    private String seatType;
+    private Integer seatType;
 
     @Column(name = "CREATED_USER")
     private Long createdUser; // Người tạo

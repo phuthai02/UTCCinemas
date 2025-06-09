@@ -3,11 +3,11 @@
         <div class="top-left">
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Tìm kiếm..."/>
-                <select id="room-select">
-                    <option value="-1">Tất cả phòng</option>
+                <select id="cinema-select">
+                    <option value="-1">Tất cả chi nhánh</option>
                 </select>
-                <select id="type-select">
-                    <option value="-1">Tất cả loại thiết bị</option>
+                <select id="room-select" disabled>
+                    <option value="-1">Tất cả phòng chiếu</option>
                 </select>
                 <button id="search">Tìm kiếm</button>
             </div>
@@ -26,14 +26,13 @@
                 <th>Tên thiết bị</th>
                 <th>Loại thiết bị</th>
                 <th>Phòng</th>
+                <th>Chi nhánh</th>
                 <th>Thương hiệu</th>
                 <th>Model</th>
                 <th>Số lượng</th>
                 <th>Tình trạng</th>
                 <th>Ngày mua</th>
                 <th>Bảo hành đến</th>
-                <th>Người tạo</th>
-                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
                 <th>Xoá</th>
             </tr>
@@ -66,8 +65,12 @@
 <script>
     let page = 0;
     let totalPages = 0;
+    let cinemaMap = {};
     let roomMap = {};
     let userMap = {};
+    let selectedCinemaId = '-1';
+    let selectedRoomId = '-1';
+    let allRooms = [];
 
     const conditionStatusMap = {
         1: 'Tốt',
@@ -77,19 +80,43 @@
         5: 'Hỏng'
     };
 
+    // Load danh sách chi nhánh
+    async function loadCinemas() {
+        try {
+            const response = await httpRequest('/api/admin/cinemas/get-all', {
+                method: 'GET'
+            });
+
+            if (response.code === 1 && response.data) {
+                const cinemaSelect = document.getElementById('cinema-select');
+                cinemaSelect.innerHTML = '<option value="-1">Tất cả chi nhánh</option>';
+
+                response.data.forEach(cinema => {
+                    cinemaMap[cinema.id] = cinema.name;
+                    const option = document.createElement('option');
+                    option.value = cinema.id;
+                    option.textContent = cinema.name;
+                    cinemaSelect.appendChild(option);
+                });
+            } else {
+                console.error('Không thể tải danh sách chi nhánh:', response.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách chi nhánh:', error);
+        }
+    }
+
+    // Load tất cả phòng (để lưu trữ mapping)
     async function loadRooms() {
         try {
             const response = await httpRequest('/api/admin/rooms/get-all', {
                 method: 'GET'
             });
-            const selectElement = document.getElementById('room-select');
+
             if (response.code === 1 && response.data) {
-                response.data.forEach(room => {
+                allRooms = response.data;
+                allRooms.forEach(room => {
                     roomMap[room.id] = room.name;
-                    const option = document.createElement('option');
-                    option.value = room.id;
-                    option.textContent = room.name;
-                    selectElement.appendChild(option);
                 });
             } else {
                 console.error('Không thể tải danh sách phòng:', response.message);
@@ -99,24 +126,29 @@
         }
     }
 
-    async function loadEquipmentTypes() {
-        try {
-            const response = await httpRequest('/api/admin/equipments/get-types', {
-                method: 'GET'
+    // Cập nhật dropdown phòng dựa trên chi nhánh được chọn
+    function updateRoomDropdown(cinemaId) {
+        const roomSelect = document.getElementById('room-select');
+        roomSelect.innerHTML = '<option value="-1">Tất cả phòng</option>';
+
+        if (cinemaId === '-1') {
+            roomSelect.disabled = true;
+            return;
+        }
+
+        const filteredRooms = allRooms.filter(room => room.cinemaId === parseInt(cinemaId));
+
+        if (filteredRooms.length > 0) {
+            roomSelect.disabled = false;
+
+            filteredRooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room.id;
+                option.textContent = room.name;
+                roomSelect.appendChild(option);
             });
-            const selectElement = document.getElementById('type-select');
-            if (response.code === 1 && response.data) {
-                response.data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error('Không thể tải danh sách loại thiết bị:', response.message);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách loại thiết bị:', error);
+        } else {
+            roomSelect.disabled = true;
         }
     }
 
@@ -137,16 +169,56 @@
         }
     }
 
+    async function toggleStatus(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn đổi trạng thái thiết bị này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/equipments/toggle-status/' + id, {
+                        method: 'PUT'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi đổi trạng thái:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    async function del(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá thiết bị này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/equipments/delete/' + id, {
+                        method: 'DELETE'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xóa thiết bị:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
     async function loadData() {
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            const roomId = document.getElementById("room-select").value;
-            const equipmentType = document.getElementById("type-select").value;
 
             let queryParams = `page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
-            if (roomId !== '-1') queryParams += `&roomId=${roomId}`;
-            if (equipmentType !== '-1') queryParams += `&equipmentType=${equipmentType}`;
+            queryParams += `&cinemaId=${selectedCinemaId}`;
+            queryParams += `&roomId=${selectedRoomId}`;
 
             const result = await httpRequest(`/api/admin/equipments/get-list?${queryParams}`);
 
@@ -160,7 +232,11 @@
             tableBody.innerHTML = "";
 
             datas.forEach((item, index) => {
-                const roomName = roomMap[item.roomId] || 'Không xác định';
+                const roomId = item.roomId;
+                const room = allRooms.find(room => room.id === roomId);
+
+                const roomName = room ? room.name : 'Không xác định';
+                const cinemaName = room ? (cinemaMap[room.cinemaId] || 'Không xác định') : 'Không xác định';
                 const conditionText = conditionStatusMap[item.conditionStatus] || 'Không xác định';
 
                 const row = document.createElement("tr");
@@ -170,6 +246,7 @@
                 <td><a href="/utc-cinemas/equipments/edit?id=${item.id}">${item.equipmentName}</a></td>
                 <td>${item.equipmentType || '-'}</td>
                 <td>${roomName}</td>
+                <td>${cinemaName}</td>
                 <td>${item.brand || '-'}</td>
                 <td>${item.model || '-'}</td>
                 <td>${item.quantity || 0}</td>
@@ -212,13 +289,19 @@
     }
 
     function getConditionBadgeClass(condition) {
-        switch(condition) {
-            case 1: return 'bg-success';
-            case 2: return 'bg-info';
-            case 3: return 'bg-warning';
-            case 4: return 'bg-danger';
-            case 5: return 'bg-dark';
-            default: return 'bg-secondary';
+        switch (condition) {
+            case 1:
+                return 'bg-success';
+            case 2:
+                return 'bg-info';
+            case 3:
+                return 'bg-warning';
+            case 4:
+                return 'bg-danger';
+            case 5:
+                return 'bg-dark';
+            default:
+                return 'bg-secondary';
         }
     }
 
@@ -243,9 +326,20 @@
             navigateTo("/utc-cinemas/equipments/create")
         });
 
-        await loadRooms();
-        await loadEquipmentTypes();
-        await loadUsers();
+        // Event listener cho cinema select
+        document.getElementById('cinema-select').addEventListener('change', function () {
+            selectedCinemaId = this.value;
+            selectedRoomId = '-1'; // Reset room selection
+            updateRoomDropdown(selectedCinemaId);
+        });
+
+        // Event listener cho room select
+        document.getElementById('room-select').addEventListener('change', function () {
+            selectedRoomId = this.value;
+        });
+
+        // Load dữ liệu ban đầu
+        await Promise.all([loadCinemas(), loadUsers(), loadRooms()]);
         await loadData();
     });
 </script>

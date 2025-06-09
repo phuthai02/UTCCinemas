@@ -6,7 +6,7 @@ import java.util.List;
 public class Constants {
     // Existing constants
     public static final Integer ROLE_DEVELOPER = 2002;
-    public static final Integer ROLE_USER = 0;
+    public static final Integer ROLE_CUSTOMER= 0;
     public static final Integer ROLE_CEO = 1;
     public static final Integer ROLE_MANAGER = 2;
     public static final Integer ROLE_TECHNICAL_STAFF = 3;

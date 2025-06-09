@@ -16,6 +16,7 @@ public class SeatDto {
     private Timestamp createdDate;
     private Timestamp modifiedDate;
     private Integer status;
+    private Integer seatType;
 
     public Seat getEntity() {
         Seat seat = new Seat();

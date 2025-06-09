@@ -12,12 +12,13 @@
                 <select id="movie-select">
                     <option value="-1">Tất cả phim</option>
                 </select>
+                <select id="status-select">
+                    <option value="-1">Tất cả trạng thái</option>
+                    <option value="0">Đã bán</option>
+                    <option value="1">Chưa bán</option>
+                </select>
                 <button id="search">Tìm kiếm</button>
             </div>
-        </div>
-
-        <div class="top-right">
-            <button class="add-btn" onclick="navigateTo('/utc-cinemas/showtimes/create')">Thêm mới</button>
         </div>
     </div>
 
@@ -35,6 +36,7 @@
                 <th>Người mua</th>
                 <th>Mua lúc</th>
                 <th>Trạng thái</th>
+                <th>Xoá</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -72,6 +74,7 @@
     let selectedCinemaId = '-1';
     let selectedRoomId = '-1';
     let selectedMovieId = '-1';
+    let selectedStatus = '-1';
     let allRooms = [];
 
     async function loadCinemas() {
@@ -190,10 +193,11 @@
         try {
             const pageSize = document.getElementById("records-select").value;
             const search = document.getElementById("search-input").value;
-            let url = `/api/admin/ticket/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
+            let url = `/api/admin/tickets/get-list?page=${page}&pageSize=${pageSize}&sortBy=id&sortOrder=desc&search=${search}`;
             url += `&cinemaId=${selectedCinemaId}`;
             url += `&roomId=${selectedRoomId}`;
             url += `&movieId=${selectedMovieId}`;
+            url += `&status=${selectedStatus}`;
 
             const result = await httpRequest(url);
 
@@ -208,6 +212,11 @@
 
             datas.forEach((item, index) => {
                 const row = document.createElement("tr");
+                let isDuplicate = item.isDuplicate;
+
+                if (isDuplicate === 1) {
+                    row.style.backgroundColor = "#ffcccc";
+                }
 
                 row.innerHTML = `
                 <td>${page * pageSize + index + 1}</td>
@@ -217,16 +226,28 @@
                 <td>${item.seat}</td>
                 <td>${new Intl.NumberFormat('vi-VN').format(item.price)}</td>
                 <td>${new Date(item.startTime).toLocaleString('vi-VN')}</td>
-                <td>${item.username || '-'}</td>
-                 <td>${item.saleDate ? new Date(item.saleDate).toLocaleString('vi-VN') : '-'}</td>
+                <td>${item.username || 'Chưa bán'}</td>
+                 <td>${item.saleDate ? new Date(item.saleDate).toLocaleString('vi-VN') : 'Chưa bán'}</td>
+                 <td>
+                      <span class="iconify toggle-status-icon ${item.status === 1 ? 'status-on' : 'status-off'}"
+                            data-icon="${item.status === 1 ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}"
+                            data-inline="false"
+                            title="Đổi trạng thái"
+                            onclick="toggleStatus(${item.id})">
+                      </span>
+                </td>
                 <td>
-                  <span class="badge ${item.status === 1 ? 'bg-danger' : 'bg-success'}">
-                    ${item.status === 1 ? 'Chưa bán' : 'Đã bán' }
-                  </span>
+                    <span class="iconify delete-icon"
+                          data-icon="mdi:trash-can-outline"
+                          data-inline="false"
+                          title="Xóa"
+                          onclick="del(${item.id})">
+                    </span>
                 </td>
                 `;
                 tableBody.appendChild(row);
             });
+
             totalPages = result.data.totalPages;
             if (totalPages > 0 && page > totalPages - 1) {
                 page = 0;
@@ -236,6 +257,48 @@
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
         }
+    }
+
+    async function toggleStatus(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn đổi trạng thái vé này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/tickets/toggle-status/' + id, {
+                        method: 'PUT'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi đổi trạng thái:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
+    }
+
+    async function del(id) {
+        showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn xoá vé này không?`, null, async (result) => {
+            if (result) {
+                try {
+                    const result = await httpRequest('/api/admin/tickets/delete/' + id, {
+                        method: 'DELETE'
+                    });
+
+                    if (result.code === 1) {
+                        await loadData();
+                    } else {
+                        showModal('error', 'Ôi xong!', result.message);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xoá:', error);
+                    showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
+                }
+            }
+        });
     }
 
     function prevPage() {
@@ -268,6 +331,10 @@
 
         document.getElementById('movie-select').addEventListener('change', function () {
             selectedMovieId = this.value;
+        });
+
+        document.getElementById('status-select').addEventListener('change', function () {
+            selectedStatus = this.value;
         });
 
         await Promise.all([loadCinemas(), loadUsers(), loadRooms(), loadMovies()]);

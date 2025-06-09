@@ -26,7 +26,7 @@
                 <th>Email</th>
                 <th>Giờ mở cửa</th>
                 <th>Giờ đóng cửa</th>
-                <th>Giám đốc cơ sở</th>
+                <th>Giám đốc chi nhánh</th>
                 <th>Trạng thái</th>
                 <th>Xoá</th>
             </tr>
@@ -96,7 +96,7 @@
                         showModal('error', 'Ôi xong!', result.message);
                     }
                 } catch (error) {
-                    console.error('Lỗi khi xóa quyền:', error);
+                    console.error('Lỗi khi xoá:', error);
                     showModal('error', 'Ôi xong!', 'Đã xảy ra lỗi khi gửi yêu cầu.');
                 }
             }

@@ -6,16 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import utc.cinemas.model.entity.Seat;
 
-import java.util.List;
-
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     @Query("SELECT s FROM Seat s " +
             "LEFT JOIN Room r ON s.roomId = r.id " +
             "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
             "WHERE (s.seatNumber LIKE :search) " +
             "AND (:cinemaId = -1 OR c.id = :cinemaId) " +
-            "AND (:roomId = -1 OR s.roomId = :roomId)  AND s.display = 1")
+            "AND (:roomId = -1 OR s.roomId = :roomId)  " +
+            "AND s.display = 1")
     Page<Seat> findAll(String search, Long cinemaId, Long roomId, Pageable pageable);
-    List<Seat> findAllByRoomId(Long roomId);
-    Long countAllByRoomId(Long roomId);
 }

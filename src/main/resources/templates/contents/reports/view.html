@@ -1,427 +1,357 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>UTC Cinemas</title>
-    <link rel="icon" type="image/png" href="/image/logo.png">
-    <link rel="stylesheet" href="/css/main.css">
-    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        select {
-            width: 220px !important;
-        }
+<style>
+    select {
+        width: 220px !important;
+    }
 
-        label {
-            display: inline-block;
-            width: 100px;
-            padding-right: 10px;
-            text-align: right;
-        }
+    label {
+        display: inline-block;
+        width: 100px;
+        padding-right: 10px;
+        text-align: right;
+    }
 
-        /* CSS cho content-box và các thành phần báo cáo */
-        .report-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
+    /* CSS cho content-box và các thành phần báo cáo */
+    .report-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-group label {
+        font-weight: bold;
+        font-size: 14px;
+        color: #2d3748;
+    }
+
+    .filter-group select {
+        padding: 8px 12px;
+        border: 1px solid #4a5568;
+        border-radius: 4px;
+        background-color: white;
+        font-size: 14px;
+    }
+
+    .sub-filter {
+        display: inline-block;
+        margin-left: 5px;
+    }
+
+    /* CSS cho thẻ tổng quan báo cáo */
+    .report-summary {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        flex: 1;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: center;
+        transition: transform 0.3s ease;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .summary-title {
+        font-size: 14px;
+        color: #4a5568;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    /* CSS cho biểu đồ */
+    .chart-container {
+        height: 350px;
+        position: relative;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: white;
+    }
+
+    /* CSS cho bảng dữ liệu */
+    .data-table-container {
+        margin-top: 30px;
+    }
+
+    .data-table-container h3 {
+        margin-bottom: 15px;
+        color: #2d3748;
+    }
+
+    #report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    #report-table th, #report-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    #report-table th {
+        background-color: #4a5568;
+        font-weight: 500;
+        color: white;
+    }
+
+    #report-table tr:hover {
+        background-color: #a0b9e6 !important;
+    }
+
+    #report-table tr:nth-child(even) {
+        background-color: #f7fafc;
+    }
+
+    #report-table tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    /* CSS cho nút chuyển đổi chế độ xem */
+    .view-toggle {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+
+    .view-toggle-btn {
+        padding: 8px 16px;
+        background-color: white;
+        color: #4a5568;
+        border: 1px solid #4a5568;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s;
+    }
+
+    .view-toggle-btn:hover {
+        background-color: #4a5568;
+        color: white;
+    }
+
+    .view-toggle-btn.active {
+        background-color: #4a5568;
+        color: white;
+    }
+
+    .view-toggle-btn:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+
+    .view-toggle-btn:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+
+    /* Hiệu ứng hiển thị/ẩn */
+    .view-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .view-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* CSS cho button trong report-filters */
+    #generate-report, #export-report {
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    #generate-report {
+        background-color: #4a5568;
+        color: white;
+        border: none;
+    }
+
+    #generate-report:hover {
+        background-color: #2d3748;
+    }
+
+    #export-report {
+        background-color: white;
+        color: #4a5568;
+        border: 1px solid #4a5568;
+    }
+
+    #export-report:hover {
+        background-color: #4a5568;
+        color: white;
+    }
+
+    /* Responsive styles cho report */
+    @media (max-width: 768px) {
+        .report-summary {
+            flex-direction: column;
         }
 
         .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group label {
-            font-weight: bold;
-            font-size: 14px;
-            color: #2d3748;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
         }
 
         .filter-group select {
-            padding: 8px 12px;
-            border: 1px solid #4a5568;
-            border-radius: 4px;
-            background-color: white;
-            font-size: 14px;
+            width: 100%;
+        }
+
+        .report-filters {
+            flex-direction: column;
         }
 
         .sub-filter {
-            display: inline-block;
-            margin-left: 5px;
-        }
-
-        /* CSS cho thẻ tổng quan báo cáo */
-        .report-summary {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .summary-card {
-            flex: 1;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            text-align: center;
-            transition: transform 0.3s ease;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-        }
-
-        .summary-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .summary-title {
-            font-size: 14px;
-            color: #4a5568;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .summary-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        /* CSS cho biểu đồ */
-        .chart-container {
-            height: 350px;
-            position: relative;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 10px;
-            background-color: white;
-        }
-
-        /* CSS cho bảng dữ liệu */
-        .data-table-container {
-            margin-top: 30px;
-        }
-
-        .data-table-container h3 {
-            margin-bottom: 15px;
-            color: #2d3748;
-        }
-
-        #report-table {
+            margin-left: 0;
             width: 100%;
-            border-collapse: collapse;
+        }
+
+        .sub-filter select {
+            width: 100%;
+        }
+
+        #generate-report, #export-report {
+            width: 100%;
             margin-top: 10px;
         }
+    }
 
-        #report-table th, #report-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    .control {
+        margin-left: 20px;
+    }
+</style>
 
-        #report-table th {
-            background-color: #4a5568;
-            font-weight: 500;
-            color: white;
-        }
+<div class="content-box">
+    <div class="report-filters">
+        <div class="filter-group">
+            <label for="report-type">Loại báo cáo:</label>
+            <select id="report-type">
+                <option value="cinema">Theo chi nhánh</option>
+                <option value="room">Theo phòng chiếu</option>
+                <option value="movie">Theo phim</option>
+            </select>
 
-        #report-table tr:hover {
-            background-color: #a0b9e6 !important;
-        }
+            <div id="cinema-filter" class="sub-filter">
+                <label for="cinema-select">Chi nhánh:</label>
+                <select id="cinema-select">
+                    <option value="-1">Tất cả chi nhánh</option>
+                </select>
+            </div>
 
-        #report-table tr:nth-child(even) {
-            background-color: #f7fafc;
-        }
+            <div id="room-filter" class="sub-filter" style="display: none;">
+                <label for="room-select">Phòng chiếu:</label>
+                <select id="room-select">
+                    <option value="-1">Tất cả phòng chiếu</option>
+                </select>
+            </div>
 
-        #report-table tr:nth-child(odd) {
-            background-color: white;
-        }
+            <div id="movie-filter" class="sub-filter" style="display: none;">
+                <label for="movie-select">Phim:</label>
+                <select id="movie-select">
+                    <option value="-1">Tất cả phim</option>
+                </select>
+            </div>
+        </div>
 
-        /* CSS cho nút chuyển đổi chế độ xem */
-        .view-toggle {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
-            margin-top: 15px;
-        }
+        <div class="filter-group">
+            <label for="date-range">Thời gian:</label>
+            <select id="date-range">
+                <option value="alltime">Tất cả các ngày</option>
+                <option value="today">Hôm nay</option>
+                <option value="last7days">7 ngày gần nhất</option>
+                <option value="last15days">15 ngày gần nhất</option>
+                <option value="last30days">30 ngày gần nhất</option>
+            </select>
+        </div>
 
-        .view-toggle-btn {
-            padding: 8px 16px;
-            background-color: white;
-            color: #4a5568;
-            border: 1px solid #4a5568;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s;
-        }
-
-        .view-toggle-btn:hover {
-            background-color: #4a5568;
-            color: white;
-        }
-
-        .view-toggle-btn.active {
-            background-color: #4a5568;
-            color: white;
-        }
-
-        .view-toggle-btn:first-child {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-        }
-
-        .view-toggle-btn:last-child {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-        }
-
-        /* Hiệu ứng hiển thị/ẩn */
-        .view-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .view-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* CSS cho button trong report-filters */
-        #generate-report, #export-report {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        #generate-report {
-            background-color: #4a5568;
-            color: white;
-            border: none;
-        }
-
-        #generate-report:hover {
-            background-color: #2d3748;
-        }
-
-        #export-report {
-            background-color: white;
-            color: #4a5568;
-            border: 1px solid #4a5568;
-        }
-
-        #export-report:hover {
-            background-color: #4a5568;
-            color: white;
-        }
-
-        /* Responsive styles cho report */
-        @media (max-width: 768px) {
-            .report-summary {
-                flex-direction: column;
-            }
-
-            .filter-group {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
-            }
-
-            .filter-group select {
-                width: 100%;
-            }
-
-            .report-filters {
-                flex-direction: column;
-            }
-
-            .sub-filter {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .sub-filter select {
-                width: 100%;
-            }
-
-            #generate-report, #export-report {
-                width: 100%;
-                margin-top: 10px;
-            }
-        }
-
-        .control {
-            margin-left: 20px;
-        }
-    </style>
-</head>
-<body>
-<div class="top-bar">
-    <div class="logo-container">
-        <img src="/image/logo.png" alt="UTC Cinemas Logo">
-        <h2>UTC Cinemas</h2>
+        <div class="controls">
+            <button id="generate-report" class="primary-btn control">Tạo báo cáo</button>
+            <button id="export-report" class="secondary-btn control">Xuất báo cáo</button>
+        </div>
     </div>
-    <h4 id="welcomeUser">Chào mừng...</h4>
-</div>
 
-<div class="container">
-    <aside class="aside">
-        <ul>
-            <li onclick="navigateTo('/utc-cinemas/home')">
-                <span class="iconify" data-icon="mdi:home-outline" data-inline="true"></span> Trang chủ
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/cinemas')">
-                <span class="iconify" data-icon="mdi:movie-roll" data-inline="true"></span> Quản lý chi nhánh
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/rooms')">
-                <span class="iconify" data-icon="mdi:projector-screen" data-inline="true"></span> Quản lý phòng chiếu
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/equipments')">
-                <span class="iconify" data-icon="mdi:tools" data-inline="true"></span> Quản lý thiết bị
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/seats')">
-                <span class="iconify" data-icon="mdi:sofa" data-inline="true"></span> Quản lý ghế ngồi
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/movies')">
-                <span class="iconify" data-icon="mdi:movie-open-outline" data-inline="true"></span> Quản lý phim
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/showtimes')">
-                <span class="iconify" data-icon="mdi:calendar-clock-outline" data-inline="true"></span> Quản lý suất chiếu
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/tickets')">
-                <span class="iconify" data-icon="mdi:ticket-confirmation-outline" data-inline="true"></span> Quản lý đặt vé
-            </li>
-
-            <li onclick="navigateTo('/utc-cinemas/staff')">
-                <span class="iconify" data-icon="mdi:account-tie-outline" data-inline="true"></span> Quản lý nhân viên
-            </li>
-            <li onclick="navigateTo('/utc-cinemas/customers')">
-                <span class="iconify" data-icon="mdi:account-outline" data-inline="true"></span> Quản lý khách hàng
-            </li>
-
-            <li class="aside-active" onclick="navigateTo('/utc-cinemas/reports')">
-                <span class="iconify" data-icon="mdi:chart-bar" data-inline="true"></span> Thống kê báo cáo
-            </li>
-        </ul>
-        <button id="logoutBtn">Đăng xuất</button>
-    </aside>
-
-    <div class="main-content">
-        <div class="content-box">
-            <div class="report-filters">
-                <div class="filter-group">
-                    <label for="report-type">Loại báo cáo:</label>
-                    <select id="report-type">
-                        <option value="cinema">Theo chi nhánh</option>
-                        <option value="room">Theo phòng chiếu</option>
-                        <option value="movie">Theo phim</option>
-                    </select>
-
-                    <div id="cinema-filter" class="sub-filter">
-                        <label for="cinema-select">Chi nhánh:</label>
-                        <select id="cinema-select">
-                            <option value="-1">Tất cả chi nhánh</option>
-                        </select>
-                    </div>
-
-                    <div id="room-filter" class="sub-filter" style="display: none;">
-                        <label for="room-select">Phòng chiếu:</label>
-                        <select id="room-select">
-                            <option value="-1">Tất cả phòng chiếu</option>
-                        </select>
-                    </div>
-
-                    <div id="movie-filter" class="sub-filter" style="display: none;">
-                        <label for="movie-select">Phim:</label>
-                        <select id="movie-select">
-                            <option value="-1">Tất cả phim</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label for="date-range">Thời gian:</label>
-                    <select id="date-range">
-                        <option value="today">Hôm nay</option>
-                        <option value="last7days">7 ngày gần nhất</option>
-                        <option value="last15days">15 ngày gần nhất</option>
-                        <option value="last30days">30 ngày gần nhất</option>
-                        <option value="alltime">Tất cả các ngày</option>
-                    </select>
-                </div>
-
-                <div class="controls">
-                    <button id="generate-report" class="primary-btn control">Tạo báo cáo</button>
-                    <button id="export-report" class="secondary-btn control">Xuất báo cáo</button>
-                </div>
+    <div class="report-results">
+        <div class="report-summary">
+            <div class="summary-card">
+                <div class="summary-title">Số lượng suất chiếu</div>
+                <div class="summary-value" id="total-showtimes">0</div>
             </div>
-
-            <div class="report-results">
-                <div class="report-summary">
-                    <div class="summary-card">
-                        <div class="summary-title">Tổng vé bán ra</div>
-                        <div class="summary-value" id="total-tickets">0</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-title">Tổng doanh thu</div>
-                        <div class="summary-value" id="total-revenue">0 VND</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-title">Tổng vé đã bán</div>
-                        <div class="summary-value" id="total-views">0</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-title">Suất chiếu</div>
-                        <div class="summary-value" id="total-showtimes">0</div>
-                    </div>
-                </div>
-
-                <div class="chart-container" style="height: calc(100vh - 402px);">
-                    <canvas id="revenue-chart"></canvas>
-                </div>
-
-                <div class="data-table-container" style="height: calc(100vh - 395px);">
-                    <h3 id="table-title">Chi tiết báo cáo</h3>
-                    <table id="report-table" class="display">
-                        <thead>
-                        <tr id="report-table-header">
-                            <th>#</th>
-                            <th>Tên</th>
-                            <th>Số vé</th>
-                            <th>Doanh thu</th>
-                            <th>Tỷ lệ</th>
-                        </tr>
-                        </thead>
-                        <tbody id="report-table-body"></tbody>
-                    </table>
-                </div>
+            <div class="summary-card">
+                <div class="summary-title">Tổng vé bán ra</div>
+                <div class="summary-value" id="total-tickets">0</div>
             </div>
+            <div class="summary-card">
+                <div class="summary-title">Tổng vé đã bán</div>
+                <div class="summary-value" id="total-views">0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Tổng doanh thu</div>
+                <div class="summary-value" id="total-revenue">0 VND</div>
+            </div>
+        </div>
+
+        <div class="chart-container" style="height: calc(100vh - 402px);">
+            <canvas id="revenue-chart"></canvas>
+        </div>
+
+        <div class="data-table-container" style="height: calc(100vh - 395px);">
+            <h3 id="table-title">Chi tiết báo cáo</h3>
+            <table id="report-table" class="display">
+                <thead>
+                <tr id="report-table-header">
+                    <th>#</th>
+                    <th>Tên</th>
+                    <th>Số vé</th>
+                    <th>Doanh thu</th>
+                    <th>Tỷ lệ</th>
+                </tr>
+                </thead>
+                <tbody id="report-table-body"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -554,11 +484,9 @@
                 updateReportDisplay(response.data, reportType);
             } else {
                 console.error('Không thể tạo báo cáo:', response.message);
-                alert('Không thể tạo báo cáo: ' + response.message);
             }
         } catch (error) {
             console.error('Lỗi khi tạo báo cáo:', error);
-            alert('Lỗi khi tạo báo cáo');
         }
     }
 
@@ -569,7 +497,6 @@
         document.getElementById('total-showtimes').textContent = data.totalShowtimes.toLocaleString();
 
         updateChart(data.chartData);
-
         // updateTable(data.tableData, reportType);
     }
 
@@ -748,7 +675,6 @@
             };
         }
         updateReportStructure();
+        await generateReport();
     });
 </script>
-</body>
-</html>

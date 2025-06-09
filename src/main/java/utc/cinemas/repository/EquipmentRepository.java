@@ -7,6 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import utc.cinemas.model.entity.Equipment;
 
 public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
-    @Query("SELECT e FROM Equipment e WHERE (e.equipmentName LIKE :search OR e.description LIKE :search) AND (:equipmentType = '-1' OR e.equipmentType = :equipmentType) AND e.display = 1")
-    Page<Equipment> findAll(String search, String equipmentType, Pageable pageable);
+    @Query("SELECT e FROM Equipment e " +
+            "LEFT JOIN Room r ON e.roomId = r.id " +
+            "LEFT JOIN Cinema c ON r.cinemaId = c.id " +
+            "WHERE (e.equipmentName LIKE :search OR e.description LIKE :search) " +
+            "AND (:cinemaId = -1 OR c.id = :cinemaId) " +
+            "AND (:roomId = -1 OR e.roomId = :roomId) " +
+            "AND e.display = 1")
+    Page<Equipment> findAll(String search, Long cinemaId, Long roomId, Pageable pageable);
 }

@@ -27,8 +27,8 @@ public class ProductServiceImpl implements ProductService {
     public Response getListOfProducts(Map<String, String> filters) {
         try {
             String search = Utils.getSearch(filters);
-            String productType = JsonUtils.convert(filters.get("productType"), String.class);
-            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> productRepository.findAll(search, productType, pageable));
+            Long cinemaId = JsonUtils.convert(filters.get("cinemaId"), Long.class);
+            Map<String, Object> result = DatabaseUtils.getList(filters, pageable -> productRepository.findAll(search, cinemaId, pageable));
             return Utils.createResponse(ResponseCode.SUCCESS, result);
         } catch (Exception e) {
             log.error("Error fetching products: {}", e.getMessage());

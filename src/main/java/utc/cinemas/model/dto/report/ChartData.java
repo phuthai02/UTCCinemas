@@ -1,4 +1,4 @@
-package utc.cinemas.model.dto;
+package utc.cinemas.model.dto.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

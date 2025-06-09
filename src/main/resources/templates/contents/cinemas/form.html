@@ -49,7 +49,7 @@
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="directorSearch">Giám đốc cơ sở <span class="required">*</span></label>
+                    <label for="directorSearch">Giám đốc chi nhánh <span class="required">*</span></label>
                     <div class="autocomplete-container">
                         <input type="text" id="directorSearch" placeholder="Nhập tên giám đốc để tìm kiếm..." autocomplete="off">
                         <div class="autocomplete-dropdown" id="directorDropdown"></div>
@@ -57,15 +57,6 @@
                         <input type="hidden" id="cinemaDirector" name="cinemaDirector">
                         <div class="error-message" id="cinemaDirector-error"></div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="status">Trạng thái <span class="required">*</span></label>
-                    <select id="status" name="status">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Dừng hoạt động</option>
-                        <option value="1" selected>Đang hoạt động</option>
-                    </select>
-                    <div class="error-message" id="status-error"></div>
                 </div>
             </div>
             <div class="form-actions">
@@ -83,28 +74,42 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         initializePage();
-        loadCinemaDirectors();
-        setupDirectorAutocomplete();
         document.getElementById('cinemaForm').addEventListener('submit', handleFormSubmit);
     });
+
+    function initializePage() {
+        setupDirectorAutocomplete();
+        checkForEditMode();
+        loadCinemaDirectors();
+    }
 
     function checkForEditMode() {
         const urlParams = new URLSearchParams(window.location.search);
         const cinemaId = urlParams.get('id');
 
+        console.log('URL params:', urlParams.toString());
+        console.log('Cinema ID from URL:', cinemaId);
+
         if (cinemaId) {
             isEditMode = true;
             document.getElementById('pageTitle').textContent = 'Chỉnh sửa chi nhánh';
             document.getElementById('saveBtn').textContent = 'Cập nhật chi nhánh';
+            document.getElementById('cinemaId').value = cinemaId;
+            console.log('Edit mode activated, cinemaId set:', cinemaId);
             loadCinemaDetails(cinemaId);
+        } else {
+            console.log('Add mode activated');
         }
     }
 
     async function loadCinemaDetails(cinemaId) {
         try {
+            console.log('Loading cinema details for ID:', cinemaId);
             const response = await httpRequest(`/api/admin/cinemas/${cinemaId}`, {
                 method: 'GET'
             });
+
+            console.log('Cinema details response:', response);
 
             if (response.code === 1 && response.data) {
                 populateForm(response.data);
@@ -119,35 +124,55 @@
     }
 
     function populateForm(cinema) {
+        console.log('Populating form with cinema data:', cinema);
+
         document.getElementById('cinemaId').value = cinema.id;
-        document.getElementById('name').value = cinema.name;
-        document.getElementById('location').value = cinema.location;
-        document.getElementById('phoneNumber').value = cinema.phoneNumber;
-        document.getElementById('email').value = cinema.email;
-        document.getElementById('openingTime').value = cinema.openingTime;
-        document.getElementById('closingTime').value = cinema.closingTime;
-        document.getElementById('status').value = cinema.status;
+        document.getElementById('name').value = cinema.name || '';
+        document.getElementById('location').value = cinema.location || '';
+        document.getElementById('phoneNumber').value = cinema.phoneNumber || '';
+        document.getElementById('email').value = cinema.email || '';
+        document.getElementById('openingTime').value = cinema.openingTime || '';
+        document.getElementById('closingTime').value = cinema.closingTime || '';
 
         if (cinema.cinemaDirector) {
             document.getElementById('cinemaDirector').value = cinema.cinemaDirector;
-            const director = directorsData.find(d => d.id === cinema.cinemaDirector);
+            console.log('Cinema director ID set:', cinema.cinemaDirector);
+
+            updateDirectorDisplay(cinema.cinemaDirector);
+        }
+    }
+
+    function updateDirectorDisplay(directorId) {
+        if (directorsData.length > 0) {
+            const director = directorsData.find(d => d.id == directorId);
             if (director) {
                 const selectedDisplay = document.getElementById('selectedDirector');
                 selectedDisplay.textContent = `Đã chọn: ${director.name}`;
                 selectedDisplay.classList.add('show');
+                console.log('Director display updated:', director.name);
             }
+        } else {
+            console.log('Directors data not loaded yet, will update later');
         }
     }
 
     async function loadCinemaDirectors() {
         try {
+            console.log('Loading cinema directors...');
             const response = await httpRequest('/api/admin/users/get-all', {
                 method: 'GET'
             });
 
+            console.log('Directors response:', response);
+
             if (response.code === 1 && response.data) {
                 directorsData = response.data;
-                checkForEditMode();
+                console.log('Directors loaded:', directorsData.length, 'items');
+
+                const currentDirectorId = document.getElementById('cinemaDirector').value;
+                if (currentDirectorId) {
+                    updateDirectorDisplay(currentDirectorId);
+                }
             } else {
                 console.error('Không thể tải danh sách người dùng:', response.message);
             }
@@ -230,13 +255,20 @@
         selectedDisplay.classList.add('show');
 
         document.getElementById('cinemaDirector-error').textContent = '';
+        console.log('Director selected:', director.name, 'ID:', director.id);
     }
 
     async function handleFormSubmit(event) {
         event.preventDefault();
+        console.log('Form submitted, isEditMode:', isEditMode);
+
         clearErrorMessages();
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            console.log('Form validation failed');
+            return;
+        }
+
         await submitFormData();
     }
 
@@ -251,7 +283,7 @@
             {
                 id: 'phoneNumber',
                 validation: value => value.trim() !== '' && /^\d{10,15}$/.test(value.trim()),
-                message: 'Vui lòng nhập số điện thoại hợp lệ'
+                message: 'Vui lòng nhập số điện thoại hợp lệ (10-15 chữ số)'
             },
             {
                 id: 'email',
@@ -260,8 +292,7 @@
             },
             {id: 'openingTime', validation: value => value !== '', message: 'Vui lòng chọn giờ mở cửa'},
             {id: 'closingTime', validation: value => value !== '', message: 'Vui lòng chọn giờ đóng cửa'},
-            {id: 'cinemaDirector', validation: value => value !== '', message: 'Vui lòng chọn giám đốc cơ sở'},
-            {id: 'status', validation: value => value !== '', message: 'Vui lòng chọn trạng thái'}
+            {id: 'cinemaDirector', validation: value => value !== '', message: 'Vui lòng chọn giám đốc chi nhánh'},
         ];
 
         let isValid = true;
@@ -273,38 +304,48 @@
             if (!rule.validation(field.value)) {
                 errorElement.textContent = rule.message;
                 isValid = false;
+                console.log('Validation failed for field:', rule.id);
             }
         });
 
+        // Kiểm tra thời gian mở cửa và đóng cửa
         const openingTime = document.getElementById('openingTime').value;
         const closingTime = document.getElementById('closingTime').value;
 
         if (openingTime && closingTime && openingTime >= closingTime) {
             document.getElementById('closingTime-error').textContent = 'Giờ đóng cửa phải sau giờ mở cửa';
             isValid = false;
+            console.log('Time validation failed');
         }
 
+        console.log('Form validation result:', isValid);
         return isValid;
     }
 
     async function submitFormData() {
         const confirmAction = isEditMode ? 'chỉnh sửa' : 'thêm mới';
         const itemType = 'chi nhánh';
+
         showModal('confirm', 'Xác nhận thao tác', `Bạn có chắc chắn muốn ${confirmAction} ${itemType} này không?`, null, async (result) => {
             if (result) {
                 try {
                     const formData = getFormData();
+                    console.log('Submitting form data:', formData);
+
                     const endpoint = isEditMode
                         ? `/api/admin/cinemas/update`
                         : '/api/admin/cinemas/create';
 
                     const method = isEditMode ? 'PUT' : 'POST';
 
+                    console.log('API call:', method, endpoint);
+
                     const response = await httpRequest(endpoint, {
                         method: method,
                         body: JSON.stringify(formData)
                     });
 
+                    console.log('API response:', response);
                     handleApiResponse(response);
                 } catch (error) {
                     console.error('Lỗi khi gửi yêu cầu:', error);
@@ -323,18 +364,21 @@
             openingTime: document.getElementById('openingTime').value,
             closingTime: document.getElementById('closingTime').value,
             cinemaDirector: document.getElementById('cinemaDirector').value,
-            status: document.getElementById('status').value
         };
 
         const cinemaId = document.getElementById('cinemaId').value;
         if (cinemaId) {
             data.id = cinemaId;
+            console.log('Including cinema ID in form data:', cinemaId);
         }
 
+        console.log('Form data prepared:', data);
         return data;
     }
 
     function handleApiResponse(response) {
+        console.log('Handling API response:', response);
+
         if (response.code === 1) {
             const actionText = isEditMode ? 'cập nhật' : 'thêm mới';
             showModal('success', 'Thành công!', response.message, '/utc-cinemas/cinemas');

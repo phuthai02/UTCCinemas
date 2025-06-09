@@ -45,12 +45,13 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="cinemaId">Chi nhánh <span class="required">*</span></label>
-                    <select id="cinemaId" name="cinemaId">
-                        <option value="">Chọn chi nhánh</option>
-                    </select>
+            <div class="form-group">
+                <label for="cinemaSearch">Chi nhánh <span class="required">*</span></label>
+                <div class="autocomplete-container">
+                    <input type="text" id="cinemaSearch" placeholder="Nhập tên chi nhánh để tìm kiếm..." autocomplete="off">
+                    <div class="autocomplete-dropdown" id="cinemaDropdown"></div>
+                    <div class="selected-cinema" id="selectedCinema"></div>
+                    <input type="hidden" id="cinemaId" name="cinemaId">
                     <div class="error-message" id="cinemaId-error"></div>
                 </div>
             </div>
@@ -63,27 +64,6 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="status">Trạng thái <span class="required">*</span></label>
-                    <select id="status" name="status">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Dừng hoạt động</option>
-                        <option value="1" selected>Đang hoạt động</option>
-                    </select>
-                    <div class="error-message" id="status-error"></div>
-                </div>
-                <div class="form-group">
-                    <label for="display">Hiển thị <span class="required">*</span></label>
-                    <select id="display" name="display">
-                        <option value="">Chọn hiển thị</option>
-                        <option value="0">Ẩn</option>
-                        <option value="1" selected>Hiển thị</option>
-                    </select>
-                    <div class="error-message" id="display-error"></div>
-                </div>
-            </div>
-
             <div class="form-actions">
                 <button type="button" id="cancelBtn" onclick="navigateTo('/utc-cinemas/products')">Hủy bỏ</button>
                 <button type="submit" id="saveBtn">Lưu sản phẩm</button>
@@ -93,16 +73,17 @@
 </div>
 
 <script>
+    let cinemasData = [];
     let isEditMode = false;
 
     document.addEventListener('DOMContentLoaded', function () {
         initializePage();
         loadCinemas();
-        loadProductTypes();
         document.getElementById('productForm').addEventListener('submit', handleFormSubmit);
     });
 
     function initializePage() {
+        setupCinemaAutocomplete();
         checkForEditMode();
     }
 
@@ -120,24 +101,119 @@
 
     async function loadCinemas() {
         try {
+            console.log('Loading cinemas...');
             const response = await httpRequest('/api/admin/cinemas/get-all', {
                 method: 'GET'
             });
 
-            const selectElement = document.getElementById('cinemaId');
+            console.log('Cinemas response:', response);
+
             if (response.code === 1 && response.data) {
-                response.data.forEach(cinema => {
-                    const option = document.createElement('option');
-                    option.value = cinema.id;
-                    option.textContent = cinema.name;
-                    selectElement.appendChild(option);
-                });
+                cinemasData = response.data;
+                console.log('Cinemas loaded:', cinemasData.length, 'items');
+
+                // Nếu đang ở chế độ edit và đã có cinemaId, cập nhật hiển thị
+                const currentCinemaId = document.getElementById('cinemaId').value;
+                if (currentCinemaId) {
+                    updateCinemaDisplay(currentCinemaId);
+                }
             } else {
                 console.error('Không thể tải danh sách chi nhánh:', response.message);
             }
         } catch (error) {
             console.error('Lỗi khi tải danh sách chi nhánh:', error);
         }
+    }
+
+    function updateCinemaDisplay(cinemaId) {
+        if (cinemasData.length > 0) {
+            const cinema = cinemasData.find(c => c.id == cinemaId);
+            if (cinema) {
+                const selectedDisplay = document.getElementById('selectedCinema');
+                selectedDisplay.textContent = `Đã chọn: ${cinema.name}`;
+                selectedDisplay.classList.add('show');
+                console.log('Cinema display updated:', cinema.name);
+            }
+        } else {
+            console.log('Cinemas data not loaded yet, will update later');
+        }
+    }
+
+    function setupCinemaAutocomplete() {
+        const searchInput = document.getElementById('cinemaSearch');
+        const dropdown = document.getElementById('cinemaDropdown');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterCinemas(searchTerm);
+        });
+
+        searchInput.addEventListener('focus', function () {
+            if (cinemasData.length > 0) {
+                filterCinemas(this.value.toLowerCase());
+            }
+        });
+
+        selectedDisplay.addEventListener('click', function () {
+            document.getElementById('cinemaId').value = '';
+            selectedDisplay.textContent = '';
+            selectedDisplay.classList.remove('show');
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target) && !selectedDisplay.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    function filterCinemas(searchTerm) {
+        const dropdown = document.getElementById('cinemaDropdown');
+        dropdown.innerHTML = '';
+
+        if (!cinemasData.length) return;
+
+        const filteredCinemas = cinemasData.filter(cinema => {
+            const cinemaName = (cinema.name || '').toLowerCase();
+            return cinemaName.includes(searchTerm);
+        });
+
+        if (filteredCinemas.length > 0) {
+            filteredCinemas.forEach(cinema => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.textContent = cinema.name;
+                item.setAttribute('data-id', cinema.id);
+
+                item.addEventListener('click', function () {
+                    selectCinema(cinema);
+                    dropdown.classList.remove('show');
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('show');
+        } else {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    function selectCinema(cinema) {
+        const searchInput = document.getElementById('cinemaSearch');
+        const hiddenInput = document.getElementById('cinemaId');
+        const selectedDisplay = document.getElementById('selectedCinema');
+
+        hiddenInput.value = cinema.id;
+        searchInput.value = '';
+        const cinemaName = cinema.name;
+        selectedDisplay.textContent = `Đã chọn: ${cinemaName}`;
+        selectedDisplay.classList.add('show');
+
+        document.getElementById('cinemaId-error').textContent = '';
+        console.log('Cinema selected:', cinema.name, 'ID:', cinema.id);
     }
 
     async function loadProductDetails(productId) {
@@ -164,10 +240,14 @@
         document.getElementById('productType').value = product.productType || '';
         document.getElementById('price').value = product.price || '';
         document.getElementById('quantity').value = product.quantity || '';
-        document.getElementById('cinemaId').value = product.cinemaId || '';
         document.getElementById('description').value = product.description || '';
-        document.getElementById('status').value = product.status;
-        document.getElementById('display').value = product.display;
+
+        // Cập nhật cinema selection
+        if (product.cinemaId) {
+            document.getElementById('cinemaId').value = product.cinemaId;
+            console.log('Cinema ID set:', product.cinemaId);
+            updateCinemaDisplay(product.cinemaId);
+        }
     }
 
     async function handleFormSubmit(event) {
@@ -208,16 +288,6 @@
                 id: 'cinemaId',
                 validation: value => value !== '',
                 message: 'Vui lòng chọn chi nhánh'
-            },
-            {
-                id: 'status',
-                validation: value => value !== '',
-                message: 'Vui lòng chọn trạng thái'
-            },
-            {
-                id: 'display',
-                validation: value => value !== '',
-                message: 'Vui lòng chọn hiển thị'
             }
         ];
 
@@ -270,9 +340,7 @@
             price: parseInt(document.getElementById('price').value),
             quantity: parseInt(document.getElementById('quantity').value),
             cinemaId: parseInt(document.getElementById('cinemaId').value),
-            description: document.getElementById('description').value.trim(),
-            status: parseInt(document.getElementById('status').value),
-            display: parseInt(document.getElementById('display').value)
+            description: document.getElementById('description').value.trim()
         };
 
         const productId = document.getElementById('productId').value;
